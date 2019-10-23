@@ -1,0 +1,30 @@
+# python native modules
+
+# third-party modules
+
+# AFM project modules
+from Filters.Filters import *
+
+
+class BandPass(Filter):
+    def __init__(self):
+        super().__init__(FilterTypes.BandPass)
+        """ Load BandPass requirements for future usage """
+        self.requirements = {TemplateInfo.Aa: None,
+                             TemplateInfo.Ap: None,
+                             TemplateInfo.fa_: None,  # fa+
+                             TemplateInfo.fa__: None,  # fa-
+                             TemplateInfo.fp_: None,  # fp+
+                             TemplateInfo.fp__: None}  # fp-
+
+    def validate_requirements(self) -> bool:
+        for each in self.requirements:
+            if self.requirements[each] is None:
+                return False  # Check if every spec was loaded
+
+        if self.requirements[TemplateInfo.Aa] > self.requirements[TemplateInfo.Ap]:
+            if self.requirements[TemplateInfo.fa] > self.requirements[TemplateInfo.fp]:
+                return True
+
+        """ If there is something wrong in the attenuations or frequencies I return False"""
+        return False

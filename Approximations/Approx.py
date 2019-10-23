@@ -11,10 +11,10 @@ Approximation base class
 
 class Approximation(object):
 
-    def __init__(self):
+    def __init__(self, name):
         """ Useful to add in the GUI """
-        self.name = ""  # The name of the approximation
-        self.requirements = {}  # A dictionary with the parameters needed
+        self.name = name  # The name of the approximation
+        self.application = []  # Approximation's filter type application
 
         """ Useful for internal working """
         self.poles = []
@@ -30,6 +30,9 @@ class Approximation(object):
         """
         return: signal.lti object
         """
+        pass
+
+    def load_information(self, filter_type, specs):
         pass
 
     """ Search more useful functions to add """
