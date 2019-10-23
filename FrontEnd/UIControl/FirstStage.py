@@ -11,4 +11,4 @@ class FirstStage(QMainWindow):
         QMainWindow.__init__(self)
         loadUi('FrontEnd/UIs/firststage.ui', self)
         self.setWindowTitle("Instrument Automation")
-        self.show()  
+        self.show()
