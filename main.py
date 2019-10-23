@@ -1,12 +1,13 @@
-from scipy import signal
-import matplotlib.pyplot as plt
-import numpy as np
+from PyQt5 import QtWidgets
+
+
+from FrontEnd.UIManager import UIManager
 
 """
 dictionary = {"A": 0, "B": 1, "C": 2}
 for key in dictionary:
     print(key, " : ", dictionary[key])
-"""
+
 N, Wn = signal.cheb2ord(1, 10, 3, 40, analog=True)
 b, a = signal.cheby2(2, 40, Wn, 'low', analog=True)
 w, h = signal.freqs(b, a)
@@ -27,3 +28,15 @@ plt.axvline(10, color='blue')  # cutoff frequency
 plt.axhline(-3, color='blue')  # rs
 plt.axis([1, 500, -80, 3])
 plt.show()
+
+"""
+
+def start():
+    app = QtWidgets.QApplication([])
+    uiMan = UIManager()
+    uiMan.begin()
+    app.exec()
+
+
+if __name__ == "__main__":
+    start()
