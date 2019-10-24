@@ -6,11 +6,13 @@ Approximation base class
 
 # third-party modules
 from sympy import *
+from scipy import signal
 
 # AFM project modules
 from Approximations.Approx import Approximation
 from Filters.Filters import FilterTypes
 from Filters.Filters import TemplateInfo
+from Filters.Filters import Filter
 
 
 class Butterwoth(Approximation):
@@ -20,20 +22,24 @@ class Butterwoth(Approximation):
         self.application = [FilterTypes.HighPass, FilterTypes.LowPass, FilterTypes.BandPass, FilterTypes.BandReject]
         self.information = {}
 
-    def load_information(self, filter_type, specs):
+    def load_information(self, filter_in_use: Filter):
 
-        if filter_type not in self.application:
-            print("Something done wrong, this approximation is not valid for ", filter_type)
+        if filter_in_use.get_type() not in self.application:
+            print("Something done wrong, Butterworth is not valid for ", filter_in_use.get_type())
             return False
 
-        if filter_type is FilterTypes.LowPass:
-            try:
-                self.information[TemplateInfo.Aa] = specs[TemplateInfo.Aa]
-                self.information[TemplateInfo.Ap] = specs[TemplateInfo.Ap]
-                self.information[TemplateInfo.fa] = specs[TemplateInfo.fa]
-                self.information[TemplateInfo.fp] = specs[TemplateInfo.fp]
-            except Exception:
-                print("Not enough information or wrong loaded")
-                return False
+        specs = filter_in_use.get_requirements()
+        for each in specs:
+            self.information[each] = filter_in_use.get_req_value(each)
+        return True
 
-            pass
+    def calculate(self, filter_in_use: Filter):
+        if filter_in_use.get_type() is FilterTypes.LowPass:
+            """ If the approximation support the filter I continue """
+            """ Then using buttlord I get the order and the frequency for the -3dB point"""
+            n, w = signal.buttord(self.information[TemplateInfo.fp], self.information[TemplateInfo.fa],
+                                  self.information[TemplateInfo.Ap], self.information[TemplateInfo.Aa],
+                                  analog=True)
+            """ After getting the order I get the zeros, poles and gain of the filter """
+            z_d, p_d, k_d = signal.butter(n, w, analog=True, output='zpk')  # Desnormalizado
+            z_n, p_n, k_n = signal.buttap(n)  # Normalizado

@@ -7,6 +7,7 @@ Approximation base class
 # third-party modules
 
 # AFM project modules
+from Filters.Filters import Filter
 
 
 class Approximation(object):
@@ -32,7 +33,7 @@ class Approximation(object):
         """
         pass
 
-    def load_information(self, filter_type, specs):
+    def load_information(self, filter_in_use: Filter):
         pass
 
     """ Search more useful functions to add """
