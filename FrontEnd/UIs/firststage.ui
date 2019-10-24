@@ -1,0 +1,470 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1098</width>
+    <height>722</height>
+   </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">background-color:rgb(40, 55, 57);</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
+   <widget class="QWidget" name="horizontalLayoutWidget">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>0</y>
+      <width>1101</width>
+      <height>711</height>
+     </rect>
+    </property>
+    <layout class="QHBoxLayout" name="horizontalLayout" stretch="20,80">
+     <property name="sizeConstraint">
+      <enum>QLayout::SetDefaultConstraint</enum>
+     </property>
+     <item>
+      <layout class="QVBoxLayout" name="verticalLayout_2" stretch="20,5,8,2,5,8,2,5,8,0,2,8,20">
+       <property name="spacing">
+        <number>7</number>
+       </property>
+       <property name="leftMargin">
+        <number>20</number>
+       </property>
+       <property name="rightMargin">
+        <number>5</number>
+       </property>
+       <item>
+        <spacer name="verticalSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeType">
+          <enum>QSizePolicy::Expanding</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <widget class="QLabel" name="label_4">
+         <property name="styleSheet">
+          <string notr="true">font: 63 10pt &quot;Open Sans Semibold&quot;;
+color:rgb(255, 255, 255);
+</string>
+         </property>
+         <property name="text">
+          <string>TIPO DE FILTRO</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QComboBox" name="comboFilter">
+         <property name="styleSheet">
+          <string notr="true">font: 63 7pt &quot;Open Sans Semibold&quot;;
+color:rgb(255, 255, 255);
+</string>
+         </property>
+         <item>
+          <property name="text">
+           <string>Pasa-bajos</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Pasa-altos</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Pasa-banda</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Rechaza-banda</string>
+          </property>
+         </item>
+        </widget>
+       </item>
+       <item>
+        <spacer name="verticalSpacer_3">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <widget class="QLabel" name="label">
+         <property name="styleSheet">
+          <string notr="true">font: 63 10pt &quot;Open Sans Semibold&quot;;
+color:rgb(255, 255, 255);
+
+</string>
+         </property>
+         <property name="text">
+          <string>APROXIMACIÓN</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QComboBox" name="comboAprox">
+         <property name="styleSheet">
+          <string notr="true">font: 63 7pt &quot;Open Sans Semibold&quot;;
+color:rgb(255, 255, 255);
+</string>
+         </property>
+         <item>
+          <property name="text">
+           <string>Chevyshev</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Chevyshev inverso</string>
+          </property>
+         </item>
+        </widget>
+       </item>
+       <item>
+        <spacer name="verticalSpacer_4">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <widget class="QLabel" name="label_5">
+         <property name="styleSheet">
+          <string notr="true">font: 63 10pt &quot;Open Sans Semibold&quot;;
+color:rgb(255, 255, 255);
+
+</string>
+         </property>
+         <property name="text">
+          <string>RANGO DE DESNORMALIZACIÓN</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QSlider" name="sliderRange">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="maximum">
+          <number>100</number>
+         </property>
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="sliderValue">
+         <property name="styleSheet">
+          <string notr="true">font: 63 7pt &quot;Open Sans Semibold&quot;;
+color:rgb(255, 255, 255);
+
+</string>
+         </property>
+         <property name="text">
+          <string>0</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="verticalSpacer_5">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <widget class="QPushButton" name="graphButton">
+         <property name="styleSheet">
+          <string notr="true">font: 63 10pt &quot;Open Sans Semibold&quot;;
+color:rgb(255, 255, 255);
+
+</string>
+         </property>
+         <property name="text">
+          <string>GRAFICAR</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="verticalSpacer_2">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QVBoxLayout" name="verticalLayout" stretch="3,5,5,82,3">
+       <property name="spacing">
+        <number>0</number>
+       </property>
+       <property name="sizeConstraint">
+        <enum>QLayout::SetMinimumSize</enum>
+       </property>
+       <item>
+        <spacer name="verticalSpacer_7">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeType">
+          <enum>QSizePolicy::Preferred</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="40,20,40">
+         <property name="sizeConstraint">
+          <enum>QLayout::SetDefaultConstraint</enum>
+         </property>
+         <item>
+          <spacer name="horizontalSpacer_2">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeType">
+            <enum>QSizePolicy::Expanding</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QComboBox" name="comboGraph">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">font: 63 7pt &quot;Open Sans Semibold&quot;;
+color:rgb(255, 255, 255);
+</string>
+           </property>
+           <item>
+            <property name="text">
+             <string>Curvas de atenuación</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Fase</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Retardo de grupo</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Máximo Q</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Respuesta al impulso</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Respuesta al escalón</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Diagrama de polos y ceros</string>
+            </property>
+           </item>
+          </widget>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeType">
+            <enum>QSizePolicy::Expanding</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <spacer name="verticalSpacer_8">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="8,86,6">
+         <property name="spacing">
+          <number>0</number>
+         </property>
+         <property name="sizeConstraint">
+          <enum>QLayout::SetNoConstraint</enum>
+         </property>
+         <item>
+          <spacer name="horizontalSpacer_4">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="GraphWidget" name="graphWidget" native="true">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer_3">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <spacer name="verticalSpacer_6">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeType">
+          <enum>QSizePolicy::Preferred</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </item>
+    </layout>
+   </widget>
+  </widget>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>GraphWidget</class>
+   <extends>QWidget</extends>
+   <header location="global">FrontEnd/UIs/graphwidget.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>

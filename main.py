@@ -36,17 +36,14 @@ plt.axhline(-3, color='blue')  # rs
 plt.axis([1, 500, -80, 3])
 plt.show()
 
-z, p, k = signal.buttap(N)
-w, h = signal.freqs_zpk(z, p, k)
+"""
 
-plt.semilogx(w, 20 * np.log10(abs(h)))
-plt.title('Butterworth frequency response (rs=40)')
-plt.xlabel('Frequency [radians / second]')
-plt.ylabel('Amplitude [dB]')
-plt.margins(0, 0.1)
-plt.grid(which='both', axis='both')
-plt.axvline(10, color='green')  # cutoff frequency
-plt.axhline(-40, color='green')  # rs
-plt.axvline(1, color='blue')  # cutoff frequency
-plt.axhline(-3, color='blue')  # rs
-plt.show()
+def start():
+    app = QtWidgets.QApplication([])
+    uiMan = UIManager()
+    uiMan.begin()
+    app.exec()
+
+
+if __name__ == "__main__":
+    start()
