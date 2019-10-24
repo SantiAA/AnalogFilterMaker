@@ -17,6 +17,8 @@ class FirstStage(QMainWindow):
         self.sliderRange.valueChanged.connect(self.slider_changed)
         self.comboGraph.currentIndexChanged.connect(self.graph)
         self.graph_widget = self.graphWidget  # GraphWidget instance.
+        #self.combo = QComboBox()
+        #self.configurationlayout.addWidget(self.combo)
 
     def graph(self):
         self.graph_widget.canvas.axes.clear()
