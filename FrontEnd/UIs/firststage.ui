@@ -43,7 +43,7 @@
       <enum>QLayout::SetDefaultConstraint</enum>
      </property>
      <item>
-      <layout class="QVBoxLayout" name="verticalLayout_2" stretch="20,5,8,2,5,8,2,5,8,0,2,8,20">
+      <layout class="QVBoxLayout" name="configurationlayout" stretch="20,5,8,2,5,8,2,5,8,0,2,8,20">
        <property name="spacing">
         <number>7</number>
        </property>
