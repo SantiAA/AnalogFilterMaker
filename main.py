@@ -1,12 +1,13 @@
 from scipy import signal
 import matplotlib.pyplot as plt
 import numpy as np
-
+from PyQt5 import QtWidgets
+from FrontEnd.UIManager import UIManager
 """
 dictionary = {"A": 0, "B": 1, "C": 2}
 for key in dictionary:
     print(key, " : ", dictionary[key])
-"""
+
 N, Wn = signal.buttord(10, 100, 3, 40, analog=True)
 z, p, k = signal.butter(N, Wn, 'low', analog=True, output='zpk')
 w, h = signal.freqs_zpk(z, p, k)
@@ -38,6 +39,7 @@ plt.show()
 
 """
 
+
 def start():
     app = QtWidgets.QApplication([])
     uiMan = UIManager()
@@ -48,4 +50,3 @@ def start():
 if __name__ == "__main__":
     start()
 
-"""
