@@ -41,5 +41,26 @@ class Butterwoth(Approximation):
                                   self.information[TemplateInfo.Ap], self.information[TemplateInfo.Aa],
                                   analog=True)
             """ After getting the order I get the zeros, poles and gain of the filter """
-            z_d, p_d, k_d = signal.butter(n, w, analog=True, output='zpk')  # Desnormalizado
-            z_n, p_n, k_n = signal.buttap(n)  # Normalizado
+            z, p, k = signal.butter(n, w, analog=True, output='zpk')  # Desnormalizado
+            filter_in_use.load_z_p_k(z, p, k)
+
+        elif filter_in_use.get_type() is FilterTypes.HighPass:
+            n, w = signal.buttord(self.information[TemplateInfo.fp], self.information[TemplateInfo.fa],
+                                  self.information[TemplateInfo.Ap], self.information[TemplateInfo.Aa],
+                                  analog=True, )
+            z, p, k = signal.butter(n, w, analog=True, output='zpk')  # Desnormalizado
+            filter_in_use.load_z_p_k(z, p, k)
+
+        elif filter_in_use.get_type() is FilterTypes.BandPass:
+            n, w = signal.buttord(self.information[TemplateInfo.fp], self.information[TemplateInfo.fa],
+                                  self.information[TemplateInfo.Ap], self.information[TemplateInfo.Aa],
+                                  analog=True)
+            z, p, k = signal.butter(n, w, analog=True, output='zpk')  # Desnormalizado
+            filter_in_use.load_z_p_k(z, p, k)
+
+        elif filter_in_use.get_type() is FilterTypes.BandReject:
+            n, w = signal.buttord(self.information[TemplateInfo.fp], self.information[TemplateInfo.fa],
+                                  self.information[TemplateInfo.Ap], self.information[TemplateInfo.Aa],
+                                  analog=True)
+            z, p, k = signal.butter(n, w, analog=True, output='zpk')  # Desnormalizado
+            filter_in_use.load_z_p_k(z, p, k)
