@@ -24,7 +24,9 @@ class TemplateInfo(Enum):
     fa__ = "fa-"
     fp_ = "fp+"
     fp__ = "fp-"
-    k = "Gain"
+    gd = "Group delay"
+    ft = "ft"
+    tol = "Tolerance"
 
 
 class Filter(object):
