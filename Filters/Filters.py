@@ -32,8 +32,14 @@ class Filter(object):
     def __init__(self, filter_type: FilterTypes):
         self.filter = filter_type
         self.requirements = {}
+        self.zeros = []
+        self.poles = []
+        self.gain = None
 
-    def ger_requirements(self):
+    def get_type(self) -> FilterTypes:
+        return self.filter
+
+    def get_requirements(self):
         return [key for key in self.requirements]
 
     def load_requirements(self, specs):
@@ -48,3 +54,11 @@ class Filter(object):
 
     def validate_requirements(self) -> bool:
         pass
+
+    def get_req_value(self, key: TemplateInfo):
+        return self.requirements[key]
+
+    def load_z_p_k(self, z, p, k):
+        self.zeros = z
+        self.poles = p
+        self.gain = k
