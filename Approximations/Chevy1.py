@@ -1,7 +1,3 @@
-"""
-Approximation base class
-"""
-
 # python native modules
 
 # third-party modules
@@ -32,13 +28,49 @@ class ChevyI(Approximation):
             self.information[each] = filter_in_use.get_req_value(each)
         return True
 
-    def calculate(self, filter_in_use: Filter):
+    def calculate(self, filter_in_use: Filter, n_max=20):
+        """ Be careful this function doesn't care of Q !!! """
+        w = None
+        n = 0
+        type_ = ""
         if filter_in_use.get_type() is FilterTypes.LowPass:
             """ If the approximation support the filter I continue """
-            """ Then using buttlord I get the order and the frequency for the -3dB point"""
+            type_ = "low"
+            """ Then using cheb1ord I get the order and the frequency for the -3dB point"""
             n, w = signal.cheb1ord(self.information[TemplateInfo.fp], self.information[TemplateInfo.fa],
-                                  self.information[TemplateInfo.Ap], self.information[TemplateInfo.Aa],
-                                  analog=True)
-            """ After getting the order I get the zeros, poles and gain of the filter """
-            z, p, k = signal.butter(n, w, analog=True, output='zpk')  # Desnormalizado
-            filter_in_use.load_z_p_k(z, p, k)
+                                   self.information[TemplateInfo.Ap], self.information[TemplateInfo.Aa],
+                                   analog=True)
+            """ Now we limit the order of the filter """
+            if n > n_max:
+                n = n_max
+
+        elif filter_in_use.get_type() is FilterTypes.HighPass:
+            n, w = signal.cheb1ord(self.information[TemplateInfo.fp], self.information[TemplateInfo.fa],
+                                   self.information[TemplateInfo.Ap], self.information[TemplateInfo.Aa],
+                                   analog=True)
+
+            if n > n_max:
+                n = n_max
+
+        elif filter_in_use.get_type() is FilterTypes.BandPass:
+            wp = [self.information[TemplateInfo.fp__], self.information[TemplateInfo.fp_]]
+            wa = [self.information[TemplateInfo.fa__], self.information[TemplateInfo.fa_]]
+            n, w = signal.cheb1ord(wp, wa, self.information[TemplateInfo.Ap], self.information[TemplateInfo.Aa],
+                                   analog=True)
+
+            if n > n_max:
+                n = n_max
+
+        elif filter_in_use.get_type() is FilterTypes.BandReject:
+            wp = [self.information[TemplateInfo.fp__], self.information[TemplateInfo.fp_]]
+            wa = [self.information[TemplateInfo.fa__], self.information[TemplateInfo.fa_]]
+            n, w = signal.cheb1ord(wp, wa, self.information[TemplateInfo.Ap], self.information[TemplateInfo.Aa],
+                                   analog=True)
+
+            if n > n_max:
+                n = n_max
+
+        """ After getting the order I get the zeros, poles and gain of the filter """
+        z, p, k = signal.cheby1(n, w, self.information[TemplateInfo.Ap], analog=True, output='zpk', btype=type_)  # Desnormalizado
+        filter_in_use.load_z_p_k(z, p, k)
+        filter_in_use.load_order(n)

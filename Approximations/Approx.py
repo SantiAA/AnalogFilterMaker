@@ -36,4 +36,6 @@ class Approximation(object):
     def load_information(self, filter_in_use: Filter):
         pass
 
+    def calculate(self, filter_in_use: Filter, n_max=20):
+        pass
     """ Search more useful functions to add """

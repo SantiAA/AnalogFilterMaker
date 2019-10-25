@@ -35,12 +35,19 @@ class Filter(object):
         self.zeros = []
         self.poles = []
         self.gain = None
+        self.order = None
 
     def get_type(self) -> FilterTypes:
         return self.filter
 
     def get_requirements(self):
         return [key for key in self.requirements]
+
+    def get_order(self):
+        return self.order
+
+    def load_order(self, order):
+        self.order = order
 
     def load_requirements(self, specs):
         for each in specs:
