@@ -10,6 +10,6 @@ class HighPassConfig:
                                ParameterLayout("Passband Freq (Fp) [Hz]", DefaultNumberEdit(0, 10000000, 0)),
                                ParameterLayout("Passband Atten. (Ap) [dB]", DefaultNumberEdit(0, 10000000, 0)),
                                ParameterLayout("Stopband Atten. (Aa) [dB]", DefaultNumberEdit(0, 10000000, 0)),
-                               ParameterLayout("Denorm [%]", DefaultSlider(0, 100)),
-                               ParameterLayout("Filter Order", DefaultSlider(0, 10))]
+                               ParameterLayout("Denorm [%]", DefaultSlider(0, 100))
+                              ]
 

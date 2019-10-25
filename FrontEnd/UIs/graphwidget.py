@@ -11,17 +11,16 @@ class GraphWidget(QWidget):
     def __init__(self, parent=None):
         QWidget.__init__(self, parent)
 
-        self.x_label = "Eje X"
-        self.y_label = "Eje Y"
+        self.x_label = "X"
+        self.y_label = "Y"
         self.title = " "
         self.figure = Figure()
         self.canvas = FigureCanvas(self.figure)
-        self.toolbar = NavigationToolbar(self.canvas, self)  # cada gráfico tiene un toolbar con herramientos para
-        # trabajar sobre él
+        self.toolbar = NavigationToolbar(self.canvas, self)  # Toolbar to work on the graphs
         vertical_layout = QVBoxLayout()
 
         vertical_layout.addWidget(self.canvas)
-        vertical_layout.addWidget(self.toolbar)  # Se le agrega el toolbar al widget
+        vertical_layout.addWidget(self.toolbar)  # Adding toolbar to the widget
         #
         self.canvas.axes = self.canvas.figure.add_subplot(111)
 

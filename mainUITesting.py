@@ -1,6 +1,7 @@
 from PyQt5 import QtWidgets
 from FrontEnd.UIManager import UIManager
 
+
 def start():
     app = QtWidgets.QApplication([])
     uiMan = UIManager()
