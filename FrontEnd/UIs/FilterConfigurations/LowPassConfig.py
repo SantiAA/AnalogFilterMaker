@@ -6,5 +6,10 @@ class LowPassConfig:
         self.name = "Low Pass"
         self.template_image = "FrontEnd/UIs/figs/filter_templates/lowpasstemplate.png"
         self.parameter_list = [ParameterLayout("Gain [dB]", DefaultNumberEdit(-10000,10000,2)),
-                               ParameterLayout("Denorm [%]",  DefaultNumberEdit(0,100))]
+        ParameterLayout("Attenuation Freq (Fa) [Hz]", DefaultNumberEdit(0,10000000,0)),
+        ParameterLayout("Passband Freq (Fp) [Hz]", DefaultNumberEdit(0,10000000,0)),
+        ParameterLayout("Passband Atten. (Ap) [dB]", DefaultNumberEdit(0,10000000,0)),
+        ParameterLayout("Stopband Atten. (Aa) [dB]", DefaultNumberEdit(0,10000000,0)),
+                               ParameterLayout("Denorm [%]",  DefaultSlider(0,100))
+                               ]
 
