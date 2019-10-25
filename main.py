@@ -6,13 +6,16 @@ from FrontEnd.UIManager import UIManager
 
 
 
-N, Wn = signal.buttord( [400, 2000], [500, 1000], 3, 40, analog=True)
+N, Wn = signal.buttord( [100, 5000], [500, 1000], 3, 40, analog=True)
 print("N = ", N, " Frecuencias: ", Wn)
 z, p, k = signal.butter(N, Wn, 'stop', analog=True, output='zpk')
-print([0, 0], [-1, -2], 1)
 
 #w, h = signal.lti(z, p, k).bode()
 my = signal.ZerosPolesGain(z, p, k)
+scnd_order = signal.zpk2sos(z, p, k)
+print(z, p, k)
+print("***********")
+print(scnd_order)
 w, h, p = my.bode(n=100000)
 
 plt.semilogx(w, h)
