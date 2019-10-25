@@ -6,8 +6,8 @@ import json
 
 # own modules
 
-from Approximations.PreCalc.gauss import gauss_approximation
-from Approximations.PreCalc.legendre import legendre_approximation
+from Scripts.gauss import gauss_approximation
+from Scripts.legendre import legendre_approximation
 
 
 def calculate_gauss(transfer_calculator: callable, n_max: int, *args):

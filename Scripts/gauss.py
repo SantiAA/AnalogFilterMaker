@@ -1,8 +1,10 @@
 # third-party modules
 from scipy import signal
+from math import factorial
 from numpy import unwrap
 from numpy import diff
 from numpy import log
+from numpy import divide
 import json
 
 
@@ -13,6 +15,7 @@ def calculate_gauss(n_max: int):
         transfer_function = gauss_approximation(i)
         w, mag, phase = transfer_function.bode()
         gd = -diff(unwrap(phase)) / diff(w)
+        gd = divide(gd, gd[0])
         data[str(i)] = {}
         data[str(i)] = {"w": w.tolist(), "|H(jw)[dB]|": mag.tolist(), "Group delay": gd.tolist()}
     json.dump(data, outfile, indent=4)
@@ -42,7 +45,11 @@ def gauss_approximation_denominator(n: int):
     den = []
     gamma = log(2)
     for k in range(n, 1, -1):
-        den.append(gamma**k)
+        den.append(gamma**k/factorial(k))
         den.append(0)
     den.append(1.)
     return den
+
+
+if __name__ == "__main__":
+    calculate_gauss(20)
