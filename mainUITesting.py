@@ -4,8 +4,10 @@ from FrontEnd.UIManager import UIManager
 
 def start():
     app = QtWidgets.QApplication([])
+
     uiMan = UIManager()
     uiMan.begin()
+
     app.exec()
 
 

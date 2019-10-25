@@ -1,5 +1,5 @@
 import copy
-
+import webbrowser
 from PyQt5 import QtGui
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import *
@@ -17,6 +17,7 @@ class FirstStage(QMainWindow):
     def __init__(self, ui_manager):
         self.graph_widget = None
         self.ui_manager = ui_manager
+
         self.filters = {
             "Low Pass": LowPassConfig(),
             "High Pass": HighPassConfig(),
@@ -32,19 +33,31 @@ class FirstStage(QMainWindow):
         QMainWindow.__init__(self)
         loadUi('FrontEnd/UIs/firststageTest.ui', self)
         self.setWindowTitle("Filter Design Tool")
+
         for filter in self.filters:
             self.comboFilter.addItem(filter)
         self.update_filter_type()
         self.show()
         self.maxQSlider.valueChanged.connect(self.maxq_slider_changed)
         self.filterOrderSlider.valueChanged.connect(self.filter_order_slider_changed)
+        self.denormSlider.valueChanged.connect(self.denorm_slider_changed)
         self.addApproxButton.clicked.connect(self.add_approx)
         self.removeApproxButton.clicked.connect(self.remove_approx)
+        self.filterTypeLabel.clicked.connect(self.filter_type_label_clicked)
+        self.approximationLabel.clicked.connect(self.approximation_label_clicked)
+        self.parametersLabels.clicked.connect(self.parameters_label_clicked)
         self.comboFilter.currentIndexChanged.connect(self.update_filter_type)
         self.graph_widget = self.graphWidget
         for approx in ApproximationNames:
             self.approxCombo.addItem(approx.value)
+    def approximation_label_clicked(self):
+        webbrowser.open('http://dsp-book.narod.ru/HFTSP/8579ch12.pdf')
 
+    def parameters_label_clicked(self):
+        webbrowser.open('https://electronicspani.com/electric-filter-types-of-filter/')
+
+    def filter_type_label_clicked(self):
+        webbrowser.open('https://www.allaboutcircuits.com/technical-articles/an-introduction-to-filters/')
 
     def update_filter_type(self):
         """
@@ -82,8 +95,7 @@ class FirstStage(QMainWindow):
             Approximations(self.approxCombo.currentText(), self.maxQSlider.value(), self.filterOrderSlider.value()))
         self.__update_active_approx_combo__()
 
-
-        #test
+        # test
         self.graph_widget.canvas.axes.clear()
         self.graph_widget.canvas.axes.set_title(self.comboGraph.currentText())
         self.graph_widget.canvas.axes.scatter([0, 10, 15, 20, 25],
@@ -112,6 +124,13 @@ class FirstStage(QMainWindow):
         """
         val = self.filterOrderSlider.value()
         self.filterOrderSliderLabel.setText(str(val))
+
+    def denorm_slider_changed(self):
+        """
+        Relates slider with its assigned label
+        """
+        val = self.denormSlider.value()
+        self.denormSliderLabel.setText(str(val))
 
     def clear_layout(self, layout):
         """

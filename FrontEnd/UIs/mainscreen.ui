@@ -90,7 +90,7 @@ background-color: rgb(40, 55, 57);
 </string>
           </property>
           <property name="text">
-           <string>INICIAR</string>
+           <string>START</string>
           </property>
          </widget>
         </item>
