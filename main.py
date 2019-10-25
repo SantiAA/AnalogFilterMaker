@@ -30,17 +30,3 @@ plt.axvline(2000, color='blue')  # cutoff frequency
 plt.axhline(-40, color='blue')  # rs
 plt.show()
 
-"""
-
-
-def start():
-    app = QtWidgets.QApplication([])
-    uiMan = UIManager()
-    uiMan.begin()
-    app.exec()
-
-
-if __name__ == "__main__":
-    start()
-
-"""
