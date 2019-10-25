@@ -5,6 +5,14 @@ class StopBandConfig:
     def __init__(self):
         self.name = "Stop Band"
         self.template_image = "FrontEnd/UIs/figs/filter_templates/stopbandtemplate.png"
-        self.parameter_list = [ParameterLayout("Gain [dB]", DefaultNumberEdit(-10000,10000,2)),
-                               ParameterLayout("Denorm [%]",  DefaultNumberEdit(0,100))]
+        self.parameter_list = [ParameterLayout("Gain [dB]", DefaultNumberEdit(-10000, 10000, 2)),
+                               ParameterLayout("Upper Attenuation Freq (Fa+) [Hz]", DefaultNumberEdit(0, 10000000, 0)),
+                               ParameterLayout("Upper Passband Freq (Fp+) [Hz]", DefaultNumberEdit(0, 10000000, 0)),
+                               ParameterLayout("Lower Attenuation Freq (Fa-) [Hz]", DefaultNumberEdit(0, 10000000, 0)),
+                               ParameterLayout("Lower Passband Freq (Fp-) [Hz]", DefaultNumberEdit(0, 10000000, 0)),
+                               ParameterLayout("Mid Freq (Fo) [Hz]", DefaultNumberEdit(0, 10000000, 0)),
+                               ParameterLayout("Passband Atten. (Ap) [dB]", DefaultNumberEdit(0, 10000000, 0)),
+                               ParameterLayout("Stopband Atten. (Aa) [dB]", DefaultNumberEdit(0, 10000000, 0)),
+                               ParameterLayout("Denorm [%]", DefaultSlider(0, 100)),
+                               ParameterLayout("Filter Order", DefaultSlider(0, 10))]
 
