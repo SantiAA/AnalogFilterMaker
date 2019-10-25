@@ -45,6 +45,7 @@ class FirstStage(QMainWindow):
         for approx in ApproximationNames:
             self.approxCombo.addItem(approx.value)
 
+
     def update_filter_type(self):
         """
         Changes the filter template image and requirements whenever the current selected filter type is changed.
