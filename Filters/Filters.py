@@ -34,10 +34,16 @@ class Filter(object):
     def __init__(self, filter_type: FilterTypes):
         self.filter = filter_type
         self.requirements = {}
-        self.zeros = []
-        self.poles = []
-        self.gain = None
-        self.order = None
+        self.normalized = {"Order": None,
+                           "Zeros": [],
+                           "Poles": [],
+                           "Gain": None,
+                           "MaxQ": None}
+        self.denormalized = {"Order": None,
+                             "Zeros": [],
+                             "Poles": [],
+                             "Gain": None,
+                             "MaxQ": None}
 
     def get_type(self) -> FilterTypes:
         return self.filter
@@ -46,10 +52,11 @@ class Filter(object):
         return [key for key in self.requirements]
 
     def get_order(self):
-        return self.order
+        return self.normalized["Order"], self.denormalized["Order"]
 
-    def load_order(self, order):
-        self.order = order
+    def load_order(self, order_norm, order_denorm):
+        self.normalized["Order"] = order_norm
+        self.denormalized["Order"] = order_denorm
 
     def load_requirements(self, specs):
         for each in specs:
@@ -68,6 +75,13 @@ class Filter(object):
         return self.requirements[key]
 
     def load_z_p_k(self, z, p, k):
-        self.zeros = z
-        self.poles = p
-        self.gain = k
+        self.denormalized["Zeros"] = z
+        self.denormalized["Poles"] = p
+        self.denormalized["Gain"] = k
+
+    def load_normalized_z_p_k(self, z, p, k):
+        self.normalized["Zeros"] = z
+        self.normalized["Poles"] = p
+        self.normalized["Gain"] = k
+
+

@@ -1,8 +1,8 @@
 # python native modules
 
 # third-party modules
-from sympy import *
 from scipy import signal
+import numpy as np
 
 # AFM project modules
 from Approximations.Approx import Approximation
@@ -16,7 +16,6 @@ class Butterwoth(Approximation):
     def __init__(self):
         Approximation.__init__(self, "Butterwoth")
         self.application = [FilterTypes.HighPass, FilterTypes.LowPass, FilterTypes.BandPass, FilterTypes.BandReject]
-        self.information = {}
 
     def load_information(self, filter_in_use: Filter):
 
@@ -27,10 +26,32 @@ class Butterwoth(Approximation):
         specs = filter_in_use.get_requirements()
         for each in specs:
             self.information[each] = filter_in_use.get_req_value(each)
+        if filter_in_use.get_type() is FilterTypes.BandReject:
+            self.__adjust_w__(False)
+        elif filter_in_use.get_type() is FilterTypes.BandPass:
+            self.__adjust_w__(True)
+
+        self.__selectivity__()
         return True
 
-    def calculate(self, filter_in_use: Filter, n_max=20):
+    def calculate(self, filter_in_use: Filter, n_max=20, denorm=0):
         """ Be careful this function doesn't care of Q !!! """
+        """ Fist I calculate the Normalized LowPass """
+        normalized_n, useful_w = signal.buttord(1, self.selectivity, self.information[TemplateInfo.Ap],
+                                                self.information[TemplateInfo.Aa], analog=True)
+        if normalized_n > n_max:
+            normalized_n = n_max
+        z_norm, p_norm, k_norm = signal.butter(normalized_n, useful_w, analog=True, output='zpk')
+        """ Now check the desnomalization cte """
+        w, h = signal.freqs_zpk(z_norm, p_norm, k_norm)
+        h = 20*np.log10(abs(h))
+        i = [abs(j + self.information[TemplateInfo.Aa]) for j in h]
+        wa = w[i.index(min(i))]
+        denorm_cte = (wa*(1-denorm/100)+denorm/(self.selectivity*100))
+        #Aca falta terminar
+        filter_in_use.load_normalized_z_p_k(z_norm, p_norm, k_norm)
+        """ Next we transform the LowPass into the requested filter """
+
         if filter_in_use.get_type() is FilterTypes.LowPass:
             """ If the approximation support the filter I continue """
             """ Then using buttlord I get the order and the frequency for the -3dB point"""
@@ -82,3 +103,4 @@ class Butterwoth(Approximation):
             z, p, k = signal.butter(n, w, analog=True, output='zpk', btype="stop")  # Desnormalizado
             filter_in_use.load_z_p_k(z, p, k)
             filter_in_use.load_order(n)
+
