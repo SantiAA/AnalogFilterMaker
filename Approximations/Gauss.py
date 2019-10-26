@@ -65,7 +65,6 @@ class Gauss(Approximation):
         data = json.load(plots_file)
         n1 = 0
         n2 = 0
-        works = False
         for n_i in data:
             wt = where(data[n_i]["Group Delay"] < self.information[TemplateInfo.tol])[0]
             if wt > self.ft_n * 2 * pi:
@@ -94,10 +93,10 @@ class Gauss(Approximation):
 
     def _pre_calc(self, n_max: int):
         data = {}
-        outfile = open("PreCalc/gauss.json", "w")
-        for i in range(1, n_max + 1):
+        outfile = open("gauss.json", "w")
+        for i in range(2, n_max + 1):
             transfer_function = self._get_tf(i)
-            w, mag, phase = transfer_function.bode()
+            w, mag, phase = transfer_function.bode(n=1500)
             gd = -diff(unwrap(phase)) / diff(w)
             gd = divide(gd, gd[0])
             data[str(i)] = {}
@@ -111,20 +110,25 @@ class Gauss(Approximation):
         :param n: Order of the gauss polynomial
         :return: Scipy signal transfer function
         """
-        num = [1.]
-        den = self._den(n)
-        transfer_function = signal.TransferFunction(num, den)
+        z, p, k = self._get_zpk(n)
+        transfer_function = signal.ZerosPolesGain(z, p, k)
         return transfer_function
 
-    def _den(self, n: int):
+    @staticmethod
+    def _get_zpk(n: int):
         """
-        :param n: Gauss approximation order
-        :return: The Gauss Approximation Denominator
+        :param n: Gauss approximation order. N_MIN = 2
+        :return: The Gauss Approximation Zeros, Poles and Gain
         """
+        num = [1.]
         den = []
-        gamma = log(2)
-        for k in range(n, 1, -1):
-            den.append(gamma ** k)
+        for k in range(n+1, 1, -1):
+            # den.append((-1)**k*gamma**k/factorial(k))
+            den.append(1 / factorial(k))    # normalizamos con gamma=1
             den.append(0)
         den.append(1.)
-        return den
+        transfer_function = signal.TransferFunction(num, den)   # tengo la transferencia al cuadrado
+        p = transfer_function.poles
+        p = p[where(p.real < 0)]    # me quedo con los polos del semiplano izquierdo
+        k = prod(p)                 # para que la ganancia sea 1
+        return [], p, k
