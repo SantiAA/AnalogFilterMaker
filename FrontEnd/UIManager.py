@@ -7,7 +7,12 @@ class UIManager:
         self.active_window = None
         self.list_of_windows = [FirstStage(self)]  # Sequence of windows to show
         self.window_iterator = -1
-
+        '''
+        self.program_state = {
+            "window_iterator": self.window_iterator,
+            "active_window_configuration": {}
+        }
+        '''
     def begin(self):
         """
         Shows the first window (Main Window)
@@ -24,6 +29,8 @@ class UIManager:
             self.window_iterator += 1
             self.active_window = self.list_of_windows[self.window_iterator]
             self.active_window.start()
+            # self.program_state["window_iterator"] = self.window_iterator
+            # self.active_window.load_current_state(self.program_state["active_window_configuration"])
 
     def previous_window(self):
         """
