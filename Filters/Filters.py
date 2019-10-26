@@ -44,6 +44,13 @@ class Filter(object):
                              "Poles": [],
                              "Gain": None,
                              "MaxQ": None}
+        self.zeros = []
+        self.poles = []
+        self.gain = None
+        self.order = None
+        self.limits = {TemplateInfo.Aa: (0, 1e9), TemplateInfo.Ap: (0, 1e9), TemplateInfo.fa: (0,1e9), TemplateInfo.fp: (0,1e9),
+                       TemplateInfo.fp_: (0,1e9), TemplateInfo.fp__: (0,1e9), TemplateInfo.fa: (0,1e9), TemplateInfo.fa_: (0,1e9),
+                       TemplateInfo.fo: (0,1e9), TemplateInfo.ft: (0,1e9), TemplateInfo.gd: (0,1e9), TemplateInfo.tol: (0,1)}
 
     def get_type(self) -> FilterTypes:
         return self.filter
@@ -85,3 +92,6 @@ class Filter(object):
         self.normalized["Gain"] = k
 
 
+
+    def get_req_limit(self, key: TemplateInfo):
+        return self.limits[key]

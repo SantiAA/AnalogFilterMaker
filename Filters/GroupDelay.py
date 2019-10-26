@@ -12,6 +12,7 @@ class GroupDelay(Filter):
         """ Load BandReject requirements for future usage """
         self.requirements = {TemplateInfo.ft: None,   # frequency of tau=gd*tol
                              TemplateInfo.fp: None,   # fp
+                             TemplateInfo.Ap: None,   # Ap
                              TemplateInfo.tol: None,  # tol
                              TemplateInfo.gd: None}   # Group delay
 
@@ -22,9 +23,10 @@ class GroupDelay(Filter):
 
         if self.requirements[TemplateInfo.ft] > 0:
             if self.requirements[TemplateInfo.fp] > 0:
-                if self.requirements[TemplateInfo.gd] > 0:
-                    if self.requirements[TemplateInfo.tol] > 0:
-                        return True
+                if self.requirements[TemplateInfo.Ap] > 0:
+                    if self.requirements[TemplateInfo.gd] > 0:
+                        if self.requirements[TemplateInfo.tol] > 0 and self.requirements[TemplateInfo.tol] < 1:
+                            return True
 
         """ If there is something wrong in the specs I return False"""
         return False

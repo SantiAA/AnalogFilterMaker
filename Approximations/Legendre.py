@@ -51,15 +51,13 @@ class Legendre(Approximation):
             """ I get the order and the frequency for the -3dB point"""
             # self.information[TemplateInfo.fp], self.information[TemplateInfo.fa],
             # self.information[TemplateInfo.Ap], self.information[TemplateInfo.Aa]
-            # hay que abrir el json y buscar el orden para que cumpla las especificaciones
             #
             """ Now we limit the order of the filter """
             if n > n_max:
                 n = n_max
             """ After getting the order I get the zeros, poles and gain of the filter """
-            z, p, k = signal.butter(n, w, analog=True, output='zpk')  # Desnormalizado
-            filter_in_use.load_z_p_k(z, p, k)
-            filter_in_use.load_order(n)
+            # filter_in_use.load_z_p_k(z, p, k)
+            # filter_in_use.load_order(n)
 
         elif filter_in_use.get_type() is FilterTypes.HighPass:
             n, w = signal.buttord(self.information[TemplateInfo.fp], self.information[TemplateInfo.fa],
@@ -99,19 +97,16 @@ class Legendre(Approximation):
             filter_in_use.load_z_p_k(z, p, k)
             filter_in_use.load_order(n)
 
-    def _precalc(self, n_max : int, ap: float):
-        data = {}
-        outfile = open("legendre.json", "w")
-        for i in range(1, n_max + 1):
-            transfer_function = legendre_approximation(i, ap)
-            w, mag, phase = transfer_function.bode()
-            data[str(i)] = {}
-            data[str(i)] = {"w": w.tolist(), "|H(jw)[dB]|": mag.tolist()}
-        json.dump(data, outfile, indent=4)
+#    def _precalc(self, n_max : int, ap: float):
+#        data = {}
+#        outfile = open("legendre.json", "w")
+#        for i in range(1, n_max + 1):
+#            transfer_function = legendre_approximation(i, ap)
+#            w, mag, phase = transfer_function.bode()
+#            data[str(i)] = {}
+#            data[str(i)] = {"w": w.tolist(), "|H(jw)[dB]|": mag.tolist()}
+#        json.dump(data, outfile, indent=4)
 
-    ##############################
-    # Legendre Package Functions #
-    ##############################
     def _get_tf(self, n: int, ap: float):
         """
         Returns the normalized transfer function of the Legendre Approximation
