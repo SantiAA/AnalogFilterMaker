@@ -44,13 +44,10 @@ class Filter(object):
                              "Poles": [],
                              "Gain": None,
                              "MaxQ": None}
-        self.zeros = []
-        self.poles = []
-        self.gain = None
-        self.order = None
-        self.limits = {TemplateInfo.Aa: (0, 1e9), TemplateInfo.Ap: (0, 1e9), TemplateInfo.fa: (0,1e9), TemplateInfo.fp: (0,1e9),
-                       TemplateInfo.fp_: (0,1e9), TemplateInfo.fp__: (0,1e9), TemplateInfo.fa: (0,1e9), TemplateInfo.fa_: (0,1e9),
-                       TemplateInfo.fo: (0,1e9), TemplateInfo.ft: (0,1e9), TemplateInfo.gd: (0,1e9), TemplateInfo.tol: (0,1)}
+        self.limits = {TemplateInfo.Aa: (0, 1e9), TemplateInfo.Ap: (0, 1e9), TemplateInfo.fa: (0, 1e9),
+                       TemplateInfo.fp: (0, 1e9), TemplateInfo.fp_: (0, 1e9), TemplateInfo.fp__: (0, 1e9),
+                       TemplateInfo.fa_: (0, 1e9), TemplateInfo.fa__: (0, 1e9), TemplateInfo.fo: (0, 1e9),
+                       TemplateInfo.ft: (0, 1e9), TemplateInfo.gd: (0, 1e9), TemplateInfo.tol: (0, 1)}
 
     def get_type(self) -> FilterTypes:
         return self.filter
@@ -60,10 +57,6 @@ class Filter(object):
 
     def get_order(self):
         return self.normalized["Order"], self.denormalized["Order"]
-
-    def load_order(self, order_norm, order_denorm):
-        self.normalized["Order"] = order_norm
-        self.denormalized["Order"] = order_denorm
 
     def load_requirements(self, specs):
         for each in specs:
@@ -85,13 +78,13 @@ class Filter(object):
         self.denormalized["Zeros"] = z
         self.denormalized["Poles"] = p
         self.denormalized["Gain"] = k
+        self.denormalized["Order"] = len(z)
 
     def load_normalized_z_p_k(self, z, p, k):
         self.normalized["Zeros"] = z
         self.normalized["Poles"] = p
         self.normalized["Gain"] = k
-
-
+        self.normalized["Order"] = len(z)
 
     def get_req_limit(self, key: TemplateInfo):
         return self.limits[key]
