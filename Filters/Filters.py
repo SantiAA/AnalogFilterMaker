@@ -74,6 +74,9 @@ class Filter(object):
     def get_req_value(self, key: TemplateInfo):
         return self.requirements[key]
 
+    def get_max_q(self):
+        return self.denormalized["MaxQ"]
+
     def load_z_p_k(self, z, p, k):
         self.denormalized["Zeros"] = z
         self.denormalized["Poles"] = p

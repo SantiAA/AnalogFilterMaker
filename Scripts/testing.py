@@ -43,4 +43,5 @@ if __name__ == "__main__":
  -7.35074235e-01+1.9413347j,  -7.35074235e-01-1.9413347j,
   7.35074235e-01+1.9413347j,   7.35074235e-01-1.9413347j,
  -5.55111512e-17+2.07692735j]
-    print("pairs: " + str(_agrup_poles(p)))
+    # print("pairs: " + str(_agrup_poles(p)))
+    fun = _agrup_poles
