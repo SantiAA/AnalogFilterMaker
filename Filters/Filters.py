@@ -1,6 +1,7 @@
 # python native modules
 from enum import Enum
-
+from numpy import poly
+from numpy import sqrt
 # third-party modules
 
 # AFM project modules
@@ -37,8 +38,7 @@ class Filter(object):
         self.normalized = {"Order": None,
                            "Zeros": [],
                            "Poles": [],
-                           "Gain": None,
-                           "MaxQ": None}
+                           "Gain": None}
         self.denormalized = {"Order": None,
                              "Zeros": [],
                              "Poles": [],
@@ -79,6 +79,15 @@ class Filter(object):
         self.denormalized["Poles"] = p
         self.denormalized["Gain"] = k
         self.denormalized["Order"] = len(z)
+        max_q = 0
+        p_pairs = self._agrup_poles(p)
+        for p_i in p_pairs:
+            if len(p_i) == 2:
+                den = poly(p_i, True)     # busco coeficientes del denominador
+                q = sqrt(den[2])/den[1]   # formula para Q en funcion de los coeficientes
+                if q > max_q:
+                    max_q = q
+        self.denormalized["MaxQ"] = max_q
 
     def load_normalized_z_p_k(self, z, p, k):
         self.normalized["Zeros"] = z
@@ -88,3 +97,19 @@ class Filter(object):
 
     def get_req_limit(self, key: TemplateInfo):
         return self.limits[key]
+
+    @staticmethod
+    def _agrup_poles(p):
+        pairs = []
+        p.sort(key=lambda x: x.real)  # ordeno por parte real creciente
+        while len(p):
+            len_in = len(pairs)
+            for i in range(1, len(p)):
+                if (abs(p[0].real - p[i].real) < 1e-10) and (abs(p[0].imag + p[i].imag) < 1e-10):
+                    pairs.append([p[0], p[i]])
+                    p.remove(p[i])
+                    break
+            if len_in == len(pairs):  # si no le encontre un conjugado
+                pairs.append([p[0]])  # no lo tiene :(
+            p.remove(p[0])
+        return pairs

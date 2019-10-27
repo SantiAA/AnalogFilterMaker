@@ -49,7 +49,6 @@ class Gauss(Approximation):
             """ Now we limit the order of the filter """
             n = amax([n, n_max])
             """ After getting the order I get the zeros, poles and gain of the filter """
-            filter_in_use.load_order(n)
             z_n, p_n, k_n = self._gauss_norm(n)
             filter_in_use.load_normalized_z_p_k(z_n, p_n, k_n)
             z, p, k = self._gauss_des(z_n, p_n)
