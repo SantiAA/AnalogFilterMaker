@@ -11,9 +11,7 @@ class GroupDelay(Filter):
         super().__init__(FilterTypes.GroupDelay)
         """ Load BandReject requirements for future usage """
         self.requirements = {TemplateInfo.ft: None,   # frequency of tau=gd*tol
-                             TemplateInfo.fp: None,   # fp
-                             TemplateInfo.Ap: None,   # Ap
-                             TemplateInfo.tol: None,  # tol
+                             TemplateInfo.tol: None,  # tolerance
                              TemplateInfo.gd: None}   # Group delay
 
     def validate_requirements(self) -> bool:
@@ -21,14 +19,4 @@ class GroupDelay(Filter):
             if self.requirements[each] is None:
                 return False  # Check if every spec was loaded
 
-        if self.requirements[TemplateInfo.ft] > 0:
-            if self.requirements[TemplateInfo.fp] > 0:
-                if self.requirements[TemplateInfo.Ap] > 0:
-                    if self.requirements[TemplateInfo.gd] > 0:
-                        if self.requirements[TemplateInfo.tol] > 0 and self.requirements[TemplateInfo.tol] < 1:
-                            return True
-
-        """ If there is something wrong in the specs I return False"""
-        return False
-
-
+        return True     # si me pasan todos los requirements ya esta, porque ya estan acotados desde el front

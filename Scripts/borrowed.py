@@ -254,7 +254,7 @@ def gauss_approximation_zpk(n: int):
     p = p[where(p.real < -1e-10)]    # me quedo con los polos del semiplano izquierdo
     #print("n= " + str(n))
     print("Left poles: " + str(p))
-    k = prod(p)                 # para que la ganancia sea 1
+    k = prod(abs(p))                 # para que la ganancia sea 1
     return [], p, k
 
 

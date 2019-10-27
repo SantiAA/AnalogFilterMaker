@@ -52,7 +52,7 @@ def gauss_approximation_zpk(n: int):
     transfer_function = signal.TransferFunction(num, den)   # tengo la transferencia al cuadrado
     p = transfer_function.poles
     p = p[where(p.real < 0)]    # me quedo con los polos del semiplano izquierdo
-    k = prod(p)                 # para que la ganancia sea 1
+    k = prod(abs(p))                 # para que la ganancia sea 1
     return [], p, k
 
 
