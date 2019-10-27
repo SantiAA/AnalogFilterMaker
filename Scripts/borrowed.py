@@ -11,6 +11,14 @@ import sys
 from scipy import special
 from scipy import signal
 
+from math import factorial
+from numpy import unwrap
+from numpy import diff
+from numpy import where
+from numpy import divide
+from numpy import prod
+from numpy import log
+
 from numpy import polymul
 from numpy import polyadd
 from numpy import polyint
@@ -20,20 +28,39 @@ from numpy import poly1d
 from numpy import sqrt
 from numpy import log10
 
-import json
-
 from matplotlib import pyplot
 
+import json
 
-def calculate_legendre(
+###############################
+# Legendre Package Exceptions #
+###############################
+
+
+###########################
+# General Usage Functions #
+###########################
+def match_filter_template(
         transfer_calculator: callable,
+        ap: float, aa: float, wa: float,
         *args):
+    """
+    Iterates the order of the transfer function recalculating it until it matches with the template
+    :param transfer_calculator: Callback to calculate the TransferFunction
+    :param ap: Maximum pass band attenuation in dB
+    :param aa: Minimum stop band attenuation in dB
+    :param wa: Stop band normalized frequency
+    :param args: Additional/Optional arguments to call transfer_calculator with other than using the order and ap
+    :return: Transfer function from the scipy signal package
+    """
     n_min = 1
     n_max = 30
     for n in range(n_min, n_max + 1):
-        zpk = transfer_calculator(n, ap, *args)
-        transfer = zpk.to_tf()
-
+        transfer_function = transfer_calculator(n, ap, *args)
+        if verifies_filter_template(transfer_function, ap, aa, wa):
+            return transfer_function
+    else:
+        return None
 
 
 def verifies_filter_template(transfer, ap: float, aa: float, wa: float) -> bool:
@@ -171,16 +198,80 @@ def legendre_polynomial(n: int):
     return special.legendre(n)
 
 
+###########################
+# Gauss Package Functions #
+###########################
+def calculate_gauss(n_max: int):
+    data = {}
+    outfile = open("gauss.json", "w")
+    for i in range(2, n_max + 1):
+        transfer_function = gauss_approximation(i)
+        #transfer_function = gauss_approximation(n_max)
+        w, mag, phase = transfer_function.bode(n=1500)
+        gd = -diff(unwrap(phase)) / diff(w)
+        # pyplot.semilogx(w[:-1], gd, label=("Denormalized group delay n= "+str(n_max)))
+        gd = divide(gd, gd[0])
+        data[str(i)] = {}
+        data[str(i)] = {"w": w.tolist(), "|H(jw)[dB]|": mag.tolist(), "Group delay": gd.tolist()}
+        pyplot.semilogx(w[:-1], gd, label=("Normalized group delay n= "+str(i)))
+        # pyplot.semilogx(w, mag, label=("Bode magnitude n= " + str(i)))
+        # pyplot.plot(w, phase, label=("Bode phase n= " + str(n_max)))
+        #pyplot.xlim(0, 5)
+        #pyplot.ylim(-15, 0)
+    json.dump(data, outfile, indent=4)
+    outfile.close()
+
+
+def gauss_approximation(n: int):
+    """
+    Returns the normalized transfer function of the Gauss Approximation
+    :param n: Order of the gauss polynomial
+    :return: Scipy signal transfer function
+    """
+    z, p, k = gauss_approximation_zpk(n)
+    transfer_function = signal.ZerosPolesGain(z, p, k)
+    return transfer_function
+
+
+def gauss_approximation_zpk(n: int):
+    """
+    :param n: Gauss approximation order
+    :return: The Gauss Approximation Zeros, Poles and Gain
+    """
+    num = [1.]
+    den = []
+    # gamma = log(2)
+    gamma = 1
+    for k in range(n+1, 1, -1):
+        den.append(gamma**k/factorial(k))
+        # den.append(1 / factorial(k))
+        den.append(0)
+    den.append(1.)
+    transfer_function = signal.TransferFunction(num, den)   # tengo la transferencia al cuadrado
+    p = transfer_function.poles
+    print("n= " + str(n))
+    print("All poles: " + str(p))
+    p = p[where(p.real < -1e-10)]    # me quedo con los polos del semiplano izquierdo
+    #print("n= " + str(n))
+    print("Left poles: " + str(p))
+    k = prod(abs(p))                 # para que la ganancia sea 1
+    return [], p, k
+
+
 if __name__ == "__main__":
-    ap = float(sys.argv[1])
-    aa = float(sys.argv[2])
-    wa = float(sys.argv[3])
+    # ap = float(sys.argv[1])
+    # aa = float(sys.argv[2])
+    # wa = float(sys.argv[3])
 
-    transfer = match_filter_template(legendre_approximation, ap, aa, wa)
-    w, module, phase = transfer.bode(n=1000)
-
+    # transfer = match_filter_template(legendre_approximation, ap, aa, wa)
+    # w, module, phase = transfer.bode(n=1000)
     pyplot.figure()
-    pyplot.semilogx(w, module)
+    calculate_gauss(10)
+    # pyplot.semilogx(w, module)
+    pyplot.xlabel('w [rad/seg]')
+    pyplot.ylabel('Tau')
+    pyplot.title('Gauss Approximation')
+    pyplot.legend()
     pyplot.show()
 
     input("Press any key to exit the program...")

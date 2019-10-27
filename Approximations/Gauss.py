@@ -29,7 +29,6 @@ class Gauss(Approximation):
         self.application = [FilterTypes.GroupDelay]
         self.information = {}
         self._pre_calc(20)  # n_max = 20
-        self.ft_n = 0
 
     def load_information(self, filter_in_use: Filter):
 
@@ -42,66 +41,57 @@ class Gauss(Approximation):
             self.information[each] = filter_in_use.get_req_value(each)
         return True
 
-    def calculate(self, filter_in_use: Filter, n_max = 20):
+    def calculate(self, filter_in_use: Filter, n_max=20, denorm=0):
         if filter_in_use.get_type() is FilterTypes.GruopDelay:
             """ If the approximation supports the filter I continue """
             """ Using the precalculated plots I get the order and the frequency for the -3dB point"""
-            self.ft_n = self.information[TemplateInfo.ft] / self.information[TemplateInfo.fp]   # normalize ft
             n = self._ord()
-
             """ Now we limit the order of the filter """
             n = amax([n, n_max])
             """ After getting the order I get the zeros, poles and gain of the filter """
-
-            z, p, k = self._gauss_des(n)
-            # filter_in_use.load_z_p_k(z, p, k)
+            filter_in_use.load_order(n)
             z_n, p_n, k_n = self._gauss_norm(n)
-            # filter_in_use.load_normalized(z_n, p_n, k_n)
+            filter_in_use.load_normalized_z_p_k(z_n, p_n, k_n)
+            z, p, k = self._gauss_des(z_n, p_n)
+            filter_in_use.load_z_p_k(z, p, k)
 
 
     " ONCE I HAVE THE SPECS I CALL THIS METHOD "
     def _ord(self):
         plots_file = open("PreCalc/gauss.json")
         data = json.load(plots_file)
-        n1 = 0
-        n2 = 0
-        works = False
+        n = 0
         for n_i in data:
-            wt = where(data[n_i]["Group Delay"] < self.information[TemplateInfo.tol])[0]
-            if wt > self.ft_n * 2 * pi:
-                n1 = int(n_i)
+            tol = data[n_i]["Group delay"][where(data[n_i]["w"] >= 1)[0]]
+            # wt = data[n_i]["w"][where(data[n_i]["Group Delay"] <= self.information[TemplateInfo.tol])[0]]
+            if tol >= self.information[TemplateInfo.tol]:
+                n = int(n_i)
                 break
-
-        if n1:
-            for n_i in data:
-                wp = where(data[n_i]["|H(jw)[dB]|"] < -self.information[TemplateInfo.Ap])[0]
-                if wp > 2 * pi:
-                    n2 = int(n_i)
-                    break
-        n = amax([n1, n2])
-        w = data[str(n)]["w"]
-        return n, w
-
-    def _gauss_des(self, n: int):
-        " Returns zeroes, poles and gain of Gauss denormalized approximation "
-        return
+        return n
 
     def _gauss_norm(self, n: int):
-        " Returns zeroes, poles and gain of Gauss normalized approximation "
+        " Returns zeros, poles and gain of Gauss normalized approximation "
         transfer_function = self._get_tf(n)
         trans_zpk = transfer_function.to_zpk()
         return trans_zpk.zeros, trans_zpk.poles, trans_zpk.gain
 
+    def _gauss_des(self, z_n, p_n):
+        " Returns zeros, poles and gain of Gauss denormalized approximation "
+        p = p_n/self.information[TemplateInfo.gd]
+        k = prod(abs(p))
+        return z_n, p, k
+
     def _pre_calc(self, n_max: int):
         data = {}
-        outfile = open("PreCalc/gauss.json", "w")
-        for i in range(1, n_max + 1):
+        outfile = open("gauss.json", "w")
+        for i in range(2, n_max + 1):
             transfer_function = self._get_tf(i)
-            w, mag, phase = transfer_function.bode()
+            w, mag, phase = transfer_function.bode(n=1500)
             gd = -diff(unwrap(phase)) / diff(w)
             gd = divide(gd, gd[0])
             data[str(i)] = {}
-            data[str(i)] = {"w": w.tolist(), "|H(jw)[dB]|": mag.tolist(), "Group delay": gd.tolist()}
+            # data[str(i)] = {"w": w.tolist(), "|H(jw)[dB]|": mag.tolist(), "Group delay": gd.tolist()}
+            data[str(i)] = {"w": w.tolist(), "Group delay": gd.tolist()}    # guardo solo retardo de grupo que es lo que me van a pedir cumplit
         json.dump(data, outfile, indent=4)
         outfile.close()
 
@@ -111,20 +101,25 @@ class Gauss(Approximation):
         :param n: Order of the gauss polynomial
         :return: Scipy signal transfer function
         """
-        num = [1.]
-        den = self._den(n)
-        transfer_function = signal.TransferFunction(num, den)
+        z, p, k = self._get_zpk(n)
+        transfer_function = signal.ZerosPolesGain(z, p, k)
         return transfer_function
 
-    def _den(self, n: int):
+    @staticmethod
+    def _get_zpk(n: int):
         """
-        :param n: Gauss approximation order
-        :return: The Gauss Approximation Denominator
+        :param n: Gauss approximation order. N_MIN = 2
+        :return: The Gauss Approximation Zeros, Poles and Gain
         """
+        num = [1.]
         den = []
-        gamma = log(2)
-        for k in range(n, 1, -1):
-            den.append(gamma ** k)
+        for k in range(n+1, 1, -1):
+            # den.append((-1)**k*gamma**k/factorial(k))
+            den.append(1 / factorial(k))    # normalizamos con gamma=1
             den.append(0)
         den.append(1.)
-        return den
+        transfer_function = signal.TransferFunction(num, den)   # tengo la transferencia al cuadrado
+        p = transfer_function.poles
+        p = p[where(p.real < -1e-10)]    # me quedo con los polos del semiplano izquierdo. -1e-10 xq sino n=7 me quedaba inestable, problema: queda de un orden menos para n impar!!!!!
+        k = prod(abs(p))                      # para que la ganancia sea 1
+        return [], p, k

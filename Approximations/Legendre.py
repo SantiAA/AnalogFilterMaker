@@ -8,7 +8,6 @@ Approximation base class
 from sympy import *
 from scipy import signal
 from scipy import special
-import json
 
 from numpy import polymul
 from numpy import polyadd
@@ -17,6 +16,7 @@ from numpy import polyval
 from numpy import polysub
 from numpy import poly1d
 from numpy import sqrt
+from numpy import where
 
 
 # AFM project modules
@@ -46,75 +46,52 @@ class Legendre(Approximation):
 
     def calculate(self, filter_in_use: Filter, n_max=20):
         """ Be careful this function doesn't care of Q !!! """
+        n, useful_w = self._legord(self.information[TemplateInfo.fp], self.information[TemplateInfo.fa],
+                                   self.information[TemplateInfo.Ap], self.information[TemplateInfo.Aa], n_max )
+        z_n, p_n, k_n = self._get_tf(n)
+        filter_in_use.load_normalized_z_p_k(z_n, p_n, k_n)
+        (...)   # suerte santi
         if filter_in_use.get_type() is FilterTypes.LowPass:
             """ If the approximation support the filter I continue """
-            """ I get the order and the frequency for the -3dB point"""
-            # self.information[TemplateInfo.fp], self.information[TemplateInfo.fa],
-            # self.information[TemplateInfo.Ap], self.information[TemplateInfo.Aa]
-            #
-            """ Now we limit the order of the filter """
-            if n > n_max:
-                n = n_max
+            z, p, k = signal.lp2lp_zpk(z_n, p_n, k_n, 2*pi*self.information[TemplateInfo.fp])
+            filter_in_use.load_z_p_k(z, p, k)
             """ After getting the order I get the zeros, poles and gain of the filter """
-            # filter_in_use.load_z_p_k(z, p, k)
-            # filter_in_use.load_order(n)
 
         elif filter_in_use.get_type() is FilterTypes.HighPass:
-            n, w = signal.buttord(self.information[TemplateInfo.fp], self.information[TemplateInfo.fa],
-                                  self.information[TemplateInfo.Ap], self.information[TemplateInfo.Aa],
-                                  analog=True)
-
-            if n > n_max:
-                n = n_max
-
-            z, p, k = signal.butter(n, w, analog=True, output='zpk')  # Desnormalizado
-            filter_in_use.load_z_p_k(z, p, k)
-            filter_in_use.load_order(n)
-
+            pass
+            # z, p, k = signal.lp2hp_zpk(z_n, p_n, k_n, self.information[TemplateInfo.f]) no se si va .fp o .fa
         elif filter_in_use.get_type() is FilterTypes.BandPass:
-            wp = [self.information[TemplateInfo.fp__], self.information[TemplateInfo.fp_]]
-            wa = [self.information[TemplateInfo.fa__], self.information[TemplateInfo.fa_]]
-            n, w = signal.buttord(wp, wa, self.information[TemplateInfo.Ap], self.information[TemplateInfo.Aa],
-                                  analog=True)
-
-            if n > n_max:
-                n = n_max
-
-            z, p, k = signal.butter(n, w, analog=True, output='zpk', btype="band")  # Desnormalizado
-            filter_in_use.load_z_p_k(z, p, k)
-            filter_in_use.load_order(n)
-
+            pass
+            # z, p, k = signal.lp2bp_zpk(z_n, p_n, k_n, ...) no se que frecuencias poner
         elif filter_in_use.get_type() is FilterTypes.BandReject:
-            wp = [self.information[TemplateInfo.fp__], self.information[TemplateInfo.fp_]]
-            wa = [self.information[TemplateInfo.fa__], self.information[TemplateInfo.fa_]]
-            n, w = signal.buttord(wp, wa, self.information[TemplateInfo.Ap], self.information[TemplateInfo.Aa],
-                                  analog=True)
+            pass
+            # z, p, k = signal.lp2bs_zpk(z_n, p_n, k_n, ...) no se que frecuencias poner
 
-            if n > n_max:
-                n = n_max
 
-            z, p, k = signal.butter(n, w, analog=True, output='zpk', btype="stop")  # Desnormalizado
-            filter_in_use.load_z_p_k(z, p, k)
-            filter_in_use.load_order(n)
+    def _legord(self, f_p, f_a, a_p, a_a, n_max: int):
+        n = 0
+        use_w = 0
+        for k in range(1,n_max+1):
+            transfer_function = self._get_tf(k)
+            w, mag, phase = transfer_function.bode(n=2000)
+            i_p = where(w >= 2*pi*f_p)[0]
+            mag_p = mag[i_p]
+            i_a = where(w >= 2*pi*f_a)[0]
+            mag_a = mag[i_a]
+            if mag_p >= -a_p and mag_a <= -a_a\
+                    or k == n_max:
+                n = k
+                use_w = w[i_p]
+                break
+        return n, use_w
 
-#    def _precalc(self, n_max : int, ap: float):
-#        data = {}
-#        outfile = open("legendre.json", "w")
-#        for i in range(1, n_max + 1):
-#            transfer_function = legendre_approximation(i, ap)
-#            w, mag, phase = transfer_function.bode()
-#            data[str(i)] = {}
-#            data[str(i)] = {"w": w.tolist(), "|H(jw)[dB]|": mag.tolist()}
-#        json.dump(data, outfile, indent=4)
-
-    def _get_tf(self, n: int, ap: float):
+    def _get_tf(self, n: int):
         """
         Returns the normalized transfer function of the Legendre Approximation
         :param n: Order of the legendre polynomial
-        :param ap: Maximum attenuation of the pass band in dB
         :return: The lti transfer function from scipy signals
         """
-        poly = self._den(n, ap)
+        poly = self._den(n)
         gain = sqrt(polyval(poly, 0))
         poles = [
             complex(
@@ -127,25 +104,25 @@ class Legendre(Approximation):
             gain *= pole
         return signal.lti([], poles, gain)
 
-    def _den(self, n: int, ap: float):
+    def _den(self, n: int):
         """
         :param n: Legendre approximation order
         :param ap: Maximum band pass attenuation
         :return: The Legendre Approximation Denominator
         """
-        epsilon = self._epsilon(ap) ** 2
+        epsilon = self._epsilon() ** 2
         ln = self._odd_poly(n) if (n % 2) else self._even_poly
         ln = epsilon * ln
         return polyadd(poly1d([1]), ln)
 
 
-    def _epsilon(self, ap: float):
+    def _epsilon(self):
         """
         Returns the legendre epsilon parameter with the given ap in dB
         :param ap: Pass band maximum attenuation in dB
         :return: Epsilon legendre parameter
         """
-        return sqrt(10 ** (ap / 10) - 1)
+        return sqrt(10 ** (self.information[TemplateInfo.Ap] / 10) - 1)
 
 
     def _even_poly(self, n: int):
@@ -219,6 +196,6 @@ class Legendre(Approximation):
         :return: Pn(x) expressed as poly1d from numpy
         """
         if n < 0:
-            raise ValueError("LegendrePolynomial received a negative order!")
+            print("LegendrePolynomial received a negative order!")
         return special.legendre(n)
 
