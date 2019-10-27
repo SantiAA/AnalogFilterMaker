@@ -1,6 +1,5 @@
 from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QIntValidator, QDoubleValidator
-from PyQt5.QtWidgets import QHBoxLayout, QLabel, QLineEdit, QSlider, QWidget, QSizePolicy, QDoubleSpinBox, QVBoxLayout, \
+from PyQt5.QtWidgets import QHBoxLayout, QLabel, QSlider, QWidget, QSizePolicy, QDoubleSpinBox, QVBoxLayout, \
     QCheckBox
 
 
@@ -23,6 +22,7 @@ class FilterParameterLayout (QWidget):
 class ApproximationParameterLayout(QWidget):
     def __init__(self, name, widget, toggleable):
         QWidget.__init__(self)
+        self.toggleable = toggleable
         self.layout = QVBoxLayout()
         self.name = name
         self.widget = widget

@@ -9,5 +9,5 @@ class UIApproximation:
         for feature in dict_of_features:
             self.parameter_list.append(ApproximationParameterLayout(feature, DefaultSlider(dict_of_features[feature][0][0],
                                                                                   dict_of_features[feature][0][1],
-                                                                                  dict_of_features[feature][1]), True))
+                                                                                  dict_of_features[feature][1]), dict_of_features[feature][0][2]))
 

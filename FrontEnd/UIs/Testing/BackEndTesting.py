@@ -34,5 +34,9 @@ class BackEndTesting:
         return True, "Error in sdasdadadasdasdasdasdasdasdas  "
 
     def get_template(self, filter):
-        rect1 =  patches.Rectangle((0,0), 1000, 1000)
-        return [rect1, patches.Rectangle((10000,5000), 100000, 100000)]
+        rect1 =  patches.Rectangle((10000,0), 10000, 30, fill=False, alpha =1)
+        rect3 =  patches.Rectangle((50000,0), 10000, 30, fill=False, alpha =1)
+        return [rect1, patches.Rectangle((30000,20), 10000, 100, fill=False, alpha =1), rect3]
+
+    def get_graphs(self, filter, approximation):
+        return True
