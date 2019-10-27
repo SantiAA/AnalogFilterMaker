@@ -1,20 +1,6 @@
 from FrontEnd.UIs.FilterConfigurations.ParameterLayout import FilterParameterLayout, DefaultNumberEdit, DefaultSlider
 from FrontEnd.UIs.Testing.UIApproximation import UIApproximation
 
-
-class LowPassConfig:
-    def __init__(self):
-        self.name = "Low Pass"
-        self.template_image = "FrontEnd/UIs/figs/filter_templates/lowpasstemplate.png"
-        self.parameter_list = [FilterParameterLayout("Gain [dB]", DefaultNumberEdit(-10000, 10000, 2)),
-                               FilterParameterLayout("Attenuation Freq (Fa) [Hz]", DefaultNumberEdit(0, 10000000, 0)),
-                               FilterParameterLayout("Passband Freq (Fp) [Hz]", DefaultNumberEdit(0, 10000000, 0)),
-                               FilterParameterLayout("Passband Atten. (Ap) [dB]", DefaultNumberEdit(0, 10000000, 0)),
-                               FilterParameterLayout("Stopband Atten. (Aa) [dB]", DefaultNumberEdit(0, 10000000, 0)),
-                               FilterParameterLayout("Denorm [%]", DefaultSlider(0, 100))
-                               ]
-
-
 class Config:
     def __init__(self, name, dict_of_features, approximation_list_received):
         self.name = name

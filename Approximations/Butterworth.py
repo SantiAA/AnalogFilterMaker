@@ -31,7 +31,7 @@ class Butterwoth(Approximation):
         elif filter_in_use.get_type() is FilterTypes.BandPass:
             self.__adjust_w__(True)
 
-        self.__selectivity__()
+        self.__selectivity__(filter_in_use.get_type())
         return True
 
     def calculate(self, filter_in_use: Filter, n_max=20, denorm=0):
@@ -42,65 +42,39 @@ class Butterwoth(Approximation):
         if normalized_n > n_max:
             normalized_n = n_max
         z_norm, p_norm, k_norm = signal.butter(normalized_n, useful_w, analog=True, output='zpk')
+        filter_in_use.load_normalized_z_p_k(z_norm, p_norm, k_norm)
         """ Now check the desnomalization cte """
         w, h = signal.freqs_zpk(z_norm, p_norm, k_norm)
         h = 20*np.log10(abs(h))
         i = [abs(j + self.information[TemplateInfo.Aa]) for j in h]
         wa = w[i.index(min(i))]
         denorm_cte = (wa*(1-denorm/100)+denorm/(self.selectivity*100))
-        #Aca falta terminar
-        filter_in_use.load_normalized_z_p_k(z_norm, p_norm, k_norm)
-        """ Next we transform the LowPass into the requested filter """
+        z_norm = z_norm*denorm_cte
+        p_norm = p_norm*denorm_cte
+        k_norm = k_norm*(denorm_cte**(len(p_norm)-len(z_norm)))
+        """" Next we transform the LowPass into the requested filter """
 
         if filter_in_use.get_type() is FilterTypes.LowPass:
             """ If the approximation support the filter I continue """
-            """ Then using buttlord I get the order and the frequency for the -3dB point"""
-            n, w = signal.buttord(self.information[TemplateInfo.fp], self.information[TemplateInfo.fa],
-                                  self.information[TemplateInfo.Ap], self.information[TemplateInfo.Aa],
-                                  analog=True)
-            """ Now we limit the order of the filter """
-            if n > n_max:
-                n = n_max
-            """ After getting the order I get the zeros, poles and gain of the filter """
-            z, p, k = signal.butter(n, w, analog=True, output='zpk')  # Desnormalizado
+            """ And transform the normalized low pass to the desire one """
+            z, p, k = signal.lp2lp_zpk(z_norm, p_norm, k_norm, self.information[TemplateInfo.fp])
             filter_in_use.load_z_p_k(z, p, k)
-            filter_in_use.load_order(n)
 
         elif filter_in_use.get_type() is FilterTypes.HighPass:
-            n, w = signal.buttord(self.information[TemplateInfo.fp], self.information[TemplateInfo.fa],
-                                  self.information[TemplateInfo.Ap], self.information[TemplateInfo.Aa],
-                                  analog=True)
-
-            if n > n_max:
-                n = n_max
-
-            z, p, k = signal.butter(n, w, analog=True, output='zpk')  # Desnormalizado
+            z, p, k = signal.lp2hp_zpk(z_norm, p_norm, k_norm, self.information[TemplateInfo.fp])
             filter_in_use.load_z_p_k(z, p, k)
-            filter_in_use.load_order(n)
 
         elif filter_in_use.get_type() is FilterTypes.BandPass:
-            wp = [self.information[TemplateInfo.fp__], self.information[TemplateInfo.fp_]]
-            wa = [self.information[TemplateInfo.fa__], self.information[TemplateInfo.fa_]]
-            n, w = signal.buttord(wp, wa, self.information[TemplateInfo.Ap], self.information[TemplateInfo.Aa],
-                                  analog=True)
+            Awp = self.information[TemplateInfo.fp_] - self.information[TemplateInfo.fp__]
+            w0 = np.sqrt(self.information[TemplateInfo.fp_] * self.information[TemplateInfo.fp__] )
 
-            if n > n_max:
-                n = n_max
-
-            z, p, k = signal.butter(n, w, analog=True, output='zpk', btype="band")  # Desnormalizado
+            z, p, k = signal.lp2bp_zpk(z_norm, p_norm, k_norm, w0, Awp)  # Desnormalizado
             filter_in_use.load_z_p_k(z, p, k)
-            filter_in_use.load_order(n)
 
         elif filter_in_use.get_type() is FilterTypes.BandReject:
-            wp = [self.information[TemplateInfo.fp__], self.information[TemplateInfo.fp_]]
-            wa = [self.information[TemplateInfo.fa__], self.information[TemplateInfo.fa_]]
-            n, w = signal.buttord(wp, wa, self.information[TemplateInfo.Ap], self.information[TemplateInfo.Aa],
-                                  analog=True)
+            Awp = self.information[TemplateInfo.fp_] - self.information[TemplateInfo.fp__]
+            w0 = np.sqrt(self.information[TemplateInfo.fp_] * self.information[TemplateInfo.fp__])
 
-            if n > n_max:
-                n = n_max
-
-            z, p, k = signal.butter(n, w, analog=True, output='zpk', btype="stop")  # Desnormalizado
+            z, p, k = signal.lp2bs_zpk(z_norm, p_norm, k_norm, w0, Awp)  # Desnormalizado
             filter_in_use.load_z_p_k(z, p, k)
-            filter_in_use.load_order(n)
 

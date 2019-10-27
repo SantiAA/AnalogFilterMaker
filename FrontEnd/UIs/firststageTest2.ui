@@ -429,7 +429,7 @@ color:rgb(255, 255, 255);
          </spacer>
         </item>
         <item>
-         <layout class="QHBoxLayout" name="approxParams" stretch="20,3,57,3,15,2">
+         <layout class="QHBoxLayout" name="approxParams" stretch="20,3,56,3,13,3">
           <item>
            <layout class="QVBoxLayout" name="verticalLayout_2">
             <item>
@@ -571,11 +571,62 @@ font: 16pt &quot;MS Shell Dlg 2&quot;;</string>
          </spacer>
         </item>
         <item>
-         <layout class="QHBoxLayout" name="removeLay" stretch="81,2,15,2">
+         <layout class="QHBoxLayout" name="removeLay" stretch="74,1,2,4,5,4,7,3">
           <item>
            <widget class="QComboBox" name="activeApproxsCombo">
             <property name="styleSheet">
              <string notr="true">font-size: 14px; color:rgb(255, 255, 255);</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer_7">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="toggleApprox">
+            <property name="text">
+             <string/>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer_5">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
+           <widget class="QPushButton" name="editApproximationButton">
+            <property name="styleSheet">
+             <string notr="true">font: 63 10pt &quot;Open Sans Semibold&quot;;
+color:rgb(255, 255, 255);
+padding: 8px;
+bottom-margin:3px;
+
+</string>
+            </property>
+            <property name="text">
+             <string>EDIT</string>
             </property>
            </widget>
           </item>
