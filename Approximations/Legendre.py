@@ -5,6 +5,7 @@ Approximation base class
 # python native modules
 
 # third-party modules
+
 from sympy import *
 from scipy import signal
 from scipy import special
@@ -17,7 +18,7 @@ from numpy import polysub
 from numpy import poly1d
 from numpy import sqrt
 from numpy import where
-
+from numpy import log10
 
 # AFM project modules
 from Approximations.Approx import Approximation
@@ -44,13 +45,23 @@ class Legendre(Approximation):
             self.information[each] = filter_in_use.get_req_value(each)
         return True
 
-    def calculate(self, filter_in_use: Filter, n_max=20):
+    def calculate(self, filter_in_use: Filter, n_max=20, denorm=0):
         """ Be careful this function doesn't care of Q !!! """
         n, useful_w = self._legord(self.information[TemplateInfo.fp], self.information[TemplateInfo.fa],
-                                   self.information[TemplateInfo.Ap], self.information[TemplateInfo.Aa], n_max )
+                                   self.information[TemplateInfo.Ap], self.information[TemplateInfo.Aa], n_max)
         z_n, p_n, k_n = self._get_tf(n)
         filter_in_use.load_normalized_z_p_k(z_n, p_n, k_n)
-        (...)   # suerte santi
+        """ Now check the desnomalization cte """
+        w, h = signal.freqs_zpk(z_n, p_n, k_n)
+        h = 20 * log10(abs(h))
+        i = [abs(j + self.information[TemplateInfo.Aa]) for j in h]
+        wa = w[i.index(min(i))]
+        denorm_cte = (wa * (1 - denorm / 100) + denorm / (self.selectivity * 100))
+        z_n = z_n * denorm_cte
+        p_n = p_n * denorm_cte
+        k_n = k_n * (denorm_cte ** (len(p_n) - len(z_n)))
+        """" Next we transform the LowPass into the requested filter """
+
         if filter_in_use.get_type() is FilterTypes.LowPass:
             """ If the approximation support the filter I continue """
             z, p, k = signal.lp2lp_zpk(z_n, p_n, k_n, 2*pi*self.information[TemplateInfo.fp])
@@ -58,20 +69,27 @@ class Legendre(Approximation):
             """ After getting the order I get the zeros, poles and gain of the filter """
 
         elif filter_in_use.get_type() is FilterTypes.HighPass:
-            pass
-            # z, p, k = signal.lp2hp_zpk(z_n, p_n, k_n, self.information[TemplateInfo.f]) no se si va .fp o .fa
-        elif filter_in_use.get_type() is FilterTypes.BandPass:
-            pass
-            # z, p, k = signal.lp2bp_zpk(z_n, p_n, k_n, ...) no se que frecuencias poner
-        elif filter_in_use.get_type() is FilterTypes.BandReject:
-            pass
-            # z, p, k = signal.lp2bs_zpk(z_n, p_n, k_n, ...) no se que frecuencias poner
+            z, p, k = signal.lp2hp_zpk(z_n, p_n, k_n, 2*pi*self.information[TemplateInfo.fp])
+            filter_in_use.load_z_p_k(z, p, k)
 
+        elif filter_in_use.get_type() is FilterTypes.BandPass:
+            Awp = self.information[TemplateInfo.fp_] - self.information[TemplateInfo.fp__]
+            w0 = sqrt(self.information[TemplateInfo.fp_] * self.information[TemplateInfo.fp__])
+
+            z, p, k = signal.lp2bp_zpk(z_n, p_n, k_n, w0, Awp)
+            filter_in_use.load_z_p_k(z, p, k)
+
+        elif filter_in_use.get_type() is FilterTypes.BandReject:
+            Awp = self.information[TemplateInfo.fp_] - self.information[TemplateInfo.fp__]
+            w0 = sqrt(self.information[TemplateInfo.fp_] * self.information[TemplateInfo.fp__])
+
+            z, p, k = signal.lp2bs_zpk(z_n, p_n, k_n, w0, Awp)
+            filter_in_use.load_z_p_k(z, p, k)
 
     def _legord(self, f_p, f_a, a_p, a_a, n_max: int):
         n = 0
         use_w = 0
-        for k in range(1,n_max+1):
+        for k in range(1, n_max+1):
             transfer_function = self._get_tf(k)
             w, mag, phase = transfer_function.bode(n=2000)
             i_p = where(w >= 2*pi*f_p)[0]
@@ -107,7 +125,6 @@ class Legendre(Approximation):
     def _den(self, n: int):
         """
         :param n: Legendre approximation order
-        :param ap: Maximum band pass attenuation
         :return: The Legendre Approximation Denominator
         """
         epsilon = self._epsilon() ** 2
@@ -115,15 +132,12 @@ class Legendre(Approximation):
         ln = epsilon * ln
         return polyadd(poly1d([1]), ln)
 
-
     def _epsilon(self):
         """
         Returns the legendre epsilon parameter with the given ap in dB
-        :param ap: Pass band maximum attenuation in dB
         :return: Epsilon legendre parameter
         """
         return sqrt(10 ** (self.information[TemplateInfo.Ap] / 10) - 1)
-
 
     def _even_poly(self, n: int):
         """
@@ -157,7 +171,6 @@ class Legendre(Approximation):
         # Using barrow and returning the result!
         return polysub(polyval(poly, upper), polyval(poly, lower))
 
-
     def _odd_poly(self, n: int):
         """
         Returns the integrated Legendre polynomial when the order is odd.
@@ -174,12 +187,11 @@ class Legendre(Approximation):
 
         for i in range(1, k + 1):
             ai = a0 * (2*i + 1)
-            poli = legendre_polynomial(i)
+            poli = self._polynomial(i)
             new_poly = ai * poli
             poly = polyadd(poly, new_poly)
 
         poly = polymul(poly, poly)
-
 
         # Calculate the indefinite integration and upper/lower limits
         poly = polyint(poly)
@@ -189,7 +201,7 @@ class Legendre(Approximation):
         # Using barrow and returning the result!
         return polysub(polyval(poly, upper), polyval(poly, lower))
 
-    def _polynomial(n: int):
+    def _polynomial(self, n: int):
         """
         Returns the polynomial of n-th order from Legendre.
         :param n: Order of the polynomial
