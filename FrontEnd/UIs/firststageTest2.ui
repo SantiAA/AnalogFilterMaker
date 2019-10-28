@@ -292,41 +292,6 @@ bottom-margin:3px;
 color:rgb(255, 255, 255);
 </string>
             </property>
-            <item>
-             <property name="text">
-              <string>Curvas de atenuación</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>Fase</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>Retardo de grupo</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>Máximo Q</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>Respuesta al impulso</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>Respuesta al escalón</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>Diagrama de polos y ceros</string>
-             </property>
-            </item>
            </widget>
           </item>
           <item>

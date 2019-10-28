@@ -23,6 +23,7 @@ class ApproximationParameterLayout(QWidget):
     def __init__(self, name, widget, toggleable):
         QWidget.__init__(self)
         self.toggleable = toggleable
+        self.auto = False
         self.layout = QVBoxLayout()
         self.name = name
         self.widget = widget
@@ -47,9 +48,12 @@ class ApproximationParameterLayout(QWidget):
         if self.check_box.isChecked():
             self.check_box.setText("Auto")
             self.rows[1].hide()
+            self.auto = True
+
         else:
             self.check_box.setText("Manual")
             self.rows[1].show()
+            self.auto = False
 
 class InternalApproximationLayoutRow (QWidget):
     def __init__(self, widget1, widget2):
@@ -82,6 +86,9 @@ class DefaultNumberEdit(QDoubleSpinBox):
 
 class DefaultSlider(QWidget):
     def __init__(self, min = 0, max = 100, default_value = 50):
+        self.min = min
+        self.max = max
+        self.default_value = default_value
         QWidget.__init__(self)
         self.slider = QSlider(Qt.Horizontal)
         self.slider.setValue(default_value)
