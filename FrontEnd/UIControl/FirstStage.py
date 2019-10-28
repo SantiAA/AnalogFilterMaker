@@ -126,10 +126,9 @@ class FirstStage(QMainWindow):
                                             if not parameter.toggleable:
                                                 parameter.check_box.hide()
                                         else:
-                                            parameter.widget.slider.setValue(int(property_tuple[1]))
+                                            parameter.set_value(int(property_tuple[1]))
                                             parameter.check_box.show()
                                             parameter.check_box.setChecked(False)
-                                            parameter.widget.label.setText(str(property_tuple[1]))
                                             if not parameter.toggleable:
                                                 parameter.check_box.hide()
 
@@ -191,6 +190,8 @@ class FirstStage(QMainWindow):
         self.current_template = Template()
         self.showingGraphs = []
         self.__update_active_approx_combo__()
+        self.templateCheckBox.setChecked(True)
+        self.templateCheckBox.hide()
         self.redraw_graphs()
         # update plot
         for filters in self.filters.values():  # Clearing requirement widgets
@@ -210,11 +211,9 @@ class FirstStage(QMainWindow):
         self.graphPic.setPixmap(QPixmap(self.filter.template_image))  # filter template image
 
         self.clear_layout(self.configurationLayout)
-        self.show()
         for parameter in self.filter.parameter_list:  # Refilling requierement widgets
             self.configurationLayout.addWidget(parameter)
         self.configurationLayout.addStretch(50)  # space
-        self.show()
         if len(self.showingGraphs) == 0:
             self.toggleApprox.hide()
         # self.save_current_state()
@@ -226,7 +225,6 @@ class FirstStage(QMainWindow):
                     parameter.setParent(None)
         self.filter = self.filters[self.comboFilter.currentText()]
         self.clear_layout(self.approxConfigurationLayout)
-        self.show()
 
         for approximation in self.filter.approximation_list:
             if approximation.name == self.approxCombo.currentText():
@@ -265,7 +263,7 @@ class FirstStage(QMainWindow):
                     for prop in approximation.parameter_list:
 
                         if not prop.toggleable or not prop.check_box.isChecked():
-                            properties.append([prop.name, prop.widget.label.text()])
+                            properties.append([prop.name, str(prop.get_value())])
                         else:
                             properties.append([prop.name, "Auto"])
                     self.graphics_returned = self.backend.get_graphs([self.filter.name, dict],

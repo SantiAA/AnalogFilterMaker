@@ -1,6 +1,6 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QHBoxLayout, QLabel, QSlider, QWidget, QSizePolicy, QDoubleSpinBox, QVBoxLayout, \
-    QCheckBox
+    QCheckBox, QComboBox
 
 
 class FilterParameterLayout (QWidget):
@@ -43,6 +43,20 @@ class ApproximationParameterLayout(QWidget):
         self.layout.addStretch()
         self.setLayout(self.layout)
 
+    def set_value(self, value):
+        self.widget.set_value(value)
+
+    def get_value(self):
+        return self.widget.get_value()
+
+    def get_min(self):
+        self.widget.get_min()
+
+    def get_max(self):
+        self.widget.get_max()
+
+    def get_default_value(self):
+        self.widget.get_default_value()
 
     def check_box_toggled(self):
         if self.check_box.isChecked():
@@ -83,6 +97,21 @@ class DefaultNumberEdit(QDoubleSpinBox):
         self.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Fixed)
         self.setStyleSheet("font-size: 14px; color:rgb(255, 255, 255);")
 
+    def get_value(self):
+        return self.value()
+
+    def set_value(self, value):
+        self.setValue(value)
+
+    def get_min(self):
+        return self.min
+
+    def get_max(self):
+        return self.max
+
+    def get_default_value(self):
+        return self.default_value
+
 
 class DefaultSlider(QWidget):
     def __init__(self, min = 0, max = 100, default_value = 50):
@@ -111,4 +140,48 @@ class DefaultSlider(QWidget):
         val = self.slider.value()
         self.label.setText(str(val))
 
+    def get_value(self):
+        return self.slider.value()
 
+    def set_value(self, value):
+        self.slider.setValue(value)
+        self.label.setText(str(value))
+
+    def get_min(self):
+        return self.min
+
+    def get_max(self):
+        return self.max
+
+    def get_default_value(self):
+        return self.default_value
+
+class DefaultComboBox(QWidget):
+        def __init__(self, approxs):
+            QWidget.__init__(self)
+            self.combo = QComboBox()
+            self.combo.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+            self.layout = QHBoxLayout()
+            self.layout.addWidget(self.combo)
+            self.setLayout(self.layout)
+            self.approxs = approxs
+            for approx in self.approxs:
+                if approx.extra_combos == 0:
+                    self.combo.addItem(approx.name)
+
+        def get_value(self):
+            return self.combo.currentText()
+
+        def set_value(self, value):
+            index = self.combo.find(value)
+            if index != -1:
+                self.combo.setCurrentIndex(index)
+
+        def get_min(self):
+            return None
+
+        def get_max(self):
+            return None
+
+        def get_default_value(self):
+            return None

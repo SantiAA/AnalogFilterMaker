@@ -1,11 +1,16 @@
-from FrontEnd.UIs.FilterConfigurations.ParameterLayout import ApproximationParameterLayout, DefaultSlider
+from FrontEnd.UIs.UIConfigurations.ParameterLayout import ApproximationParameterLayout, DefaultSlider, \
+    DefaultComboBox
 
 
 class UIApproximation:
-    def __init__(self,approximation):
+    def __init__(self,approximation, approx_name_list = []):
         self.name = approximation.name
         self.parameter_list = []
+        self.approximation_list = approx_name_list
         dict_of_features = approximation.dict
+        self.extra_combos = approximation.extra_combos
+        for i in range(0, self.extra_combos):
+            self.parameter_list.append(ApproximationParameterLayout("Approx " + str(i+1), DefaultComboBox(self.approximation_list), False))
         for feature in dict_of_features:
             self.parameter_list.append(ApproximationParameterLayout(feature, DefaultSlider(dict_of_features[feature][0][0],
                                                                                   dict_of_features[feature][0][1],
@@ -15,8 +20,10 @@ class UIApproximation:
         dict = {}
         for parameter in self.parameter_list:
             if not parameter.toggleable or not parameter.auto:
-                dict[parameter.name] = [[parameter.widget.min, parameter.widget.max, parameter.toggleable], parameter.widget.slider.value()]
+                dict[parameter.name] = [[parameter.get_min(), parameter.get_max(), parameter.toggleable], parameter.get_value()]
             else:
-                dict[parameter.name] = [[parameter.widget.min, parameter.widget.max, parameter.toggleable],
+                dict[parameter.name] = [[parameter.get_min(), parameter.get_max(), parameter.toggleable],
                                       None]
+
+
         return dict

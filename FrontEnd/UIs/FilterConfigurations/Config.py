@@ -1,5 +1,5 @@
-from FrontEnd.UIs.FilterConfigurations.ParameterLayout import FilterParameterLayout, DefaultNumberEdit, DefaultSlider
-from FrontEnd.UIs.Testing.UIApproximation import UIApproximation
+from FrontEnd.UIs.UIConfigurations.ParameterLayout import FilterParameterLayout, DefaultNumberEdit
+from FrontEnd.UIs.UIConfigurations.UIApproximation import UIApproximation
 
 class Config:
     def __init__(self, name, dict_of_features, approximation_list_received):
@@ -14,7 +14,7 @@ class Config:
                                                                                         dict_of_features[feature][1])))
         self.approximation_list = []
         for approximation in approximation_list_received:
-            self.approximation_list.append(UIApproximation(approximation))
+            self.approximation_list.append(UIApproximation(approximation, approximation_list_received))
 
     def make_feature_dictionary(self):
         dict = {}

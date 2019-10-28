@@ -15,18 +15,26 @@ class BackEndTesting:
     def get_util(self):
         self.dict = {
             "Low pass": {"Gain [dB]": [[0, 100], 50],
-                         "Attenuation [dB]": [[10, 20], 15]},
+                         "Attenuation [dB]": [[10, 20], 15],
+                         "Fa [Hz]": [[0, 10000000], 1000]},
             "High pass": {"GaAAin [dB]": [[0, 1000], 500],
                           "Attenuation222 [dB]": [[100, 250], 150]}
         }
+
+        #ApproximationTesting vendria a ser la clase Approximation
         self.approx = {
             "Low pass": [ApproximationTesting("Butterworth", {
                                                     "Max Q": [[0, 100, False], 50],
                                                     "n": [[0, 10, True], 5]
-                        }), ApproximationTesting("Chebyshev", {
+                        }),
+                         ApproximationTesting("Chebyshev", {
                                                     "MaxQcH" : [[0,57,False], 27],
                                                     "NChe" : [[0,5,True],2],
                                                     "Rango Desn" : [[0,100,False],50]}),
+                         ApproximationTesting("Transicional", {
+                             "Max Q": [[0, 100, False], 50],
+                             "n": [[0, 10, True], 5]
+                         },2)    ###IMPORTANTE, PARA LOS TRANSICIONALES PASAR 2 COMO ULTIMO ARGUMENTO. (COMO ESTA EN EL EJEMPLO) (2 VENDRIAN A SER LOS COMBO BOX EXTRAS)
                          ]
             ,
             "High pass": [ApproximationTesting("Butterworth", {
@@ -46,7 +54,14 @@ class BackEndTesting:
 
     def get_graphs(self, filter, approximation):
         graph_dict = {}
-        graph_dict[GraphTypes.Attenuation.value] = [[GraphValues([0,10,15,20,25,13000],[50,100,2000,3000,40000,25]), GraphValues([50,5000,50000,60000],[1000,1100,1500,1700])], ["freq", "module"]]
-        graph_dict[GraphTypes.GroupDelay.value] = [[GraphValues([0,100,105,2000,2500],[500,1000,20000,30000,400000]), GraphValues([500,50000,504000,600500],[10050,14100,15800,17500])], ["freq", "module"]]
-        graph_dict[GraphTypes.PolesZeros.value] = [[GraphValues([50,500,5000,50000], [10,100,1000,10000], True, False, "Zeros"), GraphValues([550,5050,50500,550000], [150,1500,10050,100500], True, True, "Poles")], ["Re", "Im"]]
+        graph_dict[GraphTypes.Attenuation.value] = [[GraphValues([0,10,15,20,25,13000],[50,100,2000,3000,40000,25])],
+                                                    ["freq", "module"]]
+
+        graph_dict[GraphTypes.GroupDelay.value] = [[GraphValues([0,100,105,2000,2500],[500,1000,20000,30000,400000])],
+                                                   ["freq", "module"]]
+
+        graph_dict[GraphTypes.PolesZeros.value] = [[GraphValues([50,500,5000,50000], [10,100,1000,10000], True, False, "Zeros"),            #GRAF CEROS
+                                                GraphValues([550,5050,50500,550000], [150,1500,10050,100500], True, True, "Poles")],        #GRAF POLOS
+                                                   ["Re", "Im"]]
+        ####IMPORTANTEE: PARA LOS POLOS Y CEROS AGREGAR UN PARAMETRO "ZEROS" O "POLOS" COMO ESTA EN EL EJEMPLO. ES PARA QUE QUEDEN LAS LEGENDS BIEN
         return graph_dict
