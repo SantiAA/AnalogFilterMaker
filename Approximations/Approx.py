@@ -49,10 +49,12 @@ class Approximation(object):
         self.n_max = 20
         self.denorm = 0
         self.q_max = -1
+        self.fixed_n = -1
         switcher = {
             "n_max": self._set_n_max,
             "denorm": self._set_denorm,
-            "q_max": self._set_q_max
+            "q_max": self._set_q_max,
+            "fixed_n": self._set_fixed_n
         }
         for key, value in kwargs.items():
             fun = switcher.get(key, lambda: "Invalid argument")
@@ -81,6 +83,12 @@ class Approximation(object):
                 self.q_max = q_max
         else:
             print("Approx.py: Invalid q_max argument, it must be float")
+
+    def _set_fixed_n(self, fixed_n):
+        if type(fixed_n) is int and fixed_n > 0:
+            self.fixed_n = fixed_n
+        else:
+            print("Approx.py: Invalid fixed_q argument, it mus be int")
 
     """ Search more useful functions to add """
 

@@ -141,7 +141,7 @@ class Filter(object):
         graphs[GraphTypes.At] = [[f, -mag, False, False]]   # se pasa una lista de graphvalues
         graphs[GraphTypes.N_AtAt] = [[f_n, -mag_n, False, False]]
         graphs[GraphTypes.Ph] = [[f, phase, False, False]]
-        # graphs[GraphTypes.Gd] = [f,-diff(unwrap(phase)) / diff(w) me mezcle pasando de w a f
+        graphs[GraphTypes.Gd] = [[f, -2*pi*diff(unwrap(phase))/diff(w), False, False]]  # -d(Phase)/df = -dP/dw * dw/df = -dP/dw * 2pi
         graphs[GraphTypes.Zp] = [[self.denormalized["Zeros"].real, self.denormalized["Zeros"].imag, False, True],
                                  [self.denormalized["Poles"].real, self.denormalized["Poles"].imag, True, True]]
         t, imp = signal.impulse(trans_func)
@@ -164,5 +164,5 @@ class Filter(object):
                     break
             if len_in == len(new_p):  # si no le encontre un conjugado
                 new_p.append([p[0]])  # no lo tiene :(
-              p.remove(p[0])
+                p.remove(p[0])
         return new_p

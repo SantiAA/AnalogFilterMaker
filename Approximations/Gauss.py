@@ -43,11 +43,14 @@ class Gauss(Approximation):
 
     def calculate(self, filter_in_use: Filter, **kwargs):
         super().calculate(filter_in_use, **kwargs)
+        """ Using the precalculated plots I get the order """
+        if self.fixed_n > 0:
+            n = self.fixed_n
+        else:
+            n = self._ord()
         while True:
+            """ If the approximation supports the filter I continue """
             if filter_in_use.get_type() is FilterTypes.GruopDelay:
-                """ If the approximation supports the filter I continue """
-                """ Using the precalculated plots I get the order """
-                n = self._ord()
                 """ Now we limit the order of the filter """
                 n = amax([n, self.n_max])
                 """ After getting the order I get the zeros, poles and gain of the filter """
@@ -57,9 +60,10 @@ class Gauss(Approximation):
                 filter_in_use.load_z_p_k(z, p, k)
             else:
                 print("Gauss.py: Invalid filter type passed to Gauss aproximation")
+                return
+            if self.q_max >= filter_in_use.get_max_q() or n == self.n_max or self.fixed_n > 0:
                 break
-            if self.q_max >= filter_in_use.get_max_q() or n == self.n_max:
-                break
+            n = n + 1
 
     " ONCE I HAVE THE SPECS I CALL THIS METHOD "
     def _ord(self):
@@ -75,13 +79,13 @@ class Gauss(Approximation):
         return n
 
     def _gauss_norm(self, n: int):
-        " Returns zeros, poles and gain of Gauss normalized approximation "
+        """ Returns zeros, poles and gain of Gauss normalized approximation """
         transfer_function = self._get_tf(n)
         trans_zpk = transfer_function.to_zpk()
         return trans_zpk.zeros, trans_zpk.poles, trans_zpk.gain
 
     def _gauss_des(self, z_n, p_n):
-        " Returns zeros, poles and gain of Gauss denormalized approximation "
+        """ Returns zeros, poles and gain of Gauss denormalized approximation """
         p = p_n/self.information[TemplateInfo.gd]
         k = prod(abs(p))
         return z_n, p, k
@@ -125,6 +129,6 @@ class Gauss(Approximation):
         den.append(1.)
         transfer_function = signal.TransferFunction(num, den)   # tengo la transferencia al cuadrado
         p = transfer_function.poles
-        p = p[where(p.real < -1e-10)]    # me quedo con los polos del semiplano izquierdo. -1e-10 xq sino n=7 me quedaba inestable, problema: queda de un orden menos para n impar!!!!!
+        p = p[where(p.real < -1e-10)]  # me quedo con los polos del semiplano izquierdo. -1e-10 xq sino n=7 me quedaba inestable, problema: queda de un orden menos para n impar!!!!!
         k = prod(abs(p))                      # para que la ganancia sea 1
         return [], p, k

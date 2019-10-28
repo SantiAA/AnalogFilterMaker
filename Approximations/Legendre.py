@@ -47,50 +47,57 @@ class Legendre(Approximation):
 
     def calculate(self, filter_in_use: Filter, **kwargs):
         super().calculate(filter_in_use, **kwargs)
+        z = []
+        p = []
+        k = 0
+        """ First I calculate the Normalized LowPass, to get the useful w """
+        n, useful_w = self._legord(self.information[TemplateInfo.fp], self.information[TemplateInfo.fa],
+                                   self.information[TemplateInfo.Ap], self.information[TemplateInfo.Aa], self.n_max)
+        if self.fixed_n > 0:
+            n = self.fixed_n
+        elif n > self.n_max:
+            n = self.n_max
+
         while True:
-            n, useful_w = self._legord(self.information[TemplateInfo.fp], self.information[TemplateInfo.fa],
-                                       self.information[TemplateInfo.Ap], self.information[TemplateInfo.Aa], self.n_max)
             z_n, p_n, k_n = self._get_tf(n)
-            filter_in_use.load_normalized_z_p_k(z_n, p_n, k_n)
+
             """ Now check the desnomalization cte """
             w, h = signal.freqs_zpk(z_n, p_n, k_n)
             h = 20 * log10(abs(h))
             i = [abs(j + self.information[TemplateInfo.Aa]) for j in h]
             wa = w[i.index(min(i))]
             denorm_cte = (wa * (1 - self.denorm / 100) + self.denorm / (self.selectivity * 100))
-            z_n = z_n * denorm_cte
-            p_n = p_n * denorm_cte
-            k_n = k_n * (denorm_cte ** (len(p_n) - len(z_n)))
+            _z = z_n * denorm_cte
+            _p = p_n * denorm_cte
+            _k = k_n * (denorm_cte ** (len(p_n) - len(z_n)))
             """" Next we transform the LowPass into the requested filter """
 
             if filter_in_use.get_type() is FilterTypes.LowPass:
                 """ If the approximation support the filter I continue """
-                z, p, k = signal.lp2lp_zpk(z_n, p_n, k_n, 2*pi*self.information[TemplateInfo.fp])
-                filter_in_use.load_z_p_k(z, p, k)
-                """ After getting the order I get the zeros, poles and gain of the filter """
+                z, p, k = signal.lp2lp_zpk(_z, _p, _k, 2*pi*self.information[TemplateInfo.fp])
 
             elif filter_in_use.get_type() is FilterTypes.HighPass:
-                z, p, k = signal.lp2hp_zpk(z_n, p_n, k_n, 2*pi*self.information[TemplateInfo.fp])
-                filter_in_use.load_z_p_k(z, p, k)
+                z, p, k = signal.lp2hp_zpk(_z, _p, _k, 2*pi*self.information[TemplateInfo.fp])
 
             elif filter_in_use.get_type() is FilterTypes.BandPass:
                 Awp = self.information[TemplateInfo.fp_] - self.information[TemplateInfo.fp__]
                 w0 = sqrt(self.information[TemplateInfo.fp_] * self.information[TemplateInfo.fp__])
 
-                z, p, k = signal.lp2bp_zpk(z_n, p_n, k_n, w0, Awp)
-                filter_in_use.load_z_p_k(z, p, k)
+                z, p, k = signal.lp2bp_zpk(_z, _p, _k, w0, Awp)
 
             elif filter_in_use.get_type() is FilterTypes.BandReject:
                 Awp = self.information[TemplateInfo.fp_] - self.information[TemplateInfo.fp__]
                 w0 = sqrt(self.information[TemplateInfo.fp_] * self.information[TemplateInfo.fp__])
 
-                z, p, k = signal.lp2bs_zpk(z_n, p_n, k_n, w0, Awp)
-                filter_in_use.load_z_p_k(z, p, k)
+                z, p, k = signal.lp2bs_zpk(_z, _p, _k, w0, Awp)
             else:
                 print("Legendre.py: Invalid filter type passed to Legendre aproximation")
+                return
+            if self.q_max >= filter_in_use.get_max_q() or n == self.n_max or self.fixed_n > 0:
                 break
-            if self.q_max >= filter_in_use.get_max_q() or n == self.n_max:
-                break
+            n = n + 1
+        filter_in_use.load_z_p_k(z, p, k)
+        filter_in_use.load_normalized_z_p_k(z_n, p_n, k_n)
 
     def _legord(self, f_p, f_a, a_p, a_a, n_max: int):
         n = 0
