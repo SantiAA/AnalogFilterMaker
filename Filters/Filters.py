@@ -2,6 +2,10 @@
 from enum import Enum
 from numpy import poly
 from numpy import sqrt
+from numpy import unwrap
+from numpy import diff
+from numpy import pi
+from scipy import signal
 # third-party modules
 
 # AFM project modules
@@ -28,6 +32,17 @@ class TemplateInfo(Enum):
     gd = "Group delay"
     ft = "ft"
     tol = "Tolerance"
+
+
+class GraphTypes(Enum):
+    N_At = "Normalized attenuation"
+    At = "Attenuation"
+    Ph = "Phase"
+    Zp = "Zeros and Poles"
+    Stp = "Step response"
+    Imp = "Impulse response"
+    Gd = "Group delay"
+#   MaxQ = "Maximum Q"
 
 
 class Filter(object):
@@ -81,7 +96,7 @@ class Filter(object):
         self.denormalized["Zeros"] = z
         self.denormalized["Poles"] = p
         self.denormalized["Gain"] = k
-        self.denormalized["Order"] = len(z)
+        self.denormalized["Order"] = len(p)
         max_q = 0
         p_pairs = self._agrup_poles(p)
         for p_i in p_pairs:
@@ -96,10 +111,30 @@ class Filter(object):
         self.normalized["Zeros"] = z
         self.normalized["Poles"] = p
         self.normalized["Gain"] = k
-        self.normalized["Order"] = len(z)
+        self.normalized["Order"] = len(p)
 
     def get_req_limit(self, key: TemplateInfo):
         return self.limits[key]
+
+    def get_all_graphs(self):
+        graphs = {}
+        trans_func = signal.ZerosPolesGain(self.denormalized["Zeros"], self.denormalized["Poles"], self.denormalized["Gain"])
+        norm_trans_func = signal.ZerosPolesGain(self.normalized["Zeros"], self.normalized["Poles"], self.normalized["Gain"])
+        w, mag, phase = trans_func.bode(n=1500)
+        f = w/(2*pi)
+        w_n, mag_n, phase_n = norm_trans_func.bode(n=1500)
+        f_n = w_n/(2*pi)
+        graphs[GraphTypes.At] = [[f, -mag, False, False]]   # se pasa una lista de graphvalues
+        graphs[GraphTypes.N_AtAt] = [[f_n, -mag_n, False, False]]
+        graphs[GraphTypes.Ph] = [[f, phase, False, False]]
+        # graphs[GraphTypes.Gd] = [f,-diff(unwrap(phase)) / diff(w) me mezcle pasando de w a f
+        graphs[GraphTypes.Zp] = [[self.denormalized["Zeros"].real, self.denormalized["Zeros"].imag, True, True],
+                                 [self.denormalized["Poles"].real, self.denormalized["Poles"].imag, True, True]]
+        t, imp = signal.impulse(trans_func)
+        graphs[GraphTypes.Imp] = [[t, imp, False, False]]
+        t, step = signal.step(trans_func)
+        graphs[GraphTypes.Stp] = [[t, step, False, False]]
+        return graphs
 
     @staticmethod
     def _agrup_poles(p):
@@ -109,7 +144,7 @@ class Filter(object):
             len_in = len(pairs)
             for i in range(1, len(p)):
                 if (abs(p[0].real - p[i].real) < 1e-10) and (abs(p[0].imag + p[i].imag) < 1e-10):
-                    pairs.append([p[0], p[i]])
+                    pairs.append([p[0], complex(p[0].real, -p[0].imag)])   # fuerzo que sean valores iguales
                     p.remove(p[i])
                     break
             if len_in == len(pairs):  # si no le encontre un conjugado
