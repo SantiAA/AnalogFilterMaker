@@ -25,8 +25,9 @@ class GraphValues:
 
     def __init__(self,
                  x_values,
-                 y_values, scattered = False, x_marks= False):
+                 y_values, scattered = False, x_marks= False, extra_information = ""):
         self.x_values = x_values
         self.y_values = y_values
         self.scattered = scattered
         self.x_marks = x_marks
+        self.extra_information = extra_information

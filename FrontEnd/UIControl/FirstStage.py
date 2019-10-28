@@ -3,8 +3,11 @@ from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import *
 from PyQt5.uic import loadUi
 import matplotlib as mpl
+from matplotlib.offsetbox import AuxTransformBox, AnnotationBbox
+
 from BackEnd.Output.plots import GraphTypes
 from FrontEnd.UIControl.FinalGraph import FinalGraph
+from FrontEnd.UIs.FilterConfigurations.Template import Template
 from FrontEnd.UIs.Testing.ApproximationTesting import ApproximationTesting
 from FrontEnd.UIs.Testing.BackEndTesting import BackEndTesting
 from FrontEnd.UIs.FilterConfigurations.Config import Config
@@ -27,8 +30,7 @@ class FirstStage(QMainWindow):
         }
         '''
         self.showingGraphs = []
-
-
+        self.current_template = Template()
 
     def start(self):
         """
@@ -59,6 +61,8 @@ class FirstStage(QMainWindow):
         self.toggleApprox.hide()
         self.fill_combo_graph()
         self.comboGraph.currentIndexChanged.connect(self.combo_graph_changed)
+        self.templateCheckBox.toggled.connect(self.template_toggled)
+        self.templateCheckBox.hide()
 
     '''
     def load_current_state(self, configuration_dict):
@@ -79,12 +83,10 @@ class FirstStage(QMainWindow):
     def combo_graph_changed(self):
         self.redraw_graphs()
 
-
     def fill_combo_graph(self):
         self.comboGraph.clear()
         for filter_type in GraphTypes:
             self.comboGraph.addItem(filter_type.value)
-
 
     def approx_combo_changed(self):
         for graph in self.showingGraphs:
@@ -131,14 +133,34 @@ class FirstStage(QMainWindow):
                                             if not parameter.toggleable:
                                                 parameter.check_box.hide()
 
+    def template_toggled(self):
+        self.current_template.enabled = not self.current_template.enabled
+        self.redraw_template()
+
+    def redraw_template(self):
+        if self.current_template.enabled:
+            mpl_squares = self.current_template.get_matplotlib_squares()
+            if mpl_squares is not None:
+                for square in mpl_squares:
+                    square.set_linewidth(3)
+                    self.plot_rectangle(square)
+        else:
+            self.redraw_graphs()
+
     def plot_template_button_clicked(self):
+        if len(self.current_template.squares) == 0:
+            self.templateCheckBox.show()
         self.filter = self.filters[self.comboFilter.currentText()]
         dict = self.filter.make_feature_dictionary()
         validated, error_string = self.backend.validate_filter([self.filter.name, dict])
         if validated:
             squares = self.backend.get_template([self.filter.name, dict])
-            for square in squares:
-                self.plot_rectangle(square)
+            self.current_template.squares = squares
+            if self.templateCheckBox.isChecked():
+                self.current_template.enabled = True
+            else:
+                self.current_template.enabled = False
+            self.redraw_template()
 
 
         else:
@@ -166,7 +188,7 @@ class FirstStage(QMainWindow):
         """
         Changes the filter template image and requirements whenever the current selected filter type is changed.
         """
-
+        self.current_template = Template()
         self.showingGraphs = []
         self.__update_active_approx_combo__()
         self.redraw_graphs()
@@ -246,7 +268,9 @@ class FirstStage(QMainWindow):
                             properties.append([prop.name, prop.widget.label.text()])
                         else:
                             properties.append([prop.name, "Auto"])
-                    self.graphics_returned = self.backend.get_graphs([self.filter.name, dict], ApproximationTesting(approximation.name, approximation.make_approx_dict()))
+                    self.graphics_returned = self.backend.get_graphs([self.filter.name, dict],
+                                                                     ApproximationTesting(approximation.name,
+                                                                                          approximation.make_approx_dict()))
                     self.existing = True
                     new_graph = FinalGraph(self.graphics_returned, properties, True)
                     if self.activeApproxsCombo.findText(new_graph.approximation_properties_string) == -1:
@@ -279,11 +303,13 @@ class FirstStage(QMainWindow):
                 item.widget().deleteLater()
 
     def plot_rectangle(self, square):
+
         self.graph_widget.canvas.axes.set_title(self.comboGraph.currentText())
         self.graph_widget.canvas.axes.set_xscale('log')
         self.graph_widget.canvas.axes.grid(True, which="both")
         self.graph_widget.canvas.axes.add_patch(square)
-        self.graph_widget.canvas.axes.autoscale()
+        self.graph_widget.canvas.axes.set_xlim(self.current_template.find_axes_limits()[0])
+        self.graph_widget.canvas.axes.set_ylim(self.current_template.find_axes_limits()[1])
         self.graph_widget.canvas.draw()  # Redraws
 
     def redraw_graphs(self):
@@ -305,23 +331,30 @@ class FirstStage(QMainWindow):
                         self.graph_widget.canvas.axes.grid(True, which="both")
                         self.graph_widget.canvas.axes.set_title(self.comboGraph.currentText())
                         self.graph_widget.canvas.draw()  # Redraws
+            if self.current_template.enabled:
+                self.redraw_template()
         except:
-            a =0
+            a = 0
 
     def __plot_graph__(self, graph, legend_string):
-        self.__fix_axes_titles_position__(self.graph_widget,graph[1][0], graph[1][1] )
+        self.__fix_axes_titles_position__(self.graph_widget, graph[1][0], graph[1][1])
         for graph_data in graph[0]:
+            complete_legend = legend_string
+            if graph_data.extra_information != "":
+                complete_legend += "-" + graph_data.extra_information
             if not graph_data.scattered:
                 if not graph_data.x_marks:
-                    self.graph_widget.canvas.axes.plot(graph_data.x_values, graph_data.y_values, label = legend_string)
+                    self.graph_widget.canvas.axes.plot(graph_data.x_values, graph_data.y_values, label=complete_legend)
                 else:
-                    self.graph_widget.canvas.axes.plot(graph_data.x_values, graph_data.y_values, marker='x', label = legend_string)
+                    self.graph_widget.canvas.axes.plot(graph_data.x_values, graph_data.y_values, marker='x',
+                                                       label=complete_legend)
 
             else:
                 if not graph_data.x_marks:
-                    self.graph_widget.canvas.axes.scatter(graph_data.x_values, graph_data.y_values, label = legend_string)
+                    self.graph_widget.canvas.axes.scatter(graph_data.x_values, graph_data.y_values, label=complete_legend)
                 else:
-                    self.graph_widget.canvas.axes.scatter(graph_data.x_values, graph_data.y_values, marker='x', label = legend_string)
+                    self.graph_widget.canvas.axes.scatter(graph_data.x_values, graph_data.y_values, marker='x',
+                                                          label=complete_legend)
         self.graph_widget.canvas.axes.legend(loc='best')
 
     # Funciones que configuran y muestran los titulos de los ejes.
