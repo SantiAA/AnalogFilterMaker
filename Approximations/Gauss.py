@@ -41,20 +41,25 @@ class Gauss(Approximation):
             self.information[each] = filter_in_use.get_req_value(each)
         return True
 
-    def calculate(self, filter_in_use: Filter, n_max=20, denorm=0):
-        if filter_in_use.get_type() is FilterTypes.GruopDelay:
-            """ If the approximation supports the filter I continue """
-            """ Using the precalculated plots I get the order and the frequency for the -3dB point"""
-            n = self._ord()
-            """ Now we limit the order of the filter """
-            n = amax([n, n_max])
-            """ After getting the order I get the zeros, poles and gain of the filter """
-            filter_in_use.load_order(n)
-            z_n, p_n, k_n = self._gauss_norm(n)
-            filter_in_use.load_normalized_z_p_k(z_n, p_n, k_n)
-            z, p, k = self._gauss_des(z_n, p_n)
-            filter_in_use.load_z_p_k(z, p, k)
-
+    def calculate(self, filter_in_use: Filter, **kwargs):
+        super().calculate(filter_in_use, **kwargs)
+        while True:
+            if filter_in_use.get_type() is FilterTypes.GruopDelay:
+                """ If the approximation supports the filter I continue """
+                """ Using the precalculated plots I get the order and the frequency for the -3dB point"""
+                n = self._ord()
+                """ Now we limit the order of the filter """
+                n = amax([n, self.n_max])
+                """ After getting the order I get the zeros, poles and gain of the filter """
+                z_n, p_n, k_n = self._gauss_norm(n)
+                filter_in_use.load_normalized_z_p_k(z_n, p_n, k_n)
+                z, p, k = self._gauss_des(z_n, p_n)
+                filter_in_use.load_z_p_k(z, p, k)
+            else:
+                print("Gauss.py: Invalid filter type passed to Gauss aproximation")
+                break
+            if self.q_max >= filter_in_use.get_max_q():
+                break
 
     " ONCE I HAVE THE SPECS I CALL THIS METHOD "
     def _ord(self):
