@@ -50,13 +50,13 @@ class ApproximationParameterLayout(QWidget):
         return self.widget.get_value()
 
     def get_min(self):
-        self.widget.get_min()
+        return self.widget.get_min()
 
     def get_max(self):
-        self.widget.get_max()
+        return self.widget.get_max()
 
     def get_default_value(self):
-        self.widget.get_default_value()
+        return self.widget.get_default_value()
 
     def check_box_toggled(self):
         if self.check_box.isChecked():

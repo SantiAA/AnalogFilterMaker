@@ -268,7 +268,7 @@ class FirstStage(QMainWindow):
                             properties.append([prop.name, "Auto"])
                     self.graphics_returned = self.backend.get_graphs([self.filter.name, dict],
                                                                      ApproximationTesting(approximation.name,
-                                                                                          approximation.make_approx_dict()))
+                                                                                          approximation.make_approx_dict(), approximation.extra_combos))
                     self.existing = True
                     new_graph = FinalGraph(self.graphics_returned, properties, True)
                     if self.activeApproxsCombo.findText(new_graph.approximation_properties_string) == -1:

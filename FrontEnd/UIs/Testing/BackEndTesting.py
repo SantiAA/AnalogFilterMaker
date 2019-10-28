@@ -52,7 +52,11 @@ class BackEndTesting:
         rect3 = Square(Dot(2000000, -INFINITE), Dot(2000000, 300), Dot(INFINITE, 300), Dot(INFINITE, -INFINITE))
         return [rect1, rect2, rect3]
 
-    def get_graphs(self, filter, approximation):
+    def get_graphs(self, filter, approximation):    ##IMPORTANTE. SI ES UN TRANSICIONAL. LOS DATOS DE QUE APROXIMACIONES SE USAN SE DEVUELVEN COMO CUALQUIER OTRA COSA. MIN Y MAX SON NONE.
+                                                    #EJEMPLO:
+                                                        #Approx 1: [[None, None, False], "Cheby"]
+                                                        #Approx 2: [[None,None, False, "Butter"]
+                                                    #El nombre de los paramatros seria Approx 2, Approx 2 y asi (se puede chequear cuantos son con approximation.extra_combos)
         graph_dict = {}
         graph_dict[GraphTypes.Attenuation.value] = [[GraphValues([0,10,15,20,25,13000],[50,100,2000,3000,40000,25])],
                                                     ["freq", "module"]]
