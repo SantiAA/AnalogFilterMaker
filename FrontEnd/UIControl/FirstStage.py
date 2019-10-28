@@ -2,8 +2,10 @@ import webbrowser
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import *
 from PyQt5.uic import loadUi
-
+import matplotlib as mpl
+from BackEnd.Output.plots import GraphTypes
 from FrontEnd.UIControl.FinalGraph import FinalGraph
+from FrontEnd.UIs.Testing.ApproximationTesting import ApproximationTesting
 from FrontEnd.UIs.Testing.BackEndTesting import BackEndTesting
 from FrontEnd.UIs.FilterConfigurations.Config import Config
 
@@ -25,6 +27,8 @@ class FirstStage(QMainWindow):
         }
         '''
         self.showingGraphs = []
+
+
 
     def start(self):
         """
@@ -53,6 +57,8 @@ class FirstStage(QMainWindow):
         self.editApproximationButton.clicked.connect(self.edit_approx)
         self.activeApproxsCombo.currentIndexChanged.connect(self.approx_combo_changed)
         self.toggleApprox.hide()
+        self.fill_combo_graph()
+        self.comboGraph.currentIndexChanged.connect(self.combo_graph_changed)
 
     '''
     def load_current_state(self, configuration_dict):
@@ -70,6 +76,16 @@ class FirstStage(QMainWindow):
         pickle.dump(Save, open("Save File", "wb"))  # Creates the file and puts the data into the file
         '''
 
+    def combo_graph_changed(self):
+        self.redraw_graphs()
+
+
+    def fill_combo_graph(self):
+        self.comboGraph.clear()
+        for filter_type in GraphTypes:
+            self.comboGraph.addItem(filter_type.value)
+
+
     def approx_combo_changed(self):
         for graph in self.showingGraphs:
             if graph.approximation_properties_string == self.activeApproxsCombo.currentText():
@@ -81,8 +97,8 @@ class FirstStage(QMainWindow):
     def toggle_approximation(self):
         for graph in self.showingGraphs:
             if graph.approximation_properties_string == self.activeApproxsCombo.currentText():
-                graph.toggle_graph()
-                self.update_plot()
+                graph.toggle_graph(self.toggleApprox.isChecked())
+                self.redraw_graphs()
 
     def edit_approx(self):
         approx_name = ""
@@ -104,7 +120,7 @@ class FirstStage(QMainWindow):
                                             parameter.rows[1].hide()
                                             parameter.check_box.show()
                                             parameter.check_box.setChecked(True)
-                                            
+
                                             if not parameter.toggleable:
                                                 parameter.check_box.hide()
                                         else:
@@ -150,9 +166,10 @@ class FirstStage(QMainWindow):
         """
         Changes the filter template image and requirements whenever the current selected filter type is changed.
         """
+
         self.showingGraphs = []
         self.__update_active_approx_combo__()
-        self.update_plot()
+        self.redraw_graphs()
         # update plot
         for filters in self.filters.values():  # Clearing requirement widgets
             for parameters in filters.parameter_list:
@@ -176,6 +193,8 @@ class FirstStage(QMainWindow):
             self.configurationLayout.addWidget(parameter)
         self.configurationLayout.addStretch(50)  # space
         self.show()
+        if len(self.showingGraphs) == 0:
+            self.toggleApprox.hide()
         # self.save_current_state()
 
     def update_approximation(self):
@@ -203,7 +222,7 @@ class FirstStage(QMainWindow):
                 if approx.approximation_properties_string == self.activeApproxsCombo.currentText():
                     self.showingGraphs.remove(approx)
             self.__update_active_approx_combo__()
-            self.update_plot()
+            self.redraw_graphs()
         if len(self.showingGraphs) == 0:
             self.toggleApprox.hide()
 
@@ -213,6 +232,7 @@ class FirstStage(QMainWindow):
         """
         self.toggleApprox.show()
         properties = []
+        self.graphics_returned = []
         self.filter = self.filters[self.comboFilter.currentText()]
         dict = self.filter.make_feature_dictionary()
         validated, error_string = self.backend.validate_filter([self.filter.name, dict])
@@ -226,8 +246,12 @@ class FirstStage(QMainWindow):
                             properties.append([prop.name, prop.widget.label.text()])
                         else:
                             properties.append([prop.name, "Auto"])
-            self.showingGraphs.append(FinalGraph(None, properties, True))
-            self.update_plot()
+                    self.graphics_returned = self.backend.get_graphs([self.filter.name, dict], ApproximationTesting(approximation.name, approximation.make_approx_dict()))
+                    self.existing = True
+                    new_graph = FinalGraph(self.graphics_returned, properties, True)
+                    if self.activeApproxsCombo.findText(new_graph.approximation_properties_string) == -1:
+                        self.showingGraphs.append(new_graph)
+            self.redraw_graphs()
 
         else:
             msg = QMessageBox()
@@ -260,18 +284,59 @@ class FirstStage(QMainWindow):
         self.graph_widget.canvas.axes.grid(True, which="both")
         self.graph_widget.canvas.axes.add_patch(square)
         self.graph_widget.canvas.axes.autoscale()
-
         self.graph_widget.canvas.draw()  # Redraws
 
-    def update_plot(self):
-        b = 0
-        # test
-        self.graph_widget.canvas.axes.clear()
-        self.graph_widget.canvas.axes.set_title(self.comboGraph.currentText())
-        self.graph_widget.canvas.axes.scatter([0, 10, 15, 20, 25],
-                                              [40, 50, 60, 90, 120],
-                                              color='b')
-        self.graph_widget.canvas.axes.set_xscale('log')
-        self.graph_widget.canvas.axes.grid(True, which="both")
+    def redraw_graphs(self):
+        try:
+            self.graph_widget.canvas.axes.clear()
+            self.graph_widget.canvas.axes.set_title(self.comboGraph.currentText())
 
-        self.graph_widget.canvas.draw()  # Redraws
+            self.graph_widget.canvas.axes.set_xscale('log')
+            self.graph_widget.canvas.axes.grid(True, which="both")
+
+            self.graph_widget.canvas.draw()  # Redraws
+
+            for graph in self.showingGraphs:
+                if graph.enabled:
+                    graph_values = graph.graphs[self.comboGraph.currentText()]
+                    if graph_values is not None:
+                        self.__plot_graph__(graph_values, graph.approximation_properties_string)
+                        self.graph_widget.canvas.axes.set_xscale('log')
+                        self.graph_widget.canvas.axes.grid(True, which="both")
+                        self.graph_widget.canvas.axes.set_title(self.comboGraph.currentText())
+                        self.graph_widget.canvas.draw()  # Redraws
+        except:
+            a =0
+
+    def __plot_graph__(self, graph, legend_string):
+        self.__fix_axes_titles_position__(self.graph_widget,graph[1][0], graph[1][1] )
+        for graph_data in graph[0]:
+            if not graph_data.scattered:
+                if not graph_data.x_marks:
+                    self.graph_widget.canvas.axes.plot(graph_data.x_values, graph_data.y_values, label = legend_string)
+                else:
+                    self.graph_widget.canvas.axes.plot(graph_data.x_values, graph_data.y_values, marker='x', label = legend_string)
+
+            else:
+                if not graph_data.x_marks:
+                    self.graph_widget.canvas.axes.scatter(graph_data.x_values, graph_data.y_values, label = legend_string)
+                else:
+                    self.graph_widget.canvas.axes.scatter(graph_data.x_values, graph_data.y_values, marker='x', label = legend_string)
+        self.graph_widget.canvas.axes.legend(loc='best')
+
+    # Funciones que configuran y muestran los titulos de los ejes.
+    def __fix_axes_titles_position__(self, widget, label_x, label_y):
+        self.__fix_y_title_position__(widget, label_y)
+        self.__fix_x_title_position__(widget, label_x)
+
+    def __fix_x_title_position__(self, widget, label):
+        ticklabelpad = mpl.rcParams['xtick.major.pad']
+        widget.canvas.axes.annotate(label, xy=(1, 0), xytext=(20, -ticklabelpad),
+                                    ha='left', va='top',
+                                    xycoords='axes fraction', textcoords='offset points')
+
+    def __fix_y_title_position__(self, widget, label):
+        ticklabelpad = mpl.rcParams['ytick.major.pad']
+        widget.canvas.axes.annotate(label, xy=(0, 1), xytext=(-30, -ticklabelpad + 10),
+                                    ha='left', va='bottom',
+                                    xycoords='axes fraction', textcoords='offset points', rotation=0)

@@ -1,6 +1,7 @@
 import matplotlib
 from matplotlib import patches
 
+from BackEnd.Output.plots import GraphTypes, GraphValues
 from FrontEnd.UIs.Testing.ApproximationTesting import ApproximationTesting
 
 
@@ -39,4 +40,7 @@ class BackEndTesting:
         return [rect1, patches.Rectangle((30000,20), 10000, 100, fill=False, alpha =1), rect3]
 
     def get_graphs(self, filter, approximation):
-        return True
+        graph_dict = {}
+        graph_dict[GraphTypes.Attenuation.value] = [[GraphValues([0,10,15,20,25],[50,100,2000,3000,40000]), GraphValues([50,5000,50000,60000],[1000,1100,1500,1700])], ["freq", "module"]]
+        graph_dict[GraphTypes.GroupDelay.value] = [[GraphValues([0,100,105,2000,2500],[500,1000,20000,30000,400000]), GraphValues([500,50000,504000,600500],[10050,14100,15800,17500])], ["freq", "module"]]
+        return graph_dict

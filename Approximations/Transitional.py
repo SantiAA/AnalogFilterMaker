@@ -11,17 +11,17 @@ from Filters.Filters import TemplateInfo
 from Filters.Filters import Filter
 
 
-class Transicional(Approximation):
+class Transitional(Approximation):
 
     def __init__(self):
-        Approximation.__init__(self, "Transicional")
+        Approximation.__init__(self, "Transitional")
         self.application = [FilterTypes.HighPass, FilterTypes.LowPass, FilterTypes.BandPass, FilterTypes.BandReject]
         self.approximations = ["Butterworth", "Cauer", "Chevy1", "Chevy2", "Legendre"]
 
     def load_information(self, filter_in_use: Filter):
 
         if filter_in_use.get_type() not in self.application:
-            print("Something done wrong, Transicional filters are not valid for ", filter_in_use.get_type())
+            print("Something done wrong, Transitional filters are not valid for ", filter_in_use.get_type())
             return False
 
         specs = filter_in_use.get_requirements()

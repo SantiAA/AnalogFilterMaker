@@ -4,10 +4,11 @@ class FinalGraph:
         self.properties = properties
         self.approximation_properties_string = ""
         self.change_approximation_string()
+        self.graphs = []
         self.graphs = graphs
 
-    def toggle_graph(self):
-        self.enabled = not self.enabled
+    def toggle_graph(self, enabled):
+        self.enabled = enabled
 
     def change_approximation_string(self):
         self.approximation_properties_string = ""
