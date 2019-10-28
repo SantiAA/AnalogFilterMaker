@@ -30,17 +30,23 @@ class Bessel(Approximation):
         self.__selectivity__(filter_in_use.get_type())
         return True
 
-    def calculate(self, filter_in_use: Filter, n_max=20, denorm=0):
-        """ Be careful this function doesn't care of Q !!! """
-        """ First search the order and the normalizer 'cut' frequency """
-        normalized_n, useful_w = self._bessord(self.information[TemplateInfo.ft], self.information[TemplateInfo.tol],
-                                               self.information[TemplateInfo.gd], n_max)
+    def calculate(self, filter_in_use: Filter, **kwargs):
+        super().calculate(filter_in_use, **kwargs)
+        while True:
+            """ First search the order and the normalizer 'cut' frequency """
+            normalized_n, useful_w = self._bessord(self.information[TemplateInfo.ft], self.information[TemplateInfo.tol],
+                                                   self.information[TemplateInfo.gd], n_max)
 
-        z_norm, p_norm, k_norm = signal.bessel(normalized_n, useful_w, analog=True, output='zpk')
-        filter_in_use.load_normalized_z_p_k(z_norm, p_norm, k_norm)
-
-        z, p, k = signal.bessel(normalized_n, useful_w/self.information[TemplateInfo.gd], 'low', True, 'zpk')
-        filter_in_use.load_z_p_k(z, p, k)
+            z_norm, p_norm, k_norm = signal.bessel(normalized_n, useful_w, analog=True, output='zpk')
+            filter_in_use.load_normalized_z_p_k(z_norm, p_norm, k_norm)
+            if filter_in_use.get_type() is FilterTypes.GroupDelay:
+                z, p, k = signal.bessel(normalized_n, useful_w/self.information[TemplateInfo.gd], 'low', True, 'zpk')
+                filter_in_use.load_z_p_k(z, p, k)
+            else:
+                print("Bessel.py: Invalid filter type passed to Bessel aproximation")
+                break
+            if self.q_max >= filter_in_use.get_max_q() or normalized_n == self.n_max:
+                break
 
     def _bessord(self, frg, tol, tau, max_order):
         wrgn = 2*np.pi*frg*tau

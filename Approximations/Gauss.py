@@ -28,7 +28,7 @@ class Gauss(Approximation):
         Approximation.__init__(self, "Gauss")
         self.application = [FilterTypes.GroupDelay]
         self.information = {}
-        self._pre_calc(20)  # n_max = 20
+        self._pre_calc(self.n_max)
 
     def load_information(self, filter_in_use: Filter):
 
@@ -46,7 +46,7 @@ class Gauss(Approximation):
         while True:
             if filter_in_use.get_type() is FilterTypes.GruopDelay:
                 """ If the approximation supports the filter I continue """
-                """ Using the precalculated plots I get the order and the frequency for the -3dB point"""
+                """ Using the precalculated plots I get the order """
                 n = self._ord()
                 """ Now we limit the order of the filter """
                 n = amax([n, self.n_max])
@@ -58,7 +58,7 @@ class Gauss(Approximation):
             else:
                 print("Gauss.py: Invalid filter type passed to Gauss aproximation")
                 break
-            if self.q_max >= filter_in_use.get_max_q():
+            if self.q_max >= filter_in_use.get_max_q() or n == self.n_max:
                 break
 
     " ONCE I HAVE THE SPECS I CALL THIS METHOD "
