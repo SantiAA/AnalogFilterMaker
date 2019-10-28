@@ -3,6 +3,7 @@ from enum import Enum
 from numpy import poly
 from numpy import sqrt
 from numpy import conj
+from numpy import amax
 from numpy import unwrap
 from numpy import diff
 from numpy import pi
@@ -37,14 +38,14 @@ class TemplateInfo(Enum):
 
 
 class GraphTypes(Enum):
-    N_At = "Normalized attenuation"
-    At = "Attenuation"
-    Ph = "Phase"
-    Zp = "Zeros and Poles"
-    Stp = "Step response"
-    Imp = "Impulse response"
-    Gd = "Group delay"
-#   MaxQ = "Maximum Q"
+    Norm_Attenuation = "Normalized attenuation"
+    Attenuation = "Attenuation"
+    Phase = "Phase"
+    PolesZeros = "Zeros and Poles"
+    Step = "Step response"
+    Impulse = "Impulse response"
+    GroupDelay = "Group delay"
+    StagesQ = "Q"
 
 
 class Filter(object):
@@ -60,6 +61,7 @@ class Filter(object):
                              "Zeros": [],
                              "Poles": [],
                              "Gain": None,
+                             "StagesQ": None,
                              "MaxQ": None}
         self.limits = {TemplateInfo.Aa: (0, 1e9), TemplateInfo.Ap: (0, 1e9), TemplateInfo.fa: (0, 1e9),
                        TemplateInfo.fp: (0, 1e9), TemplateInfo.fp_: (0, 1e9), TemplateInfo.fp__: (0, 1e9),
@@ -117,9 +119,10 @@ class Filter(object):
             if len(p_i) == 2:
                 den = poly(p_i, True)     # busco coeficientes del denominador
                 q = sqrt(den[2])/den[1]   # formula para Q en funcion de los coeficientes
-                if q > max_q:
-                    max_q = q
-        self.denormalized["MaxQ"] = max_q
+                self.denormalized["StagesQ"].append(q)
+            else:
+                self.denormalized["StagesQ"].append(-1)
+        self.denormalized["MaxQ"] = amax(self.denormalized["StagesQ"])
 
     def load_normalized_z_p_k(self, z, p, k):
         self.normalized["Zeros"] = z
@@ -138,16 +141,21 @@ class Filter(object):
         f = w/(2*pi)
         w_n, mag_n, phase_n = norm_trans_func.bode(n=1500)
         f_n = w_n/(2*pi)
-        graphs[GraphTypes.At] = [[f, -mag, False, False]]   # se pasa una lista de graphvalues
-        graphs[GraphTypes.N_AtAt] = [[f_n, -mag_n, False, False]]
-        graphs[GraphTypes.Ph] = [[f, phase, False, False]]
-        graphs[GraphTypes.Gd] = [[f, -2*pi*diff(unwrap(phase))/diff(w), False, False]]  # -d(Phase)/df = -dP/dw * dw/df = -dP/dw * 2pi
-        graphs[GraphTypes.Zp] = [[self.denormalized["Zeros"].real, self.denormalized["Zeros"].imag, False, True],
-                                 [self.denormalized["Poles"].real, self.denormalized["Poles"].imag, True, True]]
+        graphs[GraphTypes.Attenuation] = [[f, -mag, False, False], ["f[Hz]", "At[dB]"]]   # se pasa una lista de graphvalues
+        graphs[GraphTypes.Norm_Attenuation] = [[f_n, -mag_n, False, False], ["f[Hz]", "At[dB]"]]
+        graphs[GraphTypes.Phase] = [[f, phase, False, False], ["f[Hz]", "phase[deg]"]]
+        graphs[GraphTypes.GroupDelay] = [[f, -2*pi*diff(unwrap(phase))/diff(w), False, False], ["f[Hz]", "Group delay [s]"]]  # -d(Phase)/df = -dP/dw * dw/df = -dP/dw * 2pi
+        graphs[GraphTypes.PolesZeros] = [[self.denormalized["Zeros"].real, self.denormalized["Zeros"].imag, False, True],
+                                 [self.denormalized["Poles"].real, self.denormalized["Poles"].imag, True, True], ["Re(s)", "Im(s)"]]
         t, imp = signal.impulse(trans_func)
-        graphs[GraphTypes.Imp] = [[t, imp, False, False]]
+        graphs[GraphTypes.Impulse] = [[t, imp, False, False], ["t[s]", "V[V]"]]
         t, step = signal.step(trans_func)
-        graphs[GraphTypes.Stp] = [[t, step, False, False]]
+        graphs[GraphTypes.Step] = [[t, step, False, False], ["t[s]", "V[V]"]]
+        i = 0
+        while i < len(self.denormalized["StagesQ"]):
+            graphs[GraphTypes.StagesQ][i].append([[0, self.denormalized["StagesQ"][i]], [i+1, i+1], True, False])
+            i += 1
+        graphs[GraphTypes.StagesQ][i].append(["Q", "Q N°"])
         return graphs
 
     @staticmethod
