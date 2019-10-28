@@ -2,6 +2,7 @@
 from enum import Enum
 from numpy import poly
 from numpy import sqrt
+from numpy import conj
 from numpy import unwrap
 from numpy import diff
 from numpy import pi
@@ -32,6 +33,7 @@ class TemplateInfo(Enum):
     gd = "Group delay"
     ft = "ft"
     tol = "Tolerance"
+    k = "Gain"
 
 
 class GraphTypes(Enum):
@@ -62,7 +64,7 @@ class Filter(object):
         self.limits = {TemplateInfo.Aa: (0, 1e9), TemplateInfo.Ap: (0, 1e9), TemplateInfo.fa: (0, 1e9),
                        TemplateInfo.fp: (0, 1e9), TemplateInfo.fp_: (0, 1e9), TemplateInfo.fp__: (0, 1e9),
                        TemplateInfo.fa_: (0, 1e9), TemplateInfo.fa__: (0, 1e9), TemplateInfo.fo: (0, 1e9),
-                       TemplateInfo.ft: (0, 1e9), TemplateInfo.gd: (0, 1e9), TemplateInfo.tol: (0, 1)}
+                       TemplateInfo.ft: (0, 1e9), TemplateInfo.gd: (0, 1e9), TemplateInfo.tol: (0, 1), TemplateInfo.k: (0, 1e9)}
 
     def get_type(self) -> FilterTypes:
         return self.filter
@@ -94,12 +96,24 @@ class Filter(object):
 
     def load_z_p_k(self, z, p, k):
         self.denormalized["Zeros"] = z
-        self.denormalized["Poles"] = p
         self.denormalized["Gain"] = k
         self.denormalized["Order"] = len(p)
         max_q = 0
-        p_pairs = self._agrup_poles(p)
-        for p_i in p_pairs:
+        p = self._agrup_roots(p)     #ordena por parte real creciente y se asegura que los complejos conjugados tengan el mismo valor
+        self.denormalized["Poles"] = p
+        pairs = []
+        while len(p):                 # agrupo en polos complejos conjugados
+            len_in = len(pairs)
+            for i in range(1, len(p)):
+                if p[0] ==  p[i].conjugate():
+                    pairs.append(p[0])
+                    p.remove(p[i])
+                    break
+            if len_in == len(pairs):  # si no le encontre un conjugado
+                pairs.append([p[0]])  # no lo tiene :(
+            p.remove(p[0])
+
+        for p_i in pairs:
             if len(p_i) == 2:
                 den = poly(p_i, True)     # busco coeficientes del denominador
                 q = sqrt(den[2])/den[1]   # formula para Q en funcion de los coeficientes
@@ -128,7 +142,7 @@ class Filter(object):
         graphs[GraphTypes.N_AtAt] = [[f_n, -mag_n, False, False]]
         graphs[GraphTypes.Ph] = [[f, phase, False, False]]
         # graphs[GraphTypes.Gd] = [f,-diff(unwrap(phase)) / diff(w) me mezcle pasando de w a f
-        graphs[GraphTypes.Zp] = [[self.denormalized["Zeros"].real, self.denormalized["Zeros"].imag, True, True],
+        graphs[GraphTypes.Zp] = [[self.denormalized["Zeros"].real, self.denormalized["Zeros"].imag, False, True],
                                  [self.denormalized["Poles"].real, self.denormalized["Poles"].imag, True, True]]
         t, imp = signal.impulse(trans_func)
         graphs[GraphTypes.Imp] = [[t, imp, False, False]]
@@ -137,17 +151,18 @@ class Filter(object):
         return graphs
 
     @staticmethod
-    def _agrup_poles(p):
-        pairs = []
+    def _agrup_roots(p):
+        new_p = []
         p.sort(key=lambda x: x.real)  # ordeno por parte real creciente
         while len(p):
-            len_in = len(pairs)
+            len_in = len(new_p)
             for i in range(1, len(p)):
                 if (abs(p[0].real - p[i].real) < 1e-10) and (abs(p[0].imag + p[i].imag) < 1e-10):
-                    pairs.append([p[0], complex(p[0].real, -p[0].imag)])   # fuerzo que sean valores iguales
+                    new_p.append(p[0])
+                    new_p.append(complex(p[0].real, -p[0].imag))    # fuerzo que sean valores iguales
                     p.remove(p[i])
                     break
-            if len_in == len(pairs):  # si no le encontre un conjugado
-                pairs.append([p[0]])  # no lo tiene :(
-            p.remove(p[0])
-        return pairs
+            if len_in == len(new_p):  # si no le encontre un conjugado
+                new_p.append([p[0]])  # no lo tiene :(
+              p.remove(p[0])
+        return new_p
