@@ -3,6 +3,9 @@ from enum import Enum
 from numpy import poly
 from numpy import sqrt
 from numpy import conj
+from numpy import angle
+from numpy import log10
+from numpy import amax
 from numpy import unwrap
 from numpy import diff
 from numpy import pi
@@ -37,14 +40,15 @@ class TemplateInfo(Enum):
 
 
 class GraphTypes(Enum):
-    N_At = "Normalized attenuation"
-    At = "Attenuation"
-    Ph = "Phase"
-    Zp = "Zeros and Poles"
-    Stp = "Step response"
-    Imp = "Impulse response"
-    Gd = "Group delay"
-#   MaxQ = "Maximum Q"
+    Normalized = "Normalized"
+    Attenuation = "Attenuation"
+    Module = "Module"
+    Phase = "Phase"
+    PolesZeros = "Zeros and Poles"
+    Step = "Step response"
+    Impulse = "Impulse response"
+    GroupDelay = "Group delay"
+    StagesQ = "Q"
 
 
 class Filter(object):
@@ -60,6 +64,7 @@ class Filter(object):
                              "Zeros": [],
                              "Poles": [],
                              "Gain": None,
+                             "StagesQ": None,
                              "MaxQ": None}
         self.limits = {TemplateInfo.Aa: (0, 1e9), TemplateInfo.Ap: (0, 1e9), TemplateInfo.fa: (0, 1e9),
                        TemplateInfo.fp: (0, 1e9), TemplateInfo.fp_: (0, 1e9), TemplateInfo.fp__: (0, 1e9),
@@ -99,33 +104,34 @@ class Filter(object):
         self.denormalized["Gain"] = k
         self.denormalized["Order"] = len(p)
         max_q = 0
-        p = self._agrup_roots(p)     #ordena por parte real creciente y se asegura que los complejos conjugados tengan el mismo valor
+        p = self._agrup_roots(p)     # ordena Re(p) creciente, se asegura que los comp conj tengan el mismo valor
         self.denormalized["Poles"] = p
-        pairs = []
         while len(p):                 # agrupo en polos complejos conjugados
-            len_in = len(pairs)
+            # len_in = len(self.denormalized["StagesQ"])
             for i in range(1, len(p)):
-                if p[0] ==  p[i].conjugate():
-                    pairs.append(p[0])
+                if p[0] == p[i].conjugate():
+                    # pairs.append(p[0])
+                    wo = sqrt(abs(p[0] * p[i]))
+                    q = -wo / (p[0].real + p[i].real)
+                    self.denormalized["StagesQ"].append(q)
                     p.remove(p[i])
                     break
-            if len_in == len(pairs):  # si no le encontre un conjugado
-                pairs.append([p[0]])  # no lo tiene :(
             p.remove(p[0])
-
-        for p_i in pairs:
-            if len(p_i) == 2:
-                den = poly(p_i, True)     # busco coeficientes del denominador
-                q = sqrt(den[2])/den[1]   # formula para Q en funcion de los coeficientes
-                if q > max_q:
-                    max_q = q
-        self.denormalized["MaxQ"] = max_q
+            # if len_in == len(self.denormalized["StagesQ"]):  # si no le encontre un conjugado
+            #    pairs.append([p[0]])  # no lo tiene :(
+            #    self.denormalized["StagesQ"].append(-1)
+        self.denormalized["MaxQ"] = amax(self.denormalized["StagesQ"])
 
     def load_normalized_z_p_k(self, z, p, k):
         self.normalized["Zeros"] = z
         self.normalized["Poles"] = p
         self.normalized["Gain"] = k
         self.normalized["Order"] = len(p)
+
+    def get_z_p_k_q(self):
+        """ Returns poles ordered: conjugates are next to each other """
+        return self.denormalized["Zeros"], self.denormalized["Poles"], self.denormalized["Gain"], \
+               self.denormalized["StagesQ"]
 
     def get_req_limit(self, key: TemplateInfo):
         return self.limits[key]
@@ -134,20 +140,35 @@ class Filter(object):
         graphs = {}
         trans_func = signal.ZerosPolesGain(self.denormalized["Zeros"], self.denormalized["Poles"], self.denormalized["Gain"])
         norm_trans_func = signal.ZerosPolesGain(self.normalized["Zeros"], self.normalized["Poles"], self.normalized["Gain"])
-        w, mag, phase = trans_func.bode(n=1500)
+        w, h = trans_func.freqresp(n=3000)
         f = w/(2*pi)
-        w_n, mag_n, phase_n = norm_trans_func.bode(n=1500)
+        mag = 20 * log10(abs(h))
+        phase = angle(h)
+        w_n, h_n = norm_trans_func.freqresp(n=3000)
         f_n = w_n/(2*pi)
-        graphs[GraphTypes.At] = [[f, -mag, False, False]]   # se pasa una lista de graphvalues
-        graphs[GraphTypes.N_AtAt] = [[f_n, -mag_n, False, False]]
-        graphs[GraphTypes.Ph] = [[f, phase, False, False]]
-        graphs[GraphTypes.Gd] = [[f, -2*pi*diff(unwrap(phase))/diff(w), False, False]]  # -d(Phase)/df = -dP/dw * dw/df = -dP/dw * 2pi
-        graphs[GraphTypes.Zp] = [[self.denormalized["Zeros"].real, self.denormalized["Zeros"].imag, False, True],
-                                 [self.denormalized["Poles"].real, self.denormalized["Poles"].imag, True, True]]
+        mag_n = 20 * log10(abs(h_n))
+        phase_n = angle(h_n)
+        graphs[GraphTypes.Module] = [[f, -mag, False, False, True], ["Frequency [Hz]", "Amplitude [dB]"]]
+        graphs[GraphTypes.Attenuation] = [[f, -mag, False, False, True], ["Frequency [Hz]", "Attenuation[dB]"]]   # se pasa una lista de graphvalues
+        if self.filter is FilterTypes.GroupDelay:
+            graphs[GraphTypes.Normalized] = [[f, -2 * pi * diff(unwrap(phase_n)) / diff(w_n), False, False, True],
+                                             ["Frequency[Hz]", "Group delay [s]"]]  # -d(Phase)/df = -dP/dw * dw/df = -dP/dw * 2pi
+        else:
+            graphs[GraphTypes.Normalized] = [[f_n, -mag_n, False, False, True], ["Frequency[Hz]", "Attenuation[dB]"]]
+        graphs[GraphTypes.Phase] = [[f, phase, False, False, True], ["Frequency[Hz]", "Phase[deg]"]]
+        graphs[GraphTypes.GroupDelay] = [[f, -2*pi*diff(unwrap(phase))/diff(w), False, False, True], ["Frequency[Hz]", "Group delay [s]"]]  # -d(Phase)/df = -dP/dw * dw/df = -dP/dw * 2pi
+        graphs[GraphTypes.PolesZeros] = [[self.denormalized["Zeros"].real, self.denormalized["Zeros"].imag, False, True, False, "Zeros"],
+                                [self.denormalized["Poles"].real, self.denormalized["Poles"].imag, True, True, False, "Poles"], ["Re(s)", "Im(s)"]]
         t, imp = signal.impulse(trans_func)
-        graphs[GraphTypes.Imp] = [[t, imp, False, False]]
+        graphs[GraphTypes.Impulse] = [[t, imp, False, False, False], ["t[s]", "V[V]"]]
         t, step = signal.step(trans_func)
-        graphs[GraphTypes.Stp] = [[t, step, False, False]]
+        graphs[GraphTypes.Step] = [[t, step, False, False, False], ["t[s]", "V[V]"]]
+        if len(self.denormalized["StagesQ"]):   # los filtros de primer orden no tienen Q
+            i = 0
+            while i < len(self.denormalized["StagesQ"]):
+                graphs[GraphTypes.StagesQ][i].append([[0, self.denormalized["StagesQ"][i]], [i+1, i+1], True, False, False])
+                i += 1
+            graphs[GraphTypes.StagesQ][i].append(["Q", "Q N°"])
         return graphs
 
     @staticmethod
