@@ -18,6 +18,12 @@ class FilterParameterLayout (QWidget):
         self.layout.addWidget(self.widget)
         self.setLayout(self.layout)
 
+    def get_value(self):
+        return self.widget.get_value()
+
+    def set_value(self):
+        return self.widget.set_value()
+
 
 class ApproximationParameterLayout(QWidget):
     def __init__(self, name, widget, toggleable):
@@ -32,6 +38,7 @@ class ApproximationParameterLayout(QWidget):
         self.label.setStyleSheet("font-size: 14px; color:rgb(255, 255, 255);")
         self.label.setAlignment(Qt.AlignCenter)
         self.check_box = QCheckBox()
+        self.check_box.setStyleSheet("font-size: 12px; color:rgb(255, 255, 255);")
         self.check_box.setText("Manual")
         self.check_box.toggled.connect(self.check_box_toggled)
         self.rows = [InternalApproximationLayoutRow(self.label, self.check_box), self.widget]
@@ -101,7 +108,7 @@ class DefaultNumberEdit(QDoubleSpinBox):
         return self.value()
 
     def set_value(self, value):
-        self.setValue(value)
+        self.setValue(int(value))
 
     def get_min(self):
         return self.min
@@ -144,7 +151,7 @@ class DefaultSlider(QWidget):
         return self.slider.value()
 
     def set_value(self, value):
-        self.slider.setValue(value)
+        self.slider.setValue(int(value))
         self.label.setText(str(value))
 
     def get_min(self):
@@ -161,8 +168,10 @@ class DefaultComboBox(QWidget):
             QWidget.__init__(self)
             self.combo = QComboBox()
             self.combo.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+            self.combo.setStyleSheet("font-size: 14px; color:rgb(255, 255, 255);")
             self.layout = QHBoxLayout()
             self.layout.addWidget(self.combo)
+
             self.setLayout(self.layout)
             self.approxs = approxs
             for approx in self.approxs:
@@ -173,7 +182,7 @@ class DefaultComboBox(QWidget):
             return self.combo.currentText()
 
         def set_value(self, value):
-            index = self.combo.find(value)
+            index = self.combo.findText(value)
             if index != -1:
                 self.combo.setCurrentIndex(index)
 

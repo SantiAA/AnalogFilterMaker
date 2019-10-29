@@ -55,7 +55,7 @@
        </spacer>
       </item>
       <item>
-       <layout class="QVBoxLayout" name="verticalLayout" stretch="81,5,14">
+       <layout class="QVBoxLayout" name="verticalLayout" stretch="78,10,12">
         <property name="sizeConstraint">
          <enum>QLayout::SetFixedSize</enum>
         </property>
@@ -76,23 +76,46 @@
          </spacer>
         </item>
         <item>
-         <widget class="QPushButton" name="initButton">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="styleSheet">
-           <string notr="true">color:rgb(255, 255, 255);
+         <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="50,50">
+          <item>
+           <widget class="QPushButton" name="initButton">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">color:rgb(255, 255, 255);
 font: 10pt &quot;Franklin Gothic Demi&quot;;
 background-color: rgb(40, 55, 57);
 </string>
-          </property>
-          <property name="text">
-           <string>START</string>
-          </property>
-         </widget>
+            </property>
+            <property name="text">
+             <string>START</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="load_project_button">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">color:rgb(255, 255, 255);
+font: 10pt &quot;Franklin Gothic Demi&quot;;
+background-color: rgb(40, 55, 57);
+</string>
+            </property>
+            <property name="text">
+             <string>LOAD PROJECT</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
         </item>
         <item>
          <spacer name="verticalSpacer">

@@ -1,8 +1,12 @@
+import pickle
 import webbrowser
+
+from PyQt5 import QtCore
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import *
 from PyQt5.uic import loadUi
 import matplotlib as mpl
+from flask_colorpicker import colorpicker
 from matplotlib.offsetbox import AuxTransformBox, AnnotationBbox
 
 from BackEnd.Output.plots import GraphTypes
@@ -22,13 +26,9 @@ class FirstStage(QMainWindow):
         self.filters = {}
         self.backend = BackEndTesting()
         self.filters_received, self.approximations_received = self.backend.get_util()
-        '''
-        self.window_configuration = {
-            "active_filter": "",
-            "n_of_requirements": 0,
-            "requirement_current_values": []
-        }
-        '''
+
+
+
         self.showingGraphs = []
         self.current_template = Template()
 
@@ -58,35 +58,45 @@ class FirstStage(QMainWindow):
         self.toggleApprox.toggled.connect(self.toggle_approximation)
         self.editApproximationButton.clicked.connect(self.edit_approx)
         self.activeApproxsCombo.currentIndexChanged.connect(self.approx_combo_changed)
+        self.save_as_project_button.clicked.connect(self.save_as_current_state_clicked)
+        self.save_project_button.clicked.connect(self.save_current_state_clicked)
         self.toggleApprox.hide()
         self.fill_combo_graph()
         self.comboGraph.currentIndexChanged.connect(self.combo_graph_changed)
+        self.load_project_button.clicked.connect(self.load_project_clicked)
         self.templateCheckBox.toggled.connect(self.template_toggled)
         self.templateCheckBox.hide()
 
-    '''
-    def load_current_state(self, configuration_dict):
+    def load_project_clicked(self):
+        self.ui_manager.load_current_state()
 
-        index = self.comboFilter.findText(configuration_dict["active_filter"], QtCore.Qt.MatchFixedString)
-        self.comboFilter.setCurrentIndex(index)
+    def load_current_state(self, configuration_dict):
+        self.showingGraphs = []
+        self.showingGraphs = configuration_dict["showing_graphs"]
+        self.fill_combo_graph()
+        self.redraw_graphs()
     
-    def save_current_state(self):
+    def get_current_state_config(self):
+        self.window_configuration = {}
         self.window_configuration["active_filter"] = self.comboFilter.currentText()
-        self.window_configuration["n_of_requirements"] = len(
-            self.filters[self.comboFilter.currentText()].parameter_list)
-        self.window_configuration["requirement_current_values"] = [0, 0, 0, 0]
-        self.ui_manager.program_state["active_window_configuration"] = self.window_configuration
-        Save = self.ui_manager.program_state  # Saves the desired class AND a chosen attribute
-        pickle.dump(Save, open("Save File", "wb"))  # Creates the file and puts the data into the file
-        '''
+        requirements = []
+        for requirement in self.filters[self.comboFilter.currentText()].parameter_list:
+            requirements.append(requirement.get_value())
+        self.window_configuration["requirement_values"] = requirements
+        self.window_configuration["showing_graphs"] = self.showingGraphs
+        return self.window_configuration
+
 
     def combo_graph_changed(self):
         self.redraw_graphs()
 
     def fill_combo_graph(self):
         self.comboGraph.clear()
-        for filter_type in GraphTypes:
-            self.comboGraph.addItem(filter_type.value)
+
+        for graph in self.showingGraphs:
+            for key in graph.graphs.keys():
+                if self.comboGraph.findText(key) == -1:
+                    self.comboGraph.addItem(key)
 
     def approx_combo_changed(self):
         for graph in self.showingGraphs:
@@ -101,6 +111,7 @@ class FirstStage(QMainWindow):
             if graph.approximation_properties_string == self.activeApproxsCombo.currentText():
                 graph.toggle_graph(self.toggleApprox.isChecked())
                 self.redraw_graphs()
+        self.get_current_state_config()
 
     def edit_approx(self):
         approx_name = ""
@@ -126,7 +137,7 @@ class FirstStage(QMainWindow):
                                             if not parameter.toggleable:
                                                 parameter.check_box.hide()
                                         else:
-                                            parameter.set_value(int(property_tuple[1]))
+                                            parameter.set_value(property_tuple[1])
                                             parameter.check_box.show()
                                             parameter.check_box.setChecked(False)
                                             if not parameter.toggleable:
@@ -174,6 +185,12 @@ class FirstStage(QMainWindow):
         me = pickle.load(open("Save File", "rb"))  # Loads the file
         uu = 0  # Prints the stats out to verify the load has successfully happened'''
 
+    def save_as_current_state_clicked(self):
+        self.ui_manager.save_as_current_state()
+
+    def save_current_state_clicked(self):
+        self.ui_manager.save_current_state()
+
     def approximation_label_clicked(self):
         webbrowser.open('http://dsp-book.narod.ru/HFTSP/8579ch12.pdf')
 
@@ -188,6 +205,7 @@ class FirstStage(QMainWindow):
         Changes the filter template image and requirements whenever the current selected filter type is changed.
         """
         self.current_template = Template()
+        self.comboGraph.clear()
         self.showingGraphs = []
         self.__update_active_approx_combo__()
         self.templateCheckBox.setChecked(True)
@@ -216,7 +234,7 @@ class FirstStage(QMainWindow):
         self.configurationLayout.addStretch(50)  # space
         if len(self.showingGraphs) == 0:
             self.toggleApprox.hide()
-        # self.save_current_state()
+
 
     def update_approximation(self):
         for filters in self.filters.values():  # Clearing requirement widgets
@@ -241,6 +259,7 @@ class FirstStage(QMainWindow):
             for approx in self.showingGraphs:
                 if approx.approximation_properties_string == self.activeApproxsCombo.currentText():
                     self.showingGraphs.remove(approx)
+            self.fill_combo_graph()
             self.__update_active_approx_combo__()
             self.redraw_graphs()
         if len(self.showingGraphs) == 0:
@@ -268,11 +287,13 @@ class FirstStage(QMainWindow):
                             properties.append([prop.name, "Auto"])
                     self.graphics_returned = self.backend.get_graphs([self.filter.name, dict],
                                                                      ApproximationTesting(approximation.name,
-                                                                                          approximation.make_approx_dict(), approximation.extra_combos))
+                                                                                          approximation.make_approx_dict(),
+                                                                                          approximation.extra_combos))
                     self.existing = True
                     new_graph = FinalGraph(self.graphics_returned, properties, True)
                     if self.activeApproxsCombo.findText(new_graph.approximation_properties_string) == -1:
                         self.showingGraphs.append(new_graph)
+            self.fill_combo_graph()
             self.redraw_graphs()
 
         else:
@@ -315,7 +336,6 @@ class FirstStage(QMainWindow):
             self.graph_widget.canvas.axes.clear()
             self.graph_widget.canvas.axes.set_title(self.comboGraph.currentText())
 
-            self.graph_widget.canvas.axes.set_xscale('log')
             self.graph_widget.canvas.axes.grid(True, which="both")
 
             self.graph_widget.canvas.draw()  # Redraws
@@ -325,7 +345,7 @@ class FirstStage(QMainWindow):
                     graph_values = graph.graphs[self.comboGraph.currentText()]
                     if graph_values is not None:
                         self.__plot_graph__(graph_values, graph.approximation_properties_string)
-                        self.graph_widget.canvas.axes.set_xscale('log')
+
                         self.graph_widget.canvas.axes.grid(True, which="both")
                         self.graph_widget.canvas.axes.set_title(self.comboGraph.currentText())
                         self.graph_widget.canvas.draw()  # Redraws
@@ -337,6 +357,8 @@ class FirstStage(QMainWindow):
     def __plot_graph__(self, graph, legend_string):
         self.__fix_axes_titles_position__(self.graph_widget, graph[1][0], graph[1][1])
         for graph_data in graph[0]:
+            if graph_data.log:
+                self.graph_widget.canvas.axes.set_xscale('log')
             complete_legend = legend_string
             if graph_data.extra_information != "":
                 complete_legend += "-" + graph_data.extra_information
@@ -349,7 +371,8 @@ class FirstStage(QMainWindow):
 
             else:
                 if not graph_data.x_marks:
-                    self.graph_widget.canvas.axes.scatter(graph_data.x_values, graph_data.y_values, label=complete_legend)
+                    self.graph_widget.canvas.axes.scatter(graph_data.x_values, graph_data.y_values,
+                                                          label=complete_legend)
                 else:
                     self.graph_widget.canvas.axes.scatter(graph_data.x_values, graph_data.y_values, marker='x',
                                                           label=complete_legend)

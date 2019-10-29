@@ -10,6 +10,10 @@ class UIMainWindow(QMainWindow):
         self.setWindowTitle("Instrument Automation")
         self.ui_manager = ui_manager
         self.initButton.clicked.connect(self.initialize)
+        self.load_project_button.clicked.connect(self.load_project_clicked)
 
     def initialize(self):
         self.ui_manager.next_window()
+
+    def load_project_clicked(self):
+        self.ui_manager.load_current_state()

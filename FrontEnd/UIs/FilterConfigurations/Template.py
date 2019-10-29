@@ -20,7 +20,7 @@ class Template:
                     max_x_dot = dot.x_value
                 if dot.y_value != INFINITE and dot.y_value > max_y_dot:
                     max_y_dot = dot.y_value
-                if dot.x_value != -INFINITE and dot.x_value < min_x_dot:
+                if dot.x_value != 0 and dot.x_value < min_x_dot:
                     min_x_dot = dot.x_value
                 if dot.y_value != -INFINITE and dot.y_value < min_y_dot:
                     min_y_dot = dot.y_value
