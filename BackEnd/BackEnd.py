@@ -111,6 +111,6 @@ class BackEnd:
 
         specs = {}
         for aspect in front_end_filter[1]:
-            specs[aspect] = front_end_filter[1][aspect]
+            specs[aspect] = front_end_filter[1][aspect][1]
         filters.load_requirements(specs)
         return filters
