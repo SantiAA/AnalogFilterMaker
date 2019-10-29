@@ -4,15 +4,27 @@ import numpy as np
 from PyQt5 import QtWidgets
 from FrontEnd.UIManager import UIManager
 from enum import Enum
+from random import random
 
 class hola(Enum):
     A = "A"
     B = "B"
 
+class my(object):
+    def __init__(self):
+        self.lista = []
 
-my_dict = {hola.A: 1, hola.B: 2}
-print(hola.A.value)
+    def agregar(self):
+        number = 1
+        self.lista.append(number)
 
+yo = my()
+print(yo.lista)
+yo.agregar()
+print(yo.lista)
+
+yo.agregar()
+print(yo.lista)
 exit()
 
 

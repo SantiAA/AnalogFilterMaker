@@ -34,8 +34,8 @@ class Bessel(Approximation):
         self.__selectivity__(filter_in_use.get_type())
         return True
 
-    def calculate(self, filter_in_use: Filter, **kwargs):
-        super().calculate(filter_in_use, **kwargs)
+    def calculate(self, filter_in_use: Filter, kwargs):
+        super().calculate(filter_in_use, kwargs)
         z = []
         p = []
         k = 0
