@@ -36,8 +36,8 @@ class FirstStage(QMainWindow):
         self.graph_widget = self.graphWidget
         self.comboFilter.clear()
         for filter in self.filters_received:
-            self.comboFilter.addItem(filter.value)
-            self.filters[filter] = Config(filter.value, self.filters_received[filter], self.approximations_received[filter])
+            self.comboFilter.addItem(filter)
+            self.filters[filter] = Config(filter, self.filters_received[filter], self.approximations_received[filter])
 
         self.update_filter_type()
         self.show()
@@ -174,9 +174,7 @@ class FirstStage(QMainWindow):
             msg.setWindowTitle("Error")
             msg.exec_()
 
-        '''
-        me = pickle.load(open("Save File", "rb"))  # Loads the file
-        uu = 0  # Prints the stats out to verify the load has successfully happened'''
+
 
     def save_as_current_state_clicked(self):
         self.ui_manager.save_as_current_state()

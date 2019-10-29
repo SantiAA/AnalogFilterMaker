@@ -84,7 +84,7 @@ class BackEnd:
             req = my_filter.get_requirements()
             sq1 = Square(Dot(0, req[TemplateInfo.Ap.value]), Dot(INFINITE, req[TemplateInfo.Ap.value]),
                          Dot(req[TemplateInfo.fp__.value], INFINITE), Dot(req[TemplateInfo.fp__.value], req[TemplateInfo.Ap.value]))
-            sq2 = Square(Dot(req[TemplateInfo.fa__], -INFINITE), Dot(req[TemplateInfo.fa__.value], req[TemplateInfo.Aa.value]),
+            sq2 = Square(Dot(req[TemplateInfo.fa__.value], -INFINITE), Dot(req[TemplateInfo.fa__.value], req[TemplateInfo.Aa.value]),
                          Dot(req[TemplateInfo.fa_.value], req[TemplateInfo.Aa.value]), Dot(req[TemplateInfo.fa_.value], -INFINITE))
             sq3 = Square(Dot(req[TemplateInfo.fp_.value], req[TemplateInfo.Ap.value]), Dot(req[TemplateInfo.fp_.value], INFINITE),
                          Dot(INFINITE, INFINITE), Dot(INFINITE, req[TemplateInfo.Ap.value]))
@@ -104,6 +104,6 @@ class BackEnd:
 
         specs = {}
         for aspect in front_end_filter[1]:
-            specs[aspect] = front_end_filter[1][1]
+            specs[aspect] = front_end_filter[1][aspect]
         filters.load_requirements(specs)
         return filters

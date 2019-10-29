@@ -84,10 +84,10 @@ class Filter(object):
         return self.filter
 
     def get_limit(self, info: TemplateInfo):
-        return self.limits[info.value]
+        return self.limits[info]
 
     def get_default(self, info: TemplateInfo):
-        return self.defaults[info.value]
+        return self.defaults[info]
 
     def get_requirements(self):
         return [key for key in self.requirements]
