@@ -1,4 +1,6 @@
 class FinalGraph:
+    #properties = [name, value]
+    #graphs = dict coming from backend get_graphs
     def __init__(self, graphs, properties, enabled=True):
         self.enabled = enabled
         self.properties = properties
@@ -17,3 +19,5 @@ class FinalGraph:
                 self.approximation_properties_string += prop_tuple[1] + "."
             else:
                 self.approximation_properties_string += (" " + prop_tuple[0] + ": " + prop_tuple[1] + ".")
+
+

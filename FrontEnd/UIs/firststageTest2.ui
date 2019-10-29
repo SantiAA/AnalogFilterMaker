@@ -45,9 +45,9 @@
        <enum>QLayout::SetMaximumSize</enum>
       </property>
       <item>
-       <layout class="QVBoxLayout" name="leftLayout" stretch="28,5,0,60,1,0,1">
+       <layout class="QVBoxLayout" name="leftLayout" stretch="20,2,1,70,1,5,1">
         <item>
-         <layout class="QVBoxLayout" name="verticalLayout_3" stretch="0,10,4,71">
+         <layout class="QVBoxLayout" name="verticalLayout_3" stretch="20,5,15,10,5,45">
           <property name="sizeConstraint">
            <enum>QLayout::SetDefaultConstraint</enum>
           </property>
@@ -63,6 +63,81 @@
           <property name="bottomMargin">
            <number>5</number>
           </property>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_3">
+            <item>
+             <widget class="QPushButton" name="save_project_button">
+              <property name="styleSheet">
+               <string notr="true">font: 63 8pt &quot;Open Sans Semibold&quot;;
+color:rgb(255, 255, 255);
+padding: 8px;
+bottom-margin:3px;
+</string>
+              </property>
+              <property name="text">
+               <string>SAVE</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="save_as_project_button">
+              <property name="styleSheet">
+               <string notr="true">font: 63 8pt &quot;Open Sans Semibold&quot;;
+color:rgb(255, 255, 255);
+padding: 8px;
+bottom-margin:3px;
+</string>
+              </property>
+              <property name="text">
+               <string>SAVE AS</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="load_project_button">
+              <property name="styleSheet">
+               <string notr="true">font: 63 8pt &quot;Open Sans Semibold&quot;;
+color:rgb(255, 255, 255);
+padding: 8px;
+bottom-margin:3px;
+</string>
+              </property>
+              <property name="text">
+               <string>LOAD</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="horizontalSpacer_16">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <spacer name="verticalSpacer_13">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeType">
+             <enum>QSizePolicy::Maximum</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>20</width>
+              <height>40</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
           <item>
            <widget class="QPushButton" name="filterTypeLabel">
             <property name="cursor">
@@ -104,6 +179,9 @@ color:rgb(255, 255, 255);
            <spacer name="verticalSpacer_9">
             <property name="orientation">
              <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeType">
+             <enum>QSizePolicy::Expanding</enum>
             </property>
             <property name="sizeHint" stdset="0">
              <size>

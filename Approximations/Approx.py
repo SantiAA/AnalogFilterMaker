@@ -19,6 +19,8 @@ class Approximation(object):
     def __init__(self, name):
         """ Useful to add in the GUI """
         self.name = name  # The name of the approximation
+        self.dict = {}
+        self.extra_combos = 0  # To change to 2 in 'Transicionales'
         self.application = []  # Approximation's filter type application
 
         """ Useful for internal working """
@@ -29,6 +31,13 @@ class Approximation(object):
         self.n_max = 20
         self.q_max = -1  # aca ira el q maximo pedido por el usuario
         self.denorm = 0
+        self.fixed_n = -1
+
+    def is_available(self, filter_: FilterTypes):
+        if filter_ in self.application:
+            return True
+        else:
+            return False
 
     def validate_input(self):
         """

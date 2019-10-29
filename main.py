@@ -4,7 +4,18 @@ import numpy as np
 from PyQt5 import QtWidgets
 from FrontEnd.UIManager import UIManager
 
+class A(object):
+    def __init__(self):
+        print("Hola soy A")
+        self.a = 0
 
+mi = A()
+mi.a += 1
+mi_2 = mi.__new__(type(mi))
+mi_2.__init__()
+print(mi)
+print(mi_2)
+exit()
 
 N, Wn = signal.buttord( 1, 7, 2, 40, analog=True)
 print("N = ", N, " Frecuencias: ", Wn)
