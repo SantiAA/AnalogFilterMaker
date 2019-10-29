@@ -19,7 +19,7 @@ class Transitional(Approximation):
         self.dict = {
             "Q max": [(0, 10, False), 10],
             "Fixed N": [(0, 20, True), 10],
-            "Denorm.": [(0, 100, False), 0]
+            "Denorm.": [(0, 100, False), 0],
             "m": [(0, 100, False), 50]
         }
         approximations = ["Butterworth", "Cauer", "Chevy1", "Chevy2", "Legendre"]
