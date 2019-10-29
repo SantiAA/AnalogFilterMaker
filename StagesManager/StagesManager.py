@@ -4,6 +4,7 @@ from enum import Enum
 from numpy import conjugate
 from numpy import argmin
 from numpy import full
+from numpy import log10
 
 
 # AFM project modules
@@ -18,7 +19,7 @@ class SignalTypes(Enum):
 
 class StageInfo(Enum):
     Vi_min = "Vi min (Noise floor)"
-    Vo_max = "Vo max"
+    Vo_max = "Vo max (Saturation)"
 
 
 class StagesManager(object):
@@ -81,6 +82,7 @@ class StagesManager(object):
         self.p_pairs.sort(key=lambda x:x[1], reverse=True) # ordeno polos por Q decreciente
         self.z_pairs.sort(key=lambda x:x[1], reverse=True) # ordeno ceros por orden decreciente
         self.k = k
+        self.sos = []
 
     def get_singularities(self):
         """ Returns tuple with 1st/2nd order poles and 1st/2nd order zeros """
@@ -103,26 +105,44 @@ class StagesManager(object):
                 used_p = full(adj_matrix.shape(1), False)
                 while k < k_max:
                     i, j = argmin(adj_matrix)
-                    self.sos.append([self.p_pairs[j], self.z_pairs[i]])
+                    self.sos.append({"Poles": self.p_pairs[j], "Zeros": self.z_pairs[i], "Gain": 1})    # ganancia 1 por defecto
                     adj_matrix[i][j] = 1e9  # ya no me interesa esta distancia, la hago grande para que no salga elegida
                     used_p[j] = True    # marca que este polo ya se utilizo
                     k += 1
                 for i in range(adj_matrix.shape(1)):
                     if not used_p[i]:
-                        self.sos.append([self.p_pairs[i], None])
+                        self.sos.append({"Poles": self.p_pairs[i], "Zeros": None, "Gain": 1})
                 # ver que hacer con los polos y ceros de primer orden aaaaaaaaa
         else:
-            self.sos = [ [p, None] for p in self.p_pairs]
+            self.sos = [{"Poles": p, "Zeros": None, "Gain": 1} for p in self.p_pairs]
         """" The order of the stages depends on the input signal """
         if sig_type is SignalTypes.LowSignal:
-            self.sos.sort(key=lambda x:x[0][1], reverse=True) # ordena por Q decreciente
+            self.sos.sort(key=lambda x:x["Poles"][1], reverse=True) # ordena por Q decreciente
             # k a la primera celda
         elif sig_type is SignalTypes.HighSignal:
-            self.sos.sort(key=lambda x:x[0][1], reverse=True) # ordena por Q creciente
+            self.sos.sort(key=lambda x:x["Poles"][1], reverse=True) # ordena por Q creciente
             # k a la ultima celda
         elif sig_type is SignalTypes.MedSignal:
             # preguntarle a dani
             pass
         return self.sos
 
-    def
+    def load_stage(self, i, p, z):
+        """ Devuelve True si ya estan cargadas todas las etapas, False si no """
+        self.sos[i]["Poles"] = p
+        self.sos[i]["Zeros"] = z
+
+    def swap_stages(self, i, j):
+        get = self.sos[i], self.sos[j]
+        self.sos[j], self.sos[i] = get
+
+    def calc_rd(self):
+        vi_max = self.requirements[StageInfo.Vo_max]/self.k
+        for s in self.sos:
+            vi_max/=s["Gain"]
+        rd = 20*log10(vi_max/self.requirements[StageInfo.Vi_min])
+
+        return rd
+
+    def set_gain(self, i, k):
+        self.sos[i]["Gain"] = k
