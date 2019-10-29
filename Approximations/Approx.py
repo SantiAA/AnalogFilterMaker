@@ -60,7 +60,7 @@ class Approximation(object):
         self.q_max = -1
         self.fixed_n = -1
         switcher = {
-            "n_max": self._set_n_max,
+            # "n_max": self._set_n_max,
             "denorm": self._set_denorm,
             "q_max": self._set_q_max,
             "fixed_n": self._set_fixed_n
@@ -72,12 +72,12 @@ class Approximation(object):
             else:
                 print(key + "is an invalid argument for calculate()")
 
-    def _set_n_max(self, n_max):
-        if type(n_max) is int:
-            if n_max <= 20:
-                self.n_max = n_max
-        else:
-            print("Approx.py: Invalid n_max argument, it must be float")
+    # def _set_n_max(self, n_max):
+    #     if type(n_max) is int:
+    #        if n_max <= 20:
+    #            self.n_max = n_max
+    #    else:
+    #        print("Approx.py: Invalid n_max argument, it must be float")
 
     def _set_denorm(self, denorm):
         if type(denorm) is float or type(denorm) is int:
