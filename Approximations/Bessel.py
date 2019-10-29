@@ -17,9 +17,8 @@ class Bessel(Approximation):
         Approximation.__init__(self, "Bessel")
         self.application = [FilterTypes.GroupDelay]
         self.dict = {
-            "N max": [(0, 20, False), None],
-            "Q max": [(0, 10, False), None],
-            "Fixed N": [(0, 20, True), None],
+            "Q max": [(0, 10, False), 10],
+            "Fixed N": [(0, 20, True), 10],
         }
 
     def load_information(self, filter_in_use: Filter):
