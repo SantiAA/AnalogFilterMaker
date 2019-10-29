@@ -3,6 +3,18 @@ import matplotlib.pyplot as plt
 import numpy as np
 from PyQt5 import QtWidgets
 from FrontEnd.UIManager import UIManager
+from enum import Enum
+
+class hola(Enum):
+    A = "A"
+    B = "B"
+
+
+my_dict = {hola.A: 1, hola.B: 2}
+print(hola.A.value)
+
+exit()
+
 
 class A(object):
     def __init__(self):

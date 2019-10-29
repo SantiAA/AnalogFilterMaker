@@ -67,27 +67,27 @@ class Filter(object):
                              "StagesQ": None,
                              "MaxQ": None}
         self.limits = {
-            TemplateInfo.Aa: (0, 10e9), TemplateInfo.Ap: (0, 10e9), TemplateInfo.fa: (0, 10e9),
-            TemplateInfo.fp: (0, 10e9), TemplateInfo.fp_: (0, 10e9), TemplateInfo.fp__: (0, 10e9),
-            TemplateInfo.fa_: (0, 10e9), TemplateInfo.fa__: (0, 10e9), TemplateInfo.fo: (0, 10e9),
-            TemplateInfo.ft: (0, 10e9), TemplateInfo.gd: (0, 10e9), TemplateInfo.tol: (0, 1),
-            TemplateInfo.k: (0, 10e9)
+            TemplateInfo.Aa.value: (0, 10e9), TemplateInfo.Ap.value: (0, 10e9), TemplateInfo.fa.value: (0, 10e9),
+            TemplateInfo.fp.value: (0, 10e9), TemplateInfo.fp_.value: (0, 10e9), TemplateInfo.fp__.value: (0, 10e9),
+            TemplateInfo.fa_.value: (0, 10e9), TemplateInfo.fa__.value: (0, 10e9), TemplateInfo.fo.value: (0, 10e9),
+            TemplateInfo.ft.value: (0, 10e9), TemplateInfo.gd.value: (0, 10e9), TemplateInfo.tol.value: (0, 1),
+            TemplateInfo.k.value: (0, 10e9)
         }
         self.defaults = {
-            TemplateInfo.Aa: 50, TemplateInfo.Ap: 30, TemplateInfo.fa: 20000, TemplateInfo.fp: 2000,
-            TemplateInfo.fp_: 30000, TemplateInfo.fp__: 3000, TemplateInfo.fa_: 45000, TemplateInfo.fa__: 2000,
-            TemplateInfo.fo: 9486, TemplateInfo.ft: 10000, TemplateInfo.gd: 10e-3, TemplateInfo.tol: 0.2,
-            TemplateInfo.k: 1
+            TemplateInfo.Aa.value: 50, TemplateInfo.Ap.value: 30, TemplateInfo.fa.value: 20000, TemplateInfo.fp.value: 2000,
+            TemplateInfo.fp_.value: 30000, TemplateInfo.fp__.value: 3000, TemplateInfo.fa_.value: 45000, TemplateInfo.fa__.value: 2000,
+            TemplateInfo.fo.value: 9486, TemplateInfo.ft.value: 10000, TemplateInfo.gd.value: 10e-3, TemplateInfo.tol.value: 0.2,
+            TemplateInfo.k.value: 1
         }
 
     def get_type(self) -> FilterTypes:
         return self.filter
 
     def get_limit(self, info: TemplateInfo):
-        return self.limits[info]
+        return self.limits[info.value]
 
     def get_default(self, info: TemplateInfo):
-        return self.defaults[info]
+        return self.defaults[info.value]
 
     def get_requirements(self):
         return [key for key in self.requirements]

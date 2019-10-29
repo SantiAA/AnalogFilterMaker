@@ -31,7 +31,7 @@ class Legendre(Approximation):
 
     def __init__(self):
         Approximation.__init__(self, "Legendre")
-        self.application = [FilterTypes.HighPass, FilterTypes.LowPass, FilterTypes.BandPass, FilterTypes.BandReject]
+        self.application = [FilterTypes.HighPass.value, FilterTypes.LowPass.value, FilterTypes.BandPass.value, FilterTypes.BandReject.value]
         self.information = {}
         self.dict = {
             "Q max": [(0, 10, False), 10],
@@ -56,8 +56,8 @@ class Legendre(Approximation):
         p = []
         k = 0
         """ First I calculate the Normalized LowPass, to get the useful w """
-        n, useful_w = self._legord(self.information[TemplateInfo.fp], self.information[TemplateInfo.fa],
-                                   self.information[TemplateInfo.Ap], self.information[TemplateInfo.Aa], self.n_max)
+        n, useful_w = self._legord(self.information[TemplateInfo.fp.value], self.information[TemplateInfo.fa.value],
+                                   self.information[TemplateInfo.Ap.value], self.information[TemplateInfo.Aa.value], self.n_max)
         if self.fixed_n > 0:
             n = self.fixed_n
         elif n > self.n_max:
@@ -69,7 +69,7 @@ class Legendre(Approximation):
             """ Now check the desnomalization cte """
             w, h = signal.freqs_zpk(z_n, p_n, k_n)
             h = 20 * log10(abs(h))
-            i = [abs(j + self.information[TemplateInfo.Aa]) for j in h]
+            i = [abs(j + self.information[TemplateInfo.Aa.value]) for j in h]
             wa = w[i.index(min(i))]
             denorm_cte = (wa * (1 - self.denorm / 100) + self.denorm / (self.selectivity * 100))
             _z = z_n * denorm_cte
@@ -77,25 +77,25 @@ class Legendre(Approximation):
             _k = k_n * (denorm_cte ** (len(p_n) - len(z_n)))
             """" Next we transform the LowPass into the requested filter """
 
-            if filter_in_use.get_type() is FilterTypes.LowPass:
+            if filter_in_use.get_type() is FilterTypes.LowPass.value:
                 """ If the approximation support the filter I continue """
-                z, p, k = signal.lp2lp_zpk(_z, _p, _k, 2*pi*self.information[TemplateInfo.fp])
+                z, p, k = signal.lp2lp_zpk(_z, _p, _k, 2*pi*self.information[TemplateInfo.fp.value])
                 filter_in_use.load_normalized_z_p_k(z_n, p_n, k_n)
 
-            elif filter_in_use.get_type() is FilterTypes.HighPass:
-                z, p, k = signal.lp2hp_zpk(_z, _p, _k, 2*pi*self.information[TemplateInfo.fp])
+            elif filter_in_use.get_type() is FilterTypes.HighPass.value:
+                z, p, k = signal.lp2hp_zpk(_z, _p, _k, 2*pi*self.information[TemplateInfo.fp.value])
                 filter_in_use.load_normalized_z_p_k(z_n, p_n, k_n)
 
-            elif filter_in_use.get_type() is FilterTypes.BandPass:
-                Awp = self.information[TemplateInfo.fp_] - self.information[TemplateInfo.fp__]
-                w0 = sqrt(self.information[TemplateInfo.fp_] * self.information[TemplateInfo.fp__])
+            elif filter_in_use.get_type() is FilterTypes.BandPass.value:
+                Awp = self.information[TemplateInfo.fp_.value] - self.information[TemplateInfo.fp__.value]
+                w0 = sqrt(self.information[TemplateInfo.fp_.value] * self.information[TemplateInfo.fp__.value])
 
                 z, p, k = signal.lp2bp_zpk(_z, _p, _k, w0, Awp)
                 filter_in_use.load_normalized_z_p_k(z_n, p_n, k_n)
 
-            elif filter_in_use.get_type() is FilterTypes.BandReject:
-                Awp = self.information[TemplateInfo.fp_] - self.information[TemplateInfo.fp__]
-                w0 = sqrt(self.information[TemplateInfo.fp_] * self.information[TemplateInfo.fp__])
+            elif filter_in_use.get_type() is FilterTypes.BandReject.value:
+                Awp = self.information[TemplateInfo.fp_.value] - self.information[TemplateInfo.fp__.value]
+                w0 = sqrt(self.information[TemplateInfo.fp_.value] * self.information[TemplateInfo.fp__.value])
 
                 z, p, k = signal.lp2bs_zpk(_z, _p, _k, w0, Awp)
                 filter_in_use.load_normalized_z_p_k(z_n, p_n, k_n)
@@ -158,7 +158,7 @@ class Legendre(Approximation):
         Returns the legendre epsilon parameter with the given ap in dB
         :return: Epsilon legendre parameter
         """
-        return sqrt(10 ** (self.information[TemplateInfo.Ap] / 10) - 1)
+        return sqrt(10 ** (self.information[TemplateInfo.Ap.value] / 10) - 1)
 
     def _even_poly(self, n: int):
         """

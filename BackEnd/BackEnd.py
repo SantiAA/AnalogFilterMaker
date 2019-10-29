@@ -57,37 +57,37 @@ class BackEnd:
 
     def get_template(self, filtro):
         my_filter = self._parse_filter(filtro)
-        if my_filter.get_type() is FilterTypes.LowPass:
+        if my_filter.get_type() is FilterTypes.LowPass.value:
             req = my_filter.get_requirements()
-            sq1 = Square(Dot(0, req[TemplateInfo.Ap]), Dot(0, INFINITE), Dot(req[TemplateInfo.fp], INFINITE)
-                         , Dot(req[TemplateInfo.fp],  req[TemplateInfo.Ap]))
-            sq2 = Square(Dot(req[TemplateInfo.fa], -INFINITE), Dot(req[TemplateInfo.fa],  req[TemplateInfo.Aa]),
-                         Dot(INFINITE, req[TemplateInfo.Aa]), Dot(-INFINITE, -INFINITE))
+            sq1 = Square(Dot(0, req[TemplateInfo.Ap.value]), Dot(0, INFINITE), Dot(req[TemplateInfo.fp.value], INFINITE)
+                         , Dot(req[TemplateInfo.fp.value],  req[TemplateInfo.Ap.value]))
+            sq2 = Square(Dot(req[TemplateInfo.fa.value], -INFINITE), Dot(req[TemplateInfo.fa.value],  req[TemplateInfo.Aa.value]),
+                         Dot(INFINITE, req[TemplateInfo.Aa.value]), Dot(-INFINITE, -INFINITE))
             return [sq1, sq2]
-        elif my_filter.get_type() is FilterTypes.HighPass:
+        elif my_filter.get_type() is FilterTypes.HighPass.value:
             req = my_filter.get_requirements()
-            sq1 = Square(Dot(0, -INFINITE), Dot(0, req[TemplateInfo.Aa]),
-                         Dot(req[TemplateInfo.fa], req[TemplateInfo.Aa]), Dot(req[TemplateInfo.fa], -INFINITE))
-            sq2 = Square(Dot(req[TemplateInfo.fp], req[TemplateInfo.Ap]), Dot(req[TemplateInfo.fp], INFINITE),
-                         Dot(INFINITE, INFINITE), Dot(INFINITE, req[TemplateInfo.Aa]))
+            sq1 = Square(Dot(0, -INFINITE), Dot(0, req[TemplateInfo.Aa.value]),
+                         Dot(req[TemplateInfo.fa.value], req[TemplateInfo.Aa.value]), Dot(req[TemplateInfo.fa.value], -INFINITE))
+            sq2 = Square(Dot(req[TemplateInfo.fp.value], req[TemplateInfo.Ap.value]), Dot(req[TemplateInfo.fp.value], INFINITE),
+                         Dot(INFINITE, INFINITE), Dot(INFINITE, req[TemplateInfo.Aa.value]))
             return [sq1, sq2]
-        elif my_filter.get_type() is FilterTypes.BandPass:
+        elif my_filter.get_type() is FilterTypes.BandPass.value:
             req = my_filter.get_requirements()
-            sq1 = Square(Dot(0, -INFINITE), Dot(0, req[TemplateInfo.Aa]),
-                         Dot(req[TemplateInfo.fa__], req[TemplateInfo.Aa]), Dot(req[TemplateInfo.fa__], -INFINITE))
-            sq2 = Square(Dot(req[TemplateInfo.fp__], req[TemplateInfo.Ap]), Dot(req[TemplateInfo.fp__], INFINITE),
-                         Dot(req[TemplateInfo.fp_], INFINITE), Dot(req[TemplateInfo.fp_], req[TemplateInfo.Ap]))
-            sq3 = Square(Dot(req[TemplateInfo.fa_], -INFINITE), Dot(req[TemplateInfo.fa_], req[TemplateInfo.Aa]),
-                         Dot(INFINITE, req[TemplateInfo.Aa]), Dot(-INFINITE, -INFINITE))
+            sq1 = Square(Dot(0, -INFINITE), Dot(0, req[TemplateInfo.Aa.value]),
+                         Dot(req[TemplateInfo.fa__.value], req[TemplateInfo.Aa.value]), Dot(req[TemplateInfo.fa__.value], -INFINITE))
+            sq2 = Square(Dot(req[TemplateInfo.fp__.value], req[TemplateInfo.Ap.value]), Dot(req[TemplateInfo.fp__.value], INFINITE),
+                         Dot(req[TemplateInfo.fp_.value], INFINITE), Dot(req[TemplateInfo.fp_.value], req[TemplateInfo.Ap.value]))
+            sq3 = Square(Dot(req[TemplateInfo.fa_.value], -INFINITE), Dot(req[TemplateInfo.fa_.value], req[TemplateInfo.Aa.value]),
+                         Dot(INFINITE, req[TemplateInfo.Aa.value]), Dot(-INFINITE, -INFINITE))
             return [sq1, sq2, sq3]
-        elif my_filter.get_type() is FilterTypes.BandReject:
+        elif my_filter.get_type() is FilterTypes.BandReject.value:
             req = my_filter.get_requirements()
-            sq1 = Square(Dot(0, req[TemplateInfo.Ap]), Dot(INFINITE, req[TemplateInfo.Ap]),
-                         Dot(req[TemplateInfo.fp__], INFINITE), Dot(req[TemplateInfo.fp__], req[TemplateInfo.Ap]))
-            sq2 = Square(Dot(req[TemplateInfo.fa__], -INFINITE), Dot(req[TemplateInfo.fa__], req[TemplateInfo.Aa]),
-                         Dot(req[TemplateInfo.fa_], req[TemplateInfo.Aa]), Dot(req[TemplateInfo.fa_], -INFINITE))
-            sq3 = Square(Dot(req[TemplateInfo.fp_], req[TemplateInfo.Ap]), Dot(req[TemplateInfo.fp_], INFINITE),
-                         Dot(INFINITE, INFINITE), Dot(INFINITE, req[TemplateInfo.Ap]))
+            sq1 = Square(Dot(0, req[TemplateInfo.Ap.value]), Dot(INFINITE, req[TemplateInfo.Ap.value]),
+                         Dot(req[TemplateInfo.fp__.value], INFINITE), Dot(req[TemplateInfo.fp__.value], req[TemplateInfo.Ap.value]))
+            sq2 = Square(Dot(req[TemplateInfo.fa__], -INFINITE), Dot(req[TemplateInfo.fa__.value], req[TemplateInfo.Aa.value]),
+                         Dot(req[TemplateInfo.fa_.value], req[TemplateInfo.Aa.value]), Dot(req[TemplateInfo.fa_.value], -INFINITE))
+            sq3 = Square(Dot(req[TemplateInfo.fp_.value], req[TemplateInfo.Ap.value]), Dot(req[TemplateInfo.fp_.value], INFINITE),
+                         Dot(INFINITE, INFINITE), Dot(INFINITE, req[TemplateInfo.Ap.value]))
             return [sq1, sq2, sq3]
 
     def get_graphics(self, filtro, aproximacion):
