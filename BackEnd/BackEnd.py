@@ -105,6 +105,7 @@ class BackEnd:
                 approx_dict[key] = value[1]
         for each in self.all_approximations:
             if each.name is aproximacion[0]:
+                each.load_information(my_filter)
                 each.calculate(my_filter, approx_dict)
         self.dynamic_filters.append(my_filter)
         return my_filter.get_all_graphs()
