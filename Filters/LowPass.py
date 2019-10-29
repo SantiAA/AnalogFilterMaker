@@ -8,7 +8,7 @@ from Filters.Filters import *
 
 class LowPass(Filter):
     def __init__(self):
-        super().__init__(FilterTypes.LowPass)
+        super().__init__(FilterTypes.LowPass.value)
         """ Load LowPass requirements for future usage """
         self.requirements = {TemplateInfo.Aa.value: None,
                              TemplateInfo.Ap.value: None,

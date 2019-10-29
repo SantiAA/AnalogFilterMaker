@@ -8,7 +8,7 @@ from Filters.Filters import *
 
 class GroupDelay(Filter):
     def __init__(self):
-        super().__init__(FilterTypes.GroupDelay)
+        super().__init__(FilterTypes.GroupDelay.value)
         """ Load BandReject requirements for future usage """
         self.requirements = {TemplateInfo.ft.value: None,   # frequency of tau=gd*tol
                              TemplateInfo.tol.value: None,  # tolerance

@@ -8,7 +8,7 @@ from Filters.Filters import *
 
 class BandPass(Filter):
     def __init__(self):
-        super().__init__(FilterTypes.BandPass)
+        super().__init__(FilterTypes.BandPass.value)
         """ Load BandPass requirements for future usage """
         self.requirements = {TemplateInfo.Aa.value: None,
                              TemplateInfo.Ap.value: None,

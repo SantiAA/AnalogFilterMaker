@@ -8,7 +8,7 @@ from Filters.Filters import *
 
 class BandReject(Filter):
     def __init__(self):
-        super().__init__(FilterTypes.BandReject)
+        super().__init__(FilterTypes.BandReject.value)
         """ Load BandReject requirements for future usage """
         self.requirements = {TemplateInfo.Aa.value: None,
                              TemplateInfo.Ap.value: None,
