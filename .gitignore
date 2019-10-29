@@ -2,3 +2,4 @@
 *.iml
 .idea/
 .idea/misc.xml
+*.pyc
