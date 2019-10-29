@@ -67,21 +67,25 @@ class Butterworth(Approximation):
             """" Next we transform the LowPass into the requested filter """
             if filter_in_use.get_type() is FilterTypes.LowPass:
                 z, p, k = signal.lp2lp_zpk(_z, _p, _k, self.information[TemplateInfo.fp])
+                filter_in_use.load_z_p_k(z, p, k)
 
             elif filter_in_use.get_type() is FilterTypes.HighPass:
                 z, p, k = signal.lp2hp_zpk(_z, _p, _k, self.information[TemplateInfo.fp])
+                filter_in_use.load_z_p_k(z, p, k)
 
             elif filter_in_use.get_type() is FilterTypes.BandPass:
                 Awp = self.information[TemplateInfo.fp_] - self.information[TemplateInfo.fp__]
                 w0 = np.sqrt(self.information[TemplateInfo.fp_] * self.information[TemplateInfo.fp__] )
 
                 z, p, k = signal.lp2bp_zpk(_z, _p, _k, w0, Awp)  # Desnormalizado
+                filter_in_use.load_z_p_k(z, p, k)
 
             elif filter_in_use.get_type() is FilterTypes.BandReject:
                 Awp = self.information[TemplateInfo.fp_] - self.information[TemplateInfo.fp__]
                 w0 = np.sqrt(self.information[TemplateInfo.fp_] * self.information[TemplateInfo.fp__])
 
                 z, p, k = signal.lp2bs_zpk(_z, _p, _k, w0, Awp)  # Desnormalizado
+                filter_in_use.load_z_p_k(z, p, k)
 
             else:
                 print("Butterworth.py: Invalid filter type passed to Butterworth aproximation")
@@ -92,5 +96,4 @@ class Butterworth(Approximation):
             normalized_n = normalized_n + 1  # If I don't get the requested Q, increase the order, unless n_max reached
                                              # or fixed_n was setted, this method priorized the order over the max Q
 
-        filter_in_use.load_z_p_k(z, p, k)
         filter_in_use.load_normalized_z_p_k(z_norm, p_norm, k_norm)

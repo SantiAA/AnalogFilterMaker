@@ -53,6 +53,7 @@ class Bessel(Approximation):
             z_norm, p_norm, k_norm = signal.bessel(normalized_n, useful_w, analog=True, output='zpk')
             if filter_in_use.get_type() is FilterTypes.GroupDelay:
                 z, p, k = signal.bessel(normalized_n, useful_w/self.information[TemplateInfo.gd], 'low', True, 'zpk')
+                filter_in_use.load_z_p_k(z, p, k)
             else:
                 print("Bessel.py: Invalid filter type passed to Bessel aproximation")
                 return
@@ -60,7 +61,6 @@ class Bessel(Approximation):
                 break
             normalized_n = normalized_n + 1
         filter_in_use.load_normalized_z_p_k(z_norm, p_norm, k_norm)
-        filter_in_use.load_z_p_k(z, p, k)
 
     def _bessord(self, frg, tol, tau, max_order):
         wrgn = 2*np.pi*frg*tau

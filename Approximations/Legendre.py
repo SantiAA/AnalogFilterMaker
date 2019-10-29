@@ -81,28 +81,31 @@ class Legendre(Approximation):
             if filter_in_use.get_type() is FilterTypes.LowPass:
                 """ If the approximation support the filter I continue """
                 z, p, k = signal.lp2lp_zpk(_z, _p, _k, 2*pi*self.information[TemplateInfo.fp])
+                filter_in_use.load_normalized_z_p_k(z_n, p_n, k_n)
 
             elif filter_in_use.get_type() is FilterTypes.HighPass:
                 z, p, k = signal.lp2hp_zpk(_z, _p, _k, 2*pi*self.information[TemplateInfo.fp])
+                filter_in_use.load_normalized_z_p_k(z_n, p_n, k_n)
 
             elif filter_in_use.get_type() is FilterTypes.BandPass:
                 Awp = self.information[TemplateInfo.fp_] - self.information[TemplateInfo.fp__]
                 w0 = sqrt(self.information[TemplateInfo.fp_] * self.information[TemplateInfo.fp__])
 
                 z, p, k = signal.lp2bp_zpk(_z, _p, _k, w0, Awp)
+                filter_in_use.load_normalized_z_p_k(z_n, p_n, k_n)
 
             elif filter_in_use.get_type() is FilterTypes.BandReject:
                 Awp = self.information[TemplateInfo.fp_] - self.information[TemplateInfo.fp__]
                 w0 = sqrt(self.information[TemplateInfo.fp_] * self.information[TemplateInfo.fp__])
 
                 z, p, k = signal.lp2bs_zpk(_z, _p, _k, w0, Awp)
+                filter_in_use.load_normalized_z_p_k(z_n, p_n, k_n)
             else:
                 print("Legendre.py: Invalid filter type passed to Legendre aproximation")
                 return
             if self.q_max >= filter_in_use.get_max_q() or n == self.n_max or self.fixed_n > 0:
                 break
             n = n + 1
-        filter_in_use.load_z_p_k(z, p, k)
         filter_in_use.load_normalized_z_p_k(z_n, p_n, k_n)
 
     def _legord(self, f_p, f_a, a_p, a_a, n_max: int):
