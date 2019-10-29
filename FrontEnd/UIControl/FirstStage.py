@@ -275,7 +275,7 @@ class FirstStage(QMainWindow):
                             properties.append([prop.name, str(prop.get_value())])
                         else:
                             properties.append([prop.name, "Auto"])
-                    self.graphics_returned = self.backend.get_graphs([self.filter.name, dict], [approximation.name,
+                    self.graphics_returned = self.backend.get_graphics([self.filter.name, dict], [approximation.name,
                                                                                           approximation.make_approx_dict(),
                                                                                           approximation.extra_combos])
                     self.existing = True

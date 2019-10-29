@@ -63,12 +63,12 @@ class Approximation(object):
             # "n_max": self._set_n_max,
             "Denorm.": self._set_denorm,
             "Q max": self._set_q_max,
-            "Fixed n": self._set_fixed_n
+            "Fixed N": self._set_fixed_n
         }
         for key, value in kwargs.items():
             fun = switcher.get(key, lambda: "Invalid argument")
             if fun != "Invalid argument":
-                fun(self, value)
+                fun(value)
             else:
                 print(key + "is an invalid argument for calculate()")
 

@@ -100,7 +100,7 @@ class BackEnd:
     def get_graphics(self, filtro, aproximacion):
         my_filter = self._parse_filter(filtro)
         approx_dict = {}
-        for key, value in aproximacion[1]:
+        for key, value in aproximacion[1].items():
             if value[1] is not None:
                 approx_dict[key] = value[1]
         for each in self.all_approximations:
