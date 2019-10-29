@@ -54,16 +54,16 @@ class Approximation(object):
     def load_information(self, filter_in_use: Filter):
         pass
 
-    def calculate(self, filter_in_use: Filter, **kwargs):
+    def calculate(self, filter_in_use: Filter, kwargs):
         self.n_max = 20
         self.denorm = 0
         self.q_max = -1
         self.fixed_n = -1
         switcher = {
             # "n_max": self._set_n_max,
-            "denorm": self._set_denorm,
-            "q_max": self._set_q_max,
-            "fixed_n": self._set_fixed_n
+            "Denorm.": self._set_denorm,
+            "Q max": self._set_q_max,
+            "Fixed n": self._set_fixed_n
         }
         for key, value in kwargs.items():
             fun = switcher.get(key, lambda: "Invalid argument")

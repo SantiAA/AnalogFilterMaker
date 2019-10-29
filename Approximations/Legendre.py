@@ -50,8 +50,8 @@ class Legendre(Approximation):
             self.information[each] = filter_in_use.get_req_value(each)
         return True
 
-    def calculate(self, filter_in_use: Filter, **kwargs):
-        super().calculate(filter_in_use, **kwargs)
+    def calculate(self, filter_in_use: Filter, kwargs):
+        super().calculate(filter_in_use, kwargs)
         z = []
         p = []
         k = 0

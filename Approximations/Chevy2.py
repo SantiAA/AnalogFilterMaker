@@ -42,8 +42,8 @@ class ChebyII(Approximation):
 
         return True
 
-    def calculate(self, filter_in_use: Filter, **kwargs):
-        super().calculate(filter_in_use, **kwargs)
+    def calculate(self, filter_in_use: Filter, kwargs):
+        super().calculate(filter_in_use, kwargs)
         z = []
         p = []
         k = 0

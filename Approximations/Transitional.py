@@ -15,7 +15,7 @@ class Transitional(Approximation):
 
     def __init__(self):
         Approximation.__init__(self, "Transitional")
-        self.application = [FilterTypes.HighPass, FilterTypes.LowPass, FilterTypes.BandPass, FilterTypes.BandReject]
+        self.application = [FilterTypes.HighPass.value, FilterTypes.LowPass.value, FilterTypes.BandPass.value, FilterTypes.BandReject.value]
         self.approximations = ["Butterworth", "Cauer", "Chevy1", "Chevy2", "Legendre"]
         self.dict = {
             "Q max": [(0, 10, False), 10],
