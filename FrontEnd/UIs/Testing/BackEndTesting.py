@@ -66,7 +66,7 @@ class BackEndTesting:
 
         graph_dict[GraphTypes.GroupDelay.value] = [
             [GraphValues([0, 100, 105, 2000, 2500], [500, 1000, 20000, 30000, 400000], False, False, True)],
-            ["freq", "module"], True]
+            ["freq", "module"]]
 
         graph_dict[GraphTypes.PolesZeros.value] = [
             [GraphValues([50, 500, 5000, 50000], [10, 100, 1000, 10000], True, False,False, "Zeros"),  # GRAF CEROS
