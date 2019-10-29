@@ -27,7 +27,7 @@ class Gauss(Approximation):
 
     def __init__(self):
         Approximation.__init__(self, "Gauss")
-        self.application = [FilterTypes.GroupDelay]
+        self.application = [FilterTypes.GroupDelay.value]
         self.information = {}
         self._pre_calc(self.n_max)
         self.dict = {
@@ -55,7 +55,7 @@ class Gauss(Approximation):
             n = self._ord()
         while True:
             """ If the approximation supports the filter I continue """
-            if filter_in_use.get_type() is FilterTypes.GruopDelay:
+            if filter_in_use.get_type() is FilterTypes.GruopDelay.value:
                 """ Now we limit the order of the filter """
                 n = amax([n, self.n_max])
                 """ After getting the order I get the zeros, poles and gain of the filter """
@@ -91,7 +91,7 @@ class Gauss(Approximation):
 
     def _gauss_des(self, z_n, p_n):
         """ Returns zeros, poles and gain of Gauss denormalized approximation """
-        p = p_n/self.information[TemplateInfo.gd]
+        p = p_n/self.information[TemplateInfo.gd.value]
         k = prod(abs(p))
         return z_n, p, k
 
