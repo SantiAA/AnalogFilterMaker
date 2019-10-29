@@ -146,5 +146,3 @@ class StagesManager(object):
 
     def set_gain(self, i, k):
         self.sos[i]["Gain"] = k
-
-    def
