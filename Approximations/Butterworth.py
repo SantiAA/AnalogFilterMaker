@@ -11,11 +11,17 @@ from Filters.Filters import TemplateInfo
 from Filters.Filters import Filter
 
 
-class Butterwoth(Approximation):
+class Butterworth(Approximation):
 
     def __init__(self):
         Approximation.__init__(self, "Butterwoth")
         self.application = [FilterTypes.HighPass, FilterTypes.LowPass, FilterTypes.BandPass, FilterTypes.BandReject]
+        self.dict = {
+            "N max": [(0, 20, False), None],
+            "Q max": [(0, 10, False), None],
+            "Fixed N": [(0, 20, True), None],
+            "Denorm.": [(0, 100, False), None]
+        }
 
     def load_information(self, filter_in_use: Filter):
 

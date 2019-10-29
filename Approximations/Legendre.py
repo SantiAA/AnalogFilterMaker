@@ -33,6 +33,12 @@ class Legendre(Approximation):
         Approximation.__init__(self, "Legendre")
         self.application = [FilterTypes.HighPass, FilterTypes.LowPass, FilterTypes.BandPass, FilterTypes.BandReject]
         self.information = {}
+        self.dict = {
+            "N max": [(0, 20, False), None],
+            "Q max": [(0, 10, False), None],
+            "Fixed N": [(0, 20, True), None],
+            "Denorm.": [(0, 100, False), None]
+        }
 
     def load_information(self, filter_in_use: Filter):
 
