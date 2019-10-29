@@ -137,9 +137,9 @@ class StagesManager(object):
         self.sos[j], self.sos[i] = get
 
     def calc_rd(self):
-        vi_max = self.requirements[StageInfo.Vo_max]/self.k
+        vi_max = self.requirements[StageInfo.Vo_max]
         for s in self.sos:
-            vi_max/=s["Gain"]
+            vi_max /= s["Gain"]
         rd = 20*log10(vi_max/self.requirements[StageInfo.Vi_min])
 
         return rd
