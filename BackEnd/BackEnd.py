@@ -63,7 +63,7 @@ class BackEnd:
             Ap = my_filter.get_req_value(TemplateInfo.Ap.value)
             Aa = my_filter.get_req_value(TemplateInfo.Aa.value)
             sq1 = Square(Dot(0, Ap), Dot(0, INFINITE), Dot(fp, INFINITE), Dot(fp,  Ap))
-            sq2 = Square(Dot(fa, -INFINITE), Dot(fa,  Aa), Dot(INFINITE, Aa), Dot(-INFINITE, -INFINITE))
+            sq2 = Square(Dot(fa, -INFINITE), Dot(fa,  Aa), Dot(INFINITE, Aa), Dot(INFINITE, -INFINITE))
             return [sq1, sq2]
         elif my_filter.get_type() is FilterTypes.HighPass.value:
             fa = my_filter.get_req_value(TemplateInfo.fa.value)
@@ -83,7 +83,7 @@ class BackEnd:
             Aa = my_filter.get_req_value(TemplateInfo.Aa.value)
             sq1 = Square(Dot(0, -INFINITE), Dot(0, Aa), Dot(fa__, Aa), Dot(fa__, -INFINITE))
             sq2 = Square(Dot(fp__, Ap), Dot(fp__, INFINITE), Dot(fp_, INFINITE), Dot(fp_, Ap))
-            sq3 = Square(Dot(fa_, -INFINITE), Dot(fa_, Aa), Dot(INFINITE, Aa), Dot(-INFINITE, -INFINITE))
+            sq3 = Square(Dot(fa_, -INFINITE), Dot(fa_, Aa), Dot(INFINITE, Aa), Dot(INFINITE, -INFINITE))
             return [sq1, sq2, sq3]
         elif my_filter.get_type() is FilterTypes.BandReject.value:
             fa_ = my_filter.get_req_value(TemplateInfo.fa_.value)
