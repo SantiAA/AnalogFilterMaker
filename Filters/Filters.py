@@ -1,5 +1,7 @@
 # python native modules
 from enum import Enum
+
+# third-party modules
 from numpy import poly
 from numpy import sqrt
 from numpy import conj
@@ -10,7 +12,8 @@ from numpy import unwrap
 from numpy import diff
 from numpy import pi
 from scipy import signal
-# third-party modules
+from numpy import imag
+from numpy import real
 
 # AFM project modules
 
@@ -40,7 +43,8 @@ class TemplateInfo(Enum):
 
 
 class GraphTypes(Enum):
-    Normalized = "Normalized"
+    NormalizedAt = "Normalized Attenuation"
+    NormalizedGd = "Normalized Group Delay"
     Attenuation = "Attenuation"
     Module = "Module"
     Phase = "Phase"
@@ -115,12 +119,13 @@ class Filter(object):
         return self.denormalized["MaxQ"]
 
     def load_z_p_k(self, z, p, k):
-        self.denormalized["Zeros"] = z
+        self.denormalized["Zeros"] = z.copy()
         self.denormalized["Gain"] = k
         self.denormalized["Order"] = len(p)
+        self.denormalized["StagesQ"] = []
         max_q = 0
         p = self._agrup_roots(p)     # ordena Re(p) creciente, se asegura que los comp conj tengan el mismo valor
-        self.denormalized["Poles"] = p
+        self.denormalized["Poles"] = p.copy()
         while len(p):                 # agrupo en polos complejos conjugados
             # len_in = len(self.denormalized["StagesQ"])
             for i in range(1, len(p)):
@@ -163,33 +168,34 @@ class Filter(object):
         f_n = w_n/(2*pi)
         mag_n = 20 * log10(abs(h_n))
         phase_n = angle(h_n)
-        graphs[GraphTypes.Module] = [[f, -mag, False, False, True], ["Frequency [Hz]", "Amplitude [dB]"]]
-        graphs[GraphTypes.Attenuation] = [[f, -mag, False, False, True], ["Frequency [Hz]", "Attenuation[dB]"]]   # se pasa una lista de graphvalues
+        graphs[GraphTypes.Module.value] = [[f, -mag, False, False, True], ["Frequency [Hz]", "Amplitude [dB]"]]
+        graphs[GraphTypes.Attenuation.value] = [[f, -mag, False, False, True], ["Frequency [Hz]", "Attenuation[dB]"]]   # se pasa una lista de graphvalues
         if self.filter is FilterTypes.GroupDelay:
-            graphs[GraphTypes.Normalized] = [[f, -2 * pi * diff(unwrap(phase_n)) / diff(w_n), False, False, True],
+            graphs[GraphTypes.NormalizedGd.value] = [[f, -2 * pi * diff(unwrap(phase_n)) / diff(w_n), False, False, True],
                                              ["Frequency[Hz]", "Group delay [s]"]]  # -d(Phase)/df = -dP/dw * dw/df = -dP/dw * 2pi
         else:
-            graphs[GraphTypes.Normalized] = [[f_n, -mag_n, False, False, True], ["Frequency[Hz]", "Attenuation[dB]"]]
-        graphs[GraphTypes.Phase] = [[f, phase, False, False, True], ["Frequency[Hz]", "Phase[deg]"]]
-        graphs[GraphTypes.GroupDelay] = [[f, -2*pi*diff(unwrap(phase))/diff(w), False, False, True], ["Frequency[Hz]", "Group delay [s]"]]  # -d(Phase)/df = -dP/dw * dw/df = -dP/dw * 2pi
-        graphs[GraphTypes.PolesZeros] = [[self.denormalized["Zeros"].real, self.denormalized["Zeros"].imag, False, True, False, "Zeros"],
-                                [self.denormalized["Poles"].real, self.denormalized["Poles"].imag, True, True, False, "Poles"], ["Re(s)", "Im(s)"]]
+            graphs[GraphTypes.NormalizedAt.value] = [[f_n, -mag_n, False, False, True], ["Frequency[Hz]", "Attenuation[dB]"]]
+        graphs[GraphTypes.Phase.value] = [[f, phase, False, False, True], ["Frequency[Hz]", "Phase[deg]"]]
+        graphs[GraphTypes.GroupDelay.value] = [[f, -2*pi*diff(unwrap(phase))/diff(w), False, False, True], ["Frequency[Hz]", "Group delay [s]"]]  # -d(Phase)/df = -dP/dw * dw/df = -dP/dw * 2pi
+        graphs[GraphTypes.PolesZeros.value] = [[real(self.denormalized["Zeros"]), imag(self.denormalized["Zeros"]), False, True, False, "Zeros"],
+                                [real(self.denormalized["Poles"]), imag(self.denormalized["Poles"]), True, True, False, "Poles"], ["Re(s)", "Im(s)"]]
         t, imp = signal.impulse(trans_func)
-        graphs[GraphTypes.Impulse] = [[t, imp, False, False, False], ["t[s]", "V[V]"]]
+        graphs[GraphTypes.Impulse.value] = [[t, imp, False, False, False], ["t[s]", "V[V]"]]
         t, step = signal.step(trans_func)
-        graphs[GraphTypes.Step] = [[t, step, False, False, False], ["t[s]", "V[V]"]]
+        graphs[GraphTypes.Step.value] = [[t, step, False, False, False], ["t[s]", "V[V]"]]
+        graphs[GraphTypes.StagesQ.value] = []
         if len(self.denormalized["StagesQ"]):   # los filtros de primer orden no tienen Q
             i = 0
             while i < len(self.denormalized["StagesQ"]):
-                graphs[GraphTypes.StagesQ][i].append([[0, self.denormalized["StagesQ"][i]], [i+1, i+1], True, False, False])
+                graphs[GraphTypes.StagesQ.value].append([[0, self.denormalized["StagesQ"][i]], [i+1, i+1], True, False, False])
                 i += 1
-            graphs[GraphTypes.StagesQ][i].append(["Q", "Q N°"])
+            graphs[GraphTypes.StagesQ.value].append(["Q", "Q N°"])
         return graphs
 
     @staticmethod
     def _agrup_roots(p):
         new_p = []
-        p.sort(key=lambda x: x.real)  # ordeno por parte real creciente
+        p = sorted(p, key=lambda x: x.real)  # ordeno por parte real creciente
         while len(p):
             len_in = len(new_p)
             for i in range(1, len(p)):
@@ -199,6 +205,6 @@ class Filter(object):
                     p.remove(p[i])
                     break
             if len_in == len(new_p):  # si no le encontre un conjugado
-                new_p.append([p[0]])  # no lo tiene :(
-                p.remove(p[0])
+                new_p.append(p[0])  # no lo tiene :(
+            p.remove(p[0])
         return new_p
