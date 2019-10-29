@@ -3,7 +3,7 @@
 # third-party modules
 
 # AFM project modules
-from Approximations.Butterworth import Butterwoth
+from Approximations.Butterworth import Butterworth
 from Approximations.Chevy1 import ChevyI
 from Approximations.Chevy2 import ChebyII
 from Approximations.Cauer import Cauer
@@ -27,7 +27,7 @@ class BackEnd:
     def __init__(self):
         self.lp = LowPass
         self.all_filters = [LowPass(), HighPass(), BandPass(), BandReject(), GroupDelay()]
-        self.all_approximations = [Bessel(), Butterwoth(), ChevyI(), ChebyII(), Cauer(), Gauss(), Legendre()]
+        self.all_approximations = [Bessel(), Butterworth(), ChevyI(), ChebyII(), Cauer(), Gauss(), Legendre()]
         self.dynamic_filters = []
         self.fil_dict = {}
         self.filters_specs = {}

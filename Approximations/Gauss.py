@@ -3,8 +3,7 @@ Approximation base class
 """
 
 # third-party modules
-from sympy import *
-from scipy import signal
+from scipy import signal, prod
 import json
 
 from numpy import unwrap
@@ -16,6 +15,8 @@ from numpy import pi
 from numpy import amax
 
 # AFM project modules
+from scipy.special import factorial
+
 from Approximations.Approx import Approximation
 from Filters.Filters import FilterTypes
 from Filters.Filters import TemplateInfo
