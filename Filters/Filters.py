@@ -71,6 +71,9 @@ class Filter(object):
     def get_type(self) -> FilterTypes:
         return self.filter
 
+    def get_limit(self, info: TemplateInfo):
+        return self.limits[info]
+
     def get_requirements(self):
         return [key for key in self.requirements]
 

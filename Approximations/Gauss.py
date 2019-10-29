@@ -29,6 +29,11 @@ class Gauss(Approximation):
         self.application = [FilterTypes.GroupDelay]
         self.information = {}
         self._pre_calc(self.n_max)
+        self.dict = {
+            "N max": [(0, 20, False), None],
+            "Q max": [(0, 10, False), None],
+            "Fixed N": [(0, 20, True), None],
+        }
 
     def load_information(self, filter_in_use: Filter):
 
