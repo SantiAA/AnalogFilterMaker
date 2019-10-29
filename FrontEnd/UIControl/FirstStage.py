@@ -5,12 +5,11 @@ from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import *
 from PyQt5.uic import loadUi
 
-from BackEnd.BackEnd import BackEnd
 from FrontEnd.UIControl.FinalGraph import FinalGraph
 from FrontEnd.UIs.FilterConfigurations.Config import Config
 from FrontEnd.UIs.FilterConfigurations.Template import Template
 from FrontEnd.UIs.Testing.ApproximationTesting import ApproximationTesting
-
+from FrontEnd.UIs.Testing.BackEndTesting import BackEndTesting
 
 
 class FirstStage(QMainWindow):
@@ -20,7 +19,7 @@ class FirstStage(QMainWindow):
         self.ui_manager = ui_manager
         self.a = 0
         self.filters = {}
-        self.backend = BackEnd()
+        self.backend = BackEndTesting()
         self.filters_received, self.approximations_received = self.backend.get_util()
 
         self.showingGraphs = []
@@ -275,10 +274,9 @@ class FirstStage(QMainWindow):
                             properties.append([prop.name, str(prop.get_value())])
                         else:
                             properties.append([prop.name, "Auto"])
-                    self.graphics_returned = self.backend.get_graphs([self.filter.name, dict],
-                                                                     ApproximationTesting(approximation.name,
+                    self.graphics_returned = self.backend.get_graphs([self.filter.name, dict], [approximation.name,
                                                                                           approximation.make_approx_dict(),
-                                                                                          approximation.extra_combos))
+                                                                                          approximation.extra_combos])
                     self.existing = True
                     new_graph = FinalGraph(self.graphics_returned, properties, True)
 

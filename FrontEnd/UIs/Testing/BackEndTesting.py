@@ -34,7 +34,7 @@ class BackEndTesting:
                          ApproximationTesting("Transicional", {
                              "Max Q": [[0, 100, False], 50],
                              "n": [[0, 10, True], 5]
-                         }, 2)
+                         }, [["Chebyshev", "Gauss"], ["Butterworth", "Legendre"]])
                          ###IMPORTANTE, PARA LOS TRANSICIONALES PASAR 2 COMO ULTIMO ARGUMENTO. (COMO ESTA EN EL EJEMPLO) (2 VENDRIAN A SER LOS COMBO BOX EXTRAS)
                          ]
             ,
@@ -66,7 +66,7 @@ class BackEndTesting:
 
         graph_dict[GraphTypes.GroupDelay.value] = [
             [GraphValues([0, 100, 105, 2000, 2500], [500, 1000, 20000, 30000, 400000], False, False, True)],
-            ["freq", "module"]]
+            ["freq", "module"], True]
 
         graph_dict[GraphTypes.PolesZeros.value] = [
             [GraphValues([50, 500, 5000, 50000], [10, 100, 1000, 10000], True, False,False, "Zeros"),  # GRAF CEROS

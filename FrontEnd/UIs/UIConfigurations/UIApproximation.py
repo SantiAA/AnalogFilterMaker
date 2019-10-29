@@ -9,8 +9,8 @@ class UIApproximation:
         self.approximation_list = approx_name_list
         dict_of_features = approximation.dict
         self.extra_combos = approximation.extra_combos
-        for i in range(0, self.extra_combos):
-            self.parameter_list.append(ApproximationParameterLayout("Approx " + str(i+1), DefaultComboBox(self.approximation_list), False))
+        for i in range(0, len(self.extra_combos)):
+            self.parameter_list.append(ApproximationParameterLayout("Approx " + str(i+1), DefaultComboBox(self.extra_combos[i]), False))
         for feature in dict_of_features:
             self.parameter_list.append(ApproximationParameterLayout(feature, DefaultSlider(dict_of_features[feature][0][0],
                                                                                   dict_of_features[feature][0][1],

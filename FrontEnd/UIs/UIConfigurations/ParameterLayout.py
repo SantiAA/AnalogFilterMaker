@@ -177,8 +177,7 @@ class DefaultComboBox(QWidget):
         self.setLayout(self.layout)
         self.approxs = approxs
         for approx in self.approxs:
-            if approx.extra_combos == 0:
-                self.combo.addItem(approx.name)
+            self.combo.addItem(approx)
 
     def get_value(self):
         return self.combo.currentText()
