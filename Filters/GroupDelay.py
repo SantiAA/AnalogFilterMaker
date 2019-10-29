@@ -10,9 +10,9 @@ class GroupDelay(Filter):
     def __init__(self):
         super().__init__(FilterTypes.GroupDelay)
         """ Load BandReject requirements for future usage """
-        self.requirements = {TemplateInfo.ft: None,   # frequency of tau=gd*tol
-                             TemplateInfo.tol: None,  # tolerance
-                             TemplateInfo.gd: None}   # Group delay
+        self.requirements = {TemplateInfo.ft.value: None,   # frequency of tau=gd*tol
+                             TemplateInfo.tol.value: None,  # tolerance
+                             TemplateInfo.gd.value: None}   # Group delay
 
     def validate_requirements(self) -> bool:
         for each in self.requirements:
