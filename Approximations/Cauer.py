@@ -74,18 +74,24 @@ class Cauer(Approximation):
                 """ If the approximation support the filter I continue """
                 """ And transform the normalized low pass to the desire one """
                 z, p, k = signal.lp2lp_zpk(_z, _p, _k, self.information[TemplateInfo.fp])
+                filter_in_use.load_z_p_k(z, p, k)
+
             elif filter_in_use.get_type() is FilterTypes.HighPass:
                 z, p, k = signal.lp2hp_zpk(_z, _p, _k, self.information[TemplateInfo.fp])
+                filter_in_use.load_z_p_k(z, p, k)
+
             elif filter_in_use.get_type() is FilterTypes.BandPass:
                 Awp = self.information[TemplateInfo.fp_] - self.information[TemplateInfo.fp__]
                 w0 = np.sqrt(self.information[TemplateInfo.fp_] * self.information[TemplateInfo.fp__])
 
                 z, p, k = signal.lp2bp_zpk(_z, _p, _k, w0, Awp)  # Desnormalizado
+                filter_in_use.load_z_p_k(z, p, k)
             elif filter_in_use.get_type() is FilterTypes.BandReject:
                 Awp = self.information[TemplateInfo.fp_] - self.information[TemplateInfo.fp__]
                 w0 = np.sqrt(self.information[TemplateInfo.fp_] * self.information[TemplateInfo.fp__])
 
                 z, p, k = signal.lp2bs_zpk(_z, _p, _k, w0, Awp)  # Desnormalizado
+                filter_in_use.load_z_p_k(z, p, k)
             else:
                 print("Cauer.py: Invalid filter type passed to Cauer aproximation")
                 return
