@@ -5,6 +5,7 @@ from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import *
 from PyQt5.uic import loadUi
 
+from BackEnd.BackEnd import BackEnd
 from FrontEnd.UIControl.FinalGraph import FinalGraph
 from FrontEnd.UIs.FilterConfigurations.Config import Config
 from FrontEnd.UIs.FilterConfigurations.Template import Template
@@ -19,7 +20,7 @@ class FirstStage(QMainWindow):
         self.ui_manager = ui_manager
         self.a = 0
         self.filters = {}
-        self.backend = BackEndTesting()
+        self.backend = BackEnd()
         self.filters_received, self.approximations_received = self.backend.get_util()
 
         self.showingGraphs = []
