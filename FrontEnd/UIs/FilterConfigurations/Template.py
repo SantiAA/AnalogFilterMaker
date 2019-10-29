@@ -24,8 +24,8 @@ class Template:
                     min_x_dot = dot.x_value
                 if dot.y_value != -INFINITE and dot.y_value < min_y_dot:
                     min_y_dot = dot.y_value
-        x_bound = [min_x_dot - min_x_dot * 0.5, max_x_dot + max_x_dot * 0.5]
-        y_bound = [min_y_dot - min_y_dot * 0.5, max_y_dot + max_y_dot * 0.5]
+        x_bound = [min_x_dot/10, max_x_dot*10]
+        y_bound = [0, max_y_dot + max_y_dot * 0.5]
         return [x_bound, y_bound]
 
     def get_matplotlib_squares(self):
