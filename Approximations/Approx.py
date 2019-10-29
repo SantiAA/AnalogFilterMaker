@@ -20,7 +20,7 @@ class Approximation(object):
         """ Useful to add in the GUI """
         self.name = name  # The name of the approximation
         self.dict = {}
-        self.extra_combos = 0  # To change to 2 in 'Transicionales'
+        self.extra_combos = []  # To change to 2 in 'Transicionales'
         self.application = []  # Approximation's filter type application
 
         """ Useful for internal working """
