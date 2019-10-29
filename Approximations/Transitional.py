@@ -29,12 +29,14 @@ class Transitional(Approximation):
             self.information[each] = filter_in_use.get_req_value(each)
         return True
 
-    def calculate(self, filter_in_use: Filter, n_max=20, denorm=0):
-        self.approx1.calculate(filter_in_use, n_max, denorm)
-        z1, p1, k1 = filter_in_use.get_z_p_k()
-        self.approx2.calculate(filter_in_use, n_max, denorm)
-        z2, p2, k2 = filter_in_use.get_z_p_k()
+    def calculate(self, filter_in_use: Filter, **kwargs):
+        self.approx1.calculate(filter_in_use, **kwargs)
+        z1, p1, k1 = filter_in_use.get_z_p_k_q()
+        self.approx2.calculate(filter_in_use, **kwargs)
+        z2, p2, k2 = filter_in_use.get_z_p_k_q()
         p = p1**self.m * p2**(1-self.m)
-        # z= tengo que ver como se calculan polos y ceros
+        # z= tengo que ver como se calculan ceros
+        z = z1 ** self.m * z2 ** (1 - self.m)
         # k= tengo que ver como se calcula la ganancia
+        k = k1 ** self.m * k2 ** (1 - self.m)
         filter_in_use.load_z_p_k(z, p, k)

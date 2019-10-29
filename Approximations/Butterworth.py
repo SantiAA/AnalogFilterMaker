@@ -11,7 +11,7 @@ from Filters.Filters import TemplateInfo
 from Filters.Filters import Filter
 
 
-class Butterwoth(Approximation):
+class Butterworth(Approximation):
 
     def __init__(self):
         Approximation.__init__(self, "Butterwoth")

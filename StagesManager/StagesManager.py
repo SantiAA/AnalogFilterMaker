@@ -2,6 +2,9 @@
 from enum import Enum
 
 from numpy import conjugate
+from numpy import argmin
+from numpy import full
+
 
 # AFM project modules
 from Filters.Filters import Filter
@@ -27,7 +30,7 @@ class StagesManager(object):
         self.p_pairs = [] # va a tener arreglos de polos de 1er o 2do orden, guarda wo y Q (Q solo en 2do)
         self.z_pairs = [] # va a tener arreglos de ceros de 1er y 2do orden, guarda wo y orden (siempre estan sobre el eje im)
         self.k = 0
-        self.stages = []
+        self.sos = []
 
     def load_requirements(self, specs):
         for each in specs:
@@ -62,7 +65,7 @@ class StagesManager(object):
                     p.remove(p[1])
                     saved = True
             if not saved:
-                self.p_pairs.append([abs(p[0])])  # si no tiene
+                self.p_pairs.append([abs(p[0])])  # si no tiene Q
             p.remove(p[0])
             saved = False
         while len(z):   # guardo en self.z_pairs los pares de ceros complejos conjugados como [wo,n]
@@ -75,24 +78,51 @@ class StagesManager(object):
                 self.z_pairs.append([abs(z[0])])  # si no tiene
             z.remove(z[0])
             saved = False
-        self.p_pairs.sort(key=lambda x:x[0]) # ordeno polos por wo creciente
-        self.z_pairs.sort(key=lambda x:x[0]) # ordeno ceros por wo creciente
+        self.p_pairs.sort(key=lambda x:x[1], reverse=True) # ordeno polos por Q decreciente
+        self.z_pairs.sort(key=lambda x:x[1], reverse=True) # ordeno ceros por orden decreciente
         self.k = k
 
-    def get_stages(self):
-        """ Returns tuple with 1st/2nd order pole stages and 1st/2nd order zeros stages"""
+    def get_singularities(self):
+        """ Returns tuple with 1st/2nd order poles and 1st/2nd order zeros """
         return self.z_pairs, self.p_pairs
 
     def get_max_rd_stages(self, sig_type: SignalTypes):
         # agrupo todas
-        self.stages = None
-        # self
+        self.sos = []
+        """ To agrupate nearest poles and zeros """
+        if len(self.z_pairs):   # si tiene ceros
+                adj_matrix = [] # aqui se guardaran todas las distancias entre frecuencias de corte de polos y ceros
+                for i in range(len(self.z_pairs)):      # para cada cero
+                    if self.z_pairs[i][1] > 1:  # si el cero es de segundo orden
+                        for j in range(len(self.p_pairs)):
+                            if len(self.p_pairs[j]) > 1:  # si el polo es de segundo orden
+                                dist = abs(self.z_pairs[i][0] - self.p_pairs[j][0])
+                                adj_matrix[i][j] = dist         # guardo la distancia entre cada polo y cero de orden 2
+                k = 0
+                k_max = len(self.z_pairs)
+                used_p = full(adj_matrix.shape(1), False)
+                while k < k_max:
+                    i, j = argmin(adj_matrix)
+                    self.sos.append([self.p_pairs[j], self.z_pairs[i]])
+                    adj_matrix[i][j] = 1e9  # ya no me interesa esta distancia, la hago grande para que no salga elegida
+                    used_p[j] = True    # marca que este polo ya se utilizo
+                    k += 1
+                for i in range(adj_matrix.shape(1)):
+                    if not used_p[i]:
+                        self.sos.append([self.p_pairs[i], None])
+                # ver que hacer con los polos y ceros de primer orden aaaaaaaaa
+        else:
+            self.sos = [ [p, None] for p in self.p_pairs]
+        """" The order of the stages depends on the input signal """
         if sig_type is SignalTypes.LowSignal:
-            self.stages.sort(self.)
+            self.sos.sort(key=lambda x:x[0][1], reverse=True) # ordena por Q decreciente
+            # k a la primera celda
         elif sig_type is SignalTypes.HighSignal:
-            pass
+            self.sos.sort(key=lambda x:x[0][1], reverse=True) # ordena por Q creciente
+            # k a la ultima celda
         elif sig_type is SignalTypes.MedSignal:
+            # preguntarle a dani
             pass
-        return self.stages
+        return self.sos
 
     def
