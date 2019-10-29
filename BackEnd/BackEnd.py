@@ -23,6 +23,7 @@ from Filters.Filters import TemplateInfo
 from BackEnd.Output.Dot import Dot, INFINITE
 from BackEnd.Output.Square import Square
 
+
 class BackEnd:
     def __init__(self):
         self.lp = LowPass
@@ -40,7 +41,7 @@ class BackEnd:
             specs = fil.get_requirements()
             useful_dict = {}
             for request in specs:
-                useful_dict[request] = [fil.get_limit(request), None]
+                useful_dict[request] = [fil.get_limit(request), fil.get_default(request)]
             self.filters_specs[fil.get_type()] = useful_dict
     """ Returns """
 
