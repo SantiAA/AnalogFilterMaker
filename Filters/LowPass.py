@@ -10,11 +10,17 @@ class LowPass(Filter):
     def __init__(self):
         super().__init__(FilterTypes.LowPass.value)
         """ Load LowPass requirements for future usage """
-        self.requirements = {TemplateInfo.Aa.value: None,
+        self.requirements = {TemplateInfo.k.value: None,
+                             TemplateInfo.Aa.value: None,
                              TemplateInfo.Ap.value: None,
                              TemplateInfo.fa.value: None,
                              TemplateInfo.fp.value: None}
 
+        self.defaults = {
+            TemplateInfo.Aa.value: 40, TemplateInfo.Ap.value: 5, TemplateInfo.fa.value: 20000,
+            TemplateInfo.fp.value: 2000,
+            TemplateInfo.k.value: 1
+        }
     def validate_requirements(self) -> bool:
         for each in self.requirements:
             if self.requirements[each] is None:
