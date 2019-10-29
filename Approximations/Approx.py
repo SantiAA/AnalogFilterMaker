@@ -111,7 +111,7 @@ class Approximation(object):
         wa__ = f01**2/self.information[TemplateInfo.fa_.value]
         wa_ = f01 ** 2 / self.information[TemplateInfo.fa__.value]
         k1 = (self.information[TemplateInfo.fa_.value]-self.information[TemplateInfo.fa__.value]) / \
-             (wp_-self.information[TemplateInfo.fp__])
+             (wp_-self.information[TemplateInfo.fp__.value])
         k2 = (self.information[TemplateInfo.fa_.value] - self.information[TemplateInfo.fa__.value]) / \
              (self.information[TemplateInfo.fp_.value] - wp__)
         k3 = (wa_ - self.information[TemplateInfo.fa__.value]) / \
