@@ -14,7 +14,7 @@ from Filters.Filters import Filter
 class ChevyI(Approximation):
 
     def __init__(self):
-        Approximation.__init__(self, "Chevy I")
+        Approximation.__init__(self, "Cheby I")
         self.application = [FilterTypes.HighPass.value, FilterTypes.LowPass.value, FilterTypes.BandPass.value, FilterTypes.BandReject.value]
         self.information = {}
         self.dict = {

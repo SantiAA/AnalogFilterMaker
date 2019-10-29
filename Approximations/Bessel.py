@@ -15,7 +15,7 @@ class Bessel(Approximation):
 
     def __init__(self):
         Approximation.__init__(self, "Bessel")
-        self.application = [FilterTypes.GroupDelay]
+        self.application = [FilterTypes.GroupDelay.value]
         self.dict = {
             "Q max": [(0, 10, False), 10],
             "Fixed N": [(0, 20, True), 10],
@@ -40,8 +40,8 @@ class Bessel(Approximation):
         p = []
         k = 0
         """ First I calculate the Normalized LowPass, to get the useful w """
-        normalized_n, useful_w = self._bessord(self.information[TemplateInfo.ft], self.information[TemplateInfo.tol],
-                                               self.information[TemplateInfo.gd], self.n_max)
+        normalized_n, useful_w = self._bessord(self.information[TemplateInfo.ft.value], self.information[TemplateInfo.tol.value],
+                                               self.information[TemplateInfo.gd.value], self.n_max)
         if self.fixed_n > 0:
             normalized_n = self.fixed_n
         elif normalized_n > self.n_max:
@@ -50,8 +50,8 @@ class Bessel(Approximation):
         while True:
             """ First search the order and the normalizer 'cut' frequency """
             z_norm, p_norm, k_norm = signal.bessel(normalized_n, useful_w, analog=True, output='zpk')
-            if filter_in_use.get_type() is FilterTypes.GroupDelay:
-                z, p, k = signal.bessel(normalized_n, useful_w/self.information[TemplateInfo.gd], 'low', True, 'zpk')
+            if filter_in_use.get_type() is FilterTypes.GroupDelay.value:
+                z, p, k = signal.bessel(normalized_n, useful_w/self.information[TemplateInfo.gd.value], 'low', True, 'zpk')
                 filter_in_use.load_z_p_k(z, p, k)
             else:
                 print("Bessel.py: Invalid filter type passed to Bessel aproximation")
