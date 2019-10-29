@@ -30,7 +30,7 @@ class FirstStage(QMainWindow):
         Actions to perform when the window is shown.
         """
         QMainWindow.__init__(self)
-        loadUi('FrontEnd/UIs/firststageTest2.ui', self)
+        loadUi('FrontEnd/UIs/firststage.ui', self)
         self.setWindowTitle("Filter Design Tool")
         self.graph_widget = self.graphWidget
         self.comboFilter.clear()
@@ -303,8 +303,6 @@ class FirstStage(QMainWindow):
             msg.setWindowTitle("Error")
             msg.exec_()
 
-
-
     def __update_active_approx_combo__(self):
         self.activeApproxsCombo.clear()
         i = 0
@@ -312,7 +310,7 @@ class FirstStage(QMainWindow):
             approx.id = i
             i += 1
             self.activeApproxsCombo.addItem(approx.get_total_string())
-        self.activeApproxsCombo.setCurrentIndex(self.activeApproxsCombo.count()-1)
+        self.activeApproxsCombo.setCurrentIndex(self.activeApproxsCombo.count() - 1)
 
     def clear_layout(self, layout):
         """
