@@ -110,7 +110,7 @@ class FirstStage(QMainWindow):
         for graph in self.showingGraphs:
             if graph.get_total_string() == self.activeApproxsCombo.currentText():
                 graph.toggle_graph(self.toggleApprox.isChecked())
-                self.redraw_graphs()
+                self.redraw()
         self.get_current_state_config()
 
     def edit_approx(self):

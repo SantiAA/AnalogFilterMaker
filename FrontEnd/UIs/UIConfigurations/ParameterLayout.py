@@ -39,7 +39,9 @@ class ApproximationParameterLayout(QWidget):
         self.label.setAlignment(Qt.AlignCenter)
         self.check_box = QCheckBox()
         self.check_box.setStyleSheet("font-size: 12px; color:rgb(255, 255, 255);")
-        self.check_box.setText("Manual")
+        self.check_box.setText("Fixed")
+
+
         self.check_box.toggled.connect(self.check_box_toggled)
         self.rows = [InternalApproximationLayoutRow(self.label, self.check_box), self.widget]
         if not toggleable:
@@ -49,6 +51,9 @@ class ApproximationParameterLayout(QWidget):
             self.layout.addWidget(row)
         self.layout.addStretch()
         self.setLayout(self.layout)
+        if toggleable:
+            self.rows[1].hide()
+        self.auto = True
 
     def set_value(self, value):
         self.widget.set_value(value)
@@ -66,13 +71,13 @@ class ApproximationParameterLayout(QWidget):
         return self.widget.get_default_value()
 
     def check_box_toggled(self):
-        if self.check_box.isChecked():
-            self.check_box.setText("Auto")
+        if not self.check_box.isChecked():
+            self.check_box.setText("Fixed")
             self.rows[1].hide()
             self.auto = True
 
         else:
-            self.check_box.setText("Manual")
+            self.check_box.setText("Fixed")
             self.rows[1].show()
             self.auto = False
 
@@ -154,6 +159,60 @@ class DefaultSlider(QWidget):
     def set_value(self, value):
         self.slider.setValue(int(value))
         self.label.setText(str(value))
+
+    def get_min(self):
+        return self.min
+
+    def get_max(self):
+        return self.max
+
+    def get_default_value(self):
+        return self.default_value
+
+class DefaultSliderWithSpinBox(QWidget):
+    def __init__(self, min=0, max=100, default_value=50):
+        self.decimals = 3
+        self.multiplier = 10**self.decimals
+        self.min = min
+        self.max = max
+        self.default_value = default_value
+        QWidget.__init__(self)
+        self.slider = QSlider(Qt.Horizontal)
+        self.slider.setMinimum(min * self.multiplier)
+        self.slider.setMaximum(max * self.multiplier)
+        self.slider.setValue(default_value * self.multiplier)
+        self.spin_box = QDoubleSpinBox()
+        self.spin_box.setMaximum(max)
+        self.spin_box.setMinimum(min)
+        self.slider_changed()
+        self.spin_box.setStyleSheet("font-size: 14px; color:rgb(255, 255, 255);")
+        self.layout = QHBoxLayout()
+        self.slider.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+        self.spin_box.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Fixed)
+        self.slider.setSingleStep(self.multiplier)
+        self.spin_box.setContentsMargins(25, 0, 0, 0)
+        self.spin_box.setDecimals(self.decimals)
+        self.spin_box.valueChanged.connect(self.spin_box_changed)
+        self.layout.addWidget(self.slider)
+        self.layout.addWidget(self.spin_box)
+        self.slider.valueChanged.connect(self.slider_changed)
+        self.setLayout(self.layout)
+
+    def spin_box_changed(self):
+        if isinstance(self.sender(), QDoubleSpinBox):
+            self.slider.setValue(int(self.spin_box.value() * self.multiplier))
+
+    def slider_changed(self):
+        val = self.slider.value()
+
+        self.spin_box.setValue(round(val / self.multiplier, self.decimals))
+
+    def get_value(self):
+        return round(self.slider.value()/self.multiplier, self.decimals)
+
+    def set_value(self, value):
+        self.slider.setValue(int(value * self.multiplier ))
+        self.spin_box.setValue(round(value, self.decimals))
 
     def get_min(self):
         return self.min
