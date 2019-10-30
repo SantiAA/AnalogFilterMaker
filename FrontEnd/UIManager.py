@@ -7,7 +7,7 @@ from BackEnd.BackEnd import BackEnd
 from FrontEnd.UIControl.FirstStage import FirstStage, QMessageBox
 from FrontEnd.UIControl.SecondStage import SecondStage
 from FrontEnd.UIControl.UIMainWindow import UIMainWindow
-from StagesManager import StagesManager
+from StagesManager.StagesManager import StagesManager
 
 
 class UIManager:

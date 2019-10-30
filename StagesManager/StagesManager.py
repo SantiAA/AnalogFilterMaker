@@ -1,7 +1,7 @@
 # python native modules
 from enum import Enum
 
-from numpy import conjugate, amax, amin, pi
+from numpy import conjugate, amax, amin, pi, real, imag
 from numpy import argmin
 from numpy import full
 from numpy import log10
@@ -24,7 +24,7 @@ class ShowType(Enum):
 
 class StagesManager(object):
 
-    def __init__(self, fil: Filter):
+    def __init__(self):
         self.p_pairs = [] # va a tener arreglo de Poles
         self.z_pairs = [] # va a tener arreglos de Zeros
         self.sos = []
@@ -129,6 +129,7 @@ class StagesManager(object):
                 return False, "Total gain can't exceed" + str(self.k_tot) + "dB"
         else:
             return False, "Stage" + str(i + 1) + "doesn't exist."
+
     def get_z_p_plot(self):
         """" Returns poles and zeros diagram with number of repeticiones of each pole and zero """
         repeated_z = []
@@ -138,23 +139,20 @@ class StagesManager(object):
         i = 0
         while i < len(self.z_pairs):
             count = self.z_pairs.count(self.z_pairs[i])
-            for j in range(count)
-            repeated_z.append(count*self.z_pairs[i].n)
-            z.append(self.z_pairs[i])
+            add = 0
+            for j in range(count):
+                add += self.z_pairs[i + j].n
+            repeated_z.append(add)
+            z.append(complex(0,self.z_pairs[i].im))
             i += count
         i = 0
         while i < len(self.p_pairs):
             count = self.p_pairs.count(self.p_pairs[i])
             repeated_p.append(count)
-            p.append(self.denormalized["Poles"][i])
+            p.append(self.p_pairs[i].p)
             i += count
-
-        graphs[GraphTypes.PolesZeros.value] = [[GraphValues(real(z),
-                                                            imag(z), True, False, False,
-                                                            "Zeros", repeated_z),
-                                                GraphValues(real(p),
-                                                            imag(p), True, True, False,
-                                                            "Poles", repeated_p)], ["Re(s)[rad/sec]", "Im(s)[rad/sec]"]]
+        return [[GraphValues(real(z), imag(z), True, False, False, "Zeros", repeated_z), GraphValues(real(p),
+                        imag(p), True, True, False, "Poles", repeated_p)], ["Re(s)[rad/sec]", "Im(s)[rad/sec]"]]
 
 
     def get_z_p_dict(self):
