@@ -348,7 +348,7 @@ class FirstStage(QMainWindow):
         """
         Appends user selected approximation to active approximations and applies it to the filter.
         """
-        #self.comboFilter.model().item(1).setEnabled(False)
+
         self.toggleApprox.show()
         properties = []
         self.graphics_returned = []
