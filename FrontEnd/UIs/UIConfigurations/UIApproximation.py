@@ -12,10 +12,15 @@ class UIApproximation:
         for i in range(0, len(self.extra_combos)):
             self.parameter_list.append(ApproximationParameterLayout("Approx " + str(i+1), DefaultComboBox(self.extra_combos[i]), False))
         for feature in dict_of_features:
-            self.parameter_list.append(ApproximationParameterLayout(feature, DefaultSliderWithSpinBox(dict_of_features[feature][0][0],
+            if isinstance(dict_of_features[feature][0][3] ,float ):
+                self.parameter_list.append(ApproximationParameterLayout(feature, DefaultSliderWithSpinBox(dict_of_features[feature][0][0],
                                                                                   dict_of_features[feature][0][1],
                                                                                   dict_of_features[feature][1]), dict_of_features[feature][0][2]))
 
+            elif isinstance(dict_of_features[feature][0][3],int):
+                self.parameter_list.append(ApproximationParameterLayout(feature, DefaultSlider(dict_of_features[feature][0][0],
+                                                                                   dict_of_features[feature][0][1],
+                                                                                   dict_of_features[feature][1]),dict_of_features[feature][0][2]))
     def make_approx_dict(self):
         dict = {}
         for parameter in self.parameter_list:
