@@ -17,11 +17,7 @@ class Cauer(Approximation):
         Approximation.__init__(self, "Cauer")
         self.application = [FilterTypes.HighPass.value, FilterTypes.LowPass.value, FilterTypes.BandPass.value, FilterTypes.BandReject.value]
         self.information = {}
-        self.dict = {
-            "Q max": [(0, 10, False), 10],
-            "Fixed N": [(0, 20, True), 10],
-            "Denorm.": [(0, 100, False), 0]
-        }
+        self.dict["Denorm."] = [(0, 100, False), 0]
 
     def load_information(self, filter_in_use: Filter):
 
@@ -37,9 +33,7 @@ class Cauer(Approximation):
             self.__adjust_w__(False)
         elif filter_in_use.get_type() is FilterTypes.BandPass.value:
             self.__adjust_w__(True)
-
-        self.__selectivity__(filter_in_use.get_type())
-
+        self.selectivity = filter_in_use.get_selectivity()
         return True
 
     def calculate(self, filter_in_use: Filter, kwargs):

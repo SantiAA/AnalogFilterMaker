@@ -1,9 +1,12 @@
 # python native modules
 
 # third-party modules
+from numpy import where
 
 # AFM project modules
 from Filters.Filters import *
+from BackEnd.Output.Dot import Dot, INFINITE
+from BackEnd.Output.Square import Square
 
 
 class BandReject(Filter):
@@ -24,15 +27,46 @@ class BandReject(Filter):
             TemplateInfo.k.value: 1
         }
 
-    def validate_requirements(self) -> bool:
+    def validate_requirements(self) -> (bool, str):
+        ret = ""
         for each in self.requirements:
             if self.requirements[each] is None:
-                return False  # Check if every spec was loaded
+                ret = "Please enter a value for " + each[:where(" [")]
+                return False, ret  # Check if every spec was loaded
 
         if self.requirements[TemplateInfo.Aa.value] > self.requirements[TemplateInfo.Ap.value]:
             if self.requirements[TemplateInfo.fp__.value] < self.requirements[TemplateInfo.fa__.value]:
                 if self.requirements[TemplateInfo.fp_.value] > self.requirements[TemplateInfo.fa_.value]:
-                    return True
+                    self.selectivity = (self.requirements[TemplateInfo.fa_.value] -
+                                        self.requirements[TemplateInfo.fa__.value])/ \
+                                       (self.requirements[TemplateInfo.fp_.value] -
+                                        self.requirements[TemplateInfo.fp__.value])  # K = Awp/ Awa
+                    self.normalized_freqs = [1, 1 / self.selectivity]
+                    return True, ret
+                else:
+                    ret = "fp+ must be greater than fa+"
+            else:
+                ret = "fa- must be greater than fp-"
+        else:
+            ret = "Aa must be greater than Ap"
 
         """ If there is something wrong in the attenuations or frequencies I return False"""
-        return False
+        return False, ret
+
+    def get_templates(self):
+        fa_ = self.requirements[TemplateInfo.fa_.value]
+        fa__= self.requirements[TemplateInfo.fa__.value]
+        fp_ = self.requirements[TemplateInfo.fp_.value]
+        fp__ = self.requirements[TemplateInfo.fp__.value]
+        Ap = self.requirements[TemplateInfo.Ap.value]
+        Aa = self.requirements[TemplateInfo.Aa.value]
+        sq1 = Square(Dot(0, -INFINITE), Dot(0, Aa), Dot(fa__, Aa), Dot(fa__, -INFINITE))
+        sq2 = Square(Dot(fp__, Ap), Dot(fp__, INFINITE), Dot(fp_, INFINITE), Dot(fp_, Ap))
+        sq3 = Square(Dot(fa_, -INFINITE), Dot(fa_, Aa), Dot(INFINITE, Aa), Dot(INFINITE, -INFINITE))
+
+        sq1_n = Square(Dot(0, Ap), Dot(0, INFINITE), Dot(self.normalized_freqs[0], INFINITE), Dot(self.normalized_freqs[0], Ap))
+        sq2_n = Square(Dot(self.normalized_freqs[1], -INFINITE), Dot(self.normalized_freqs[1], Aa), Dot(INFINITE, Aa), Dot(INFINITE, -INFINITE))
+
+        denorm_template, norm_temlate = [sq1, sq2, sq3], [sq1_n, sq2_n]
+        return {GraphTypes.Attenuation.value: denorm_template,
+                GraphTypes.NormalizedAt.value: norm_temlate}

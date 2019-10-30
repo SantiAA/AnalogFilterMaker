@@ -61,7 +61,7 @@ class StagesManager(object):
         while len(p):   # guardo en self.p_pairs los pares de polos complejos conjugados como [wo,Q]
             if len(p) > 1:
                 if p[0] == conjugate(p[1]):
-                    self.p_pairs.append([abs(p[0]),q[0]])   
+                    self.p_pairs.append([abs(p[0]), q[0]])
                     q.remove(q[0])
                     p.remove(p[1])
                     saved = True

@@ -19,7 +19,10 @@ class Approximation(object):
     def __init__(self, name):
         """ Useful to add in the GUI """
         self.name = name  # The name of the approximation
-        self.dict = {}
+        self.dict = {
+            "Q max": [(0, 100, False, type(float)), 10],
+            "Fixed N": [(0, 20, True, type(int)), 10],
+        }
         self.extra_combos = []  # To change to 2 in 'Transicionales'
         self.application = []  # Approximation's filter type application
 
@@ -138,15 +141,4 @@ class Approximation(object):
         elif n4 <= n1 and n4 <= n2 and n4 <= n2:
             self.information[TemplateInfo.fa__.value] = wa__
 
-    def __selectivity__(self, filter_in_use: FilterTypes):
-        if filter_in_use is FilterTypes.HighPass.value:
-            self.selectivity = self.information[TemplateInfo.fa.value] / self.information[TemplateInfo.fp.value]  # K = wa/wp
-        elif filter_in_use is FilterTypes.LowPass.value:
-            self.selectivity = self.information[TemplateInfo.fp.value] / self.information[TemplateInfo.fa.value]  # K = wp/wa
-        elif filter_in_use is FilterTypes.BandPass.value:
-            self.selectivity = (self.information[TemplateInfo.fp_.value] - self.information[TemplateInfo.fp__.value]) / \
-                               (self.information[TemplateInfo.fa_.value] - self.information[TemplateInfo.fa__.value])  # K = Awa/ Awp
-        elif filter_in_use is FilterTypes.BandReject.value:
-            self.selectivity = (self.information[TemplateInfo.fa_.value] - self.information[TemplateInfo.fa__.value]) / \
-                               (self.information[TemplateInfo.fp_.value] - self.information[TemplateInfo.fp__.value])  # K = Awp/ Awa
 

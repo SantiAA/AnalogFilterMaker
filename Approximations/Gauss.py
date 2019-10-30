@@ -30,10 +30,6 @@ class Gauss(Approximation):
         self.application = [FilterTypes.GroupDelay.value]
         self.information = {}
         self._pre_calc(self.n_max)
-        self.dict = {
-            "Q max": [(0, 10, False), 10],
-            "Fixed N": [(0, 20, True), 0],
-        }
 
     def load_information(self, filter_in_use: Filter):
 
@@ -91,7 +87,7 @@ class Gauss(Approximation):
 
     def _gauss_des(self, z_n, p_n):
         """ Returns zeros, poles and gain of Gauss denormalized approximation """
-        p = p_n/self.information[TemplateInfo.gd.value]
+        p = p_n/(self.information[TemplateInfo.gd.value]*10e-6)     # user's group delay in us
         k = prod(abs(p))
         return z_n, p, k
 
