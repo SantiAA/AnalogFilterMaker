@@ -106,7 +106,7 @@ class SecondStage(QMainWindow):
         self.__plot_p_z_graph__(z_p_plot)
 
     def __plot_p_z_graph__(self, graphs):
-        self.__fix_axes_titles_position__(self.graph_widget, graphs[1][0], graphs[1][1])
+        self.__fix_axes_titles_position__(self.z_p_diagram, graphs[1][0], graphs[1][1])
         for graph_data in graphs[0]:
             if graph_data.log:
                 self.z_p_diagram.canvas.axes.set_xscale('log')
@@ -129,6 +129,7 @@ class SecondStage(QMainWindow):
 
     # Funciones que configuran y muestran los titulos de los ejes.
     def __fix_axes_titles_position__(self, widget, label_x, label_y):
+        #widget.canvas.axes.legend.remove()
         self.__fix_y_title_position__(widget, label_y)
         self.__fix_x_title_position__(widget, label_x)
 
@@ -242,6 +243,7 @@ class SecondStage(QMainWindow):
 
     def __plot_graph__(self, graph):
         self.__fix_axes_titles_position__(self.graph_widget, graph[1][0], graph[1][1])
+        self.graph_widget.canvas.axes.grid(True, which="both")
         for graph_data in graph[0]:
             if graph_data.log:
                 self.graph_widget.canvas.axes.set_xscale('log')
