@@ -5,6 +5,7 @@ from PyQt5.uic import loadUi
 from BackEnd.BackEnd import BackEnd
 from FrontEnd.UIs.Testing.BackEndTesting import BackEndTesting
 from FrontEnd.UIs.UIConfigurations.StagesUILayout import StagesUILayout
+from StagesManager.StagesManager import StagesManager
 
 
 class SecondStage(QMainWindow):
@@ -28,6 +29,8 @@ class SecondStage(QMainWindow):
         self.stagesLayout.addWidget(self.stages_ui_layout)
         self.create_button.clicked.connect(self.create_clicked)
         self.deleteButton.clicked.connect(self.delete_stages)
+        self.stages_manager = StagesManager()
+
         self.show()
 
 
@@ -53,7 +56,7 @@ class SecondStage(QMainWindow):
         hbox = QHBoxLayout()
         self.showing_group.setLayout(hbox)
 
-        radiobutton = QRadioButton("Individual")
+        radiobutton = QRadioButton("Selected")
         hbox.addWidget(radiobutton)
         radiobutton.setStyleSheet("font: 63 7pt ; color:rgb(255, 255, 255);")
 
