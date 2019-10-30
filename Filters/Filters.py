@@ -74,12 +74,8 @@ class Filter(object):
             TemplateInfo.fp.value: (0, 10e9), TemplateInfo.fp_.value: (0, 10e9), TemplateInfo.fp__.value: (0, 10e9),
             TemplateInfo.fa_.value: (0, 10e9), TemplateInfo.fa__.value: (0, 10e9), TemplateInfo.ft.value: (0, 10e9),
             TemplateInfo.gd.value: (0, 10e9), TemplateInfo.tol.value: (0, 1), TemplateInfo.k.value: (0, 10e9)}
-        # self.defaults = {
-        #     TemplateInfo.Aa.value: 40, TemplateInfo.Ap.value: 5, TemplateInfo.fa.value: 20000, TemplateInfo.fp.value: 2000,
-        #     TemplateInfo.fp_.value: 30000, TemplateInfo.fp__.value: 3000, TemplateInfo.fa_.value: 45000, TemplateInfo.fa__.value: 2000,
-        #     TemplateInfo.fo.value: 9486, TemplateInfo.ft.value: 10000, TemplateInfo.gd.value: 10e-3, TemplateInfo.tol.value: 0.2,
-        #     TemplateInfo.k.value: 1
-        # }
+        self.selectivity = 0
+        self.defaults = []
 
     def get_type(self) -> FilterTypes:
         return self.filter
@@ -205,3 +201,9 @@ class Filter(object):
                 new_p.append(p[0])  # no lo tiene :(
             p.remove(p[0])
         return new_p
+
+    def get_templates(self):
+        pass
+
+    def get_selectivity(self):
+        return self.selectivity

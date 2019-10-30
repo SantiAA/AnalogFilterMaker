@@ -5,6 +5,8 @@ from numpy import where
 
 # AFM project modules
 from Filters.Filters import *
+from BackEnd.Output.Dot import Dot, INFINITE
+from BackEnd.Output.Square import Square
 
 
 class BandPass(Filter):
@@ -35,6 +37,11 @@ class BandPass(Filter):
         if self.requirements[TemplateInfo.Aa.value] > self.requirements[TemplateInfo.Ap.value]:
             if self.requirements[TemplateInfo.fp__.value] > self.requirements[TemplateInfo.fa__.value]:
                 if self.requirements[TemplateInfo.fa_.value] > self.requirements[TemplateInfo.fp_.value]:
+                    self.selectivity = (self.requirements[TemplateInfo.fp_.value] -
+                                        self.requirements[TemplateInfo.fp__.value]) / \
+                                       (self.requirements[TemplateInfo.fa_.value] -
+                                        self.requirements[TemplateInfo.fa__.value])  # K = Awa/ Awp
+
                     return True, ret
                 else:
                     ret = "fa+ must me greater than fp+"
@@ -45,3 +52,16 @@ class BandPass(Filter):
 
         """ If there is something wrong in the attenuations or frequencies I return False"""
         return False, ret
+
+    def get_templates(self):
+        fa = self.requirements[TemplateInfo.fa.value]
+        fp = self.requirements[TemplateInfo.fp.value]
+        Ap = self.requirements[TemplateInfo.Ap.value]
+        Aa = self.requirements[TemplateInfo.Aa.value]
+        sq1 = Square(Dot(0, Ap), Dot(0, INFINITE), Dot(fp, INFINITE), Dot(fp, Ap))
+        sq2 = Square(Dot(fa, -INFINITE), Dot(fa, Aa), Dot(INFINITE, Aa), Dot(INFINITE, -INFINITE))
+
+        sq1_n = Square(Dot(0, Ap), Dot(0, INFINITE), Dot(1, INFINITE), Dot(1, Ap))
+        sq2_n = Square(Dot(self, -INFINITE), Dot(fa, Aa), Dot(INFINITE, Aa), Dot(INFINITE, -INFINITE))
+
+        return [sq1, sq2], [sq1_n, sq2_n]

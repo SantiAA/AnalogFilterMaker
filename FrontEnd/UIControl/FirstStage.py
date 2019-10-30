@@ -21,7 +21,7 @@ class FirstStage(QMainWindow):
         self.ui_manager = ui_manager
         self.a = 0
         self.filters = {}
-        self.backend = BackEndTesting()
+        self.backend = BackEnd()
         self.filters_received, self.approximations_received = self.backend.get_util()
 
         self.showingGraphs = []

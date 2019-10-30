@@ -32,6 +32,8 @@ class HighPass(Filter):
 
         if self.requirements[TemplateInfo.Aa.value] > self.requirements[TemplateInfo.Ap.value]:
             if self.requirements[TemplateInfo.fp.value] > self.requirements[TemplateInfo.fa.value]:
+                self.selectivity = self.requirements[TemplateInfo.fa.value] / self.requirements[
+                    TemplateInfo.fp.value]  # K = wa/wp
                 return True, ret
             else:
                 ret = "fp must be greater than fa"

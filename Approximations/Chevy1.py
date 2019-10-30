@@ -37,9 +37,7 @@ class ChevyI(Approximation):
             self.__adjust_w__(False)
         elif filter_in_use.get_type() is FilterTypes.BandPass.value:
             self.__adjust_w__(True)
-
-        self.__selectivity__(filter_in_use.get_type())
-
+        self.selectivity = filter_in_use.get_selectivity()
         return True
 
     def calculate(self, filter_in_use: Filter, kwargs):

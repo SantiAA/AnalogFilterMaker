@@ -31,7 +31,6 @@ class Bessel(Approximation):
         for each in specs:
             self.information[each] = filter_in_use.get_req_value(each)
 
-        self.__selectivity__(filter_in_use.get_type())
         return True
 
     def calculate(self, filter_in_use: Filter, kwargs):

@@ -22,6 +22,7 @@ class LowPass(Filter):
             TemplateInfo.fp.value: 2000,
             TemplateInfo.k.value: 1
         }
+
     def validate_requirements(self) -> (bool, str):
         ret = ""
         for each in self.requirements:
@@ -31,6 +32,7 @@ class LowPass(Filter):
 
         if self.requirements[TemplateInfo.Aa.value] > self.requirements[TemplateInfo.Ap.value]:
             if self.requirements[TemplateInfo.fa.value] > self.requirements[TemplateInfo.fp.value]:
+                self.selectivity = self.requirements[TemplateInfo.fp.value] / self.requirements[TemplateInfo.fa.value]  # K = wp/wa
                 return True, ret
             else:
                 ret = "fa must be greater than fp"

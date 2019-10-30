@@ -48,6 +48,8 @@ class Legendre(Approximation):
         specs = filter_in_use.get_requirements()
         for each in specs:
             self.information[each] = filter_in_use.get_req_value(each)
+
+        self.selectivity = filter_in_use.get_selectivity()
         return True
 
     def calculate(self, filter_in_use: Filter, kwargs):

@@ -35,6 +35,11 @@ class BandReject(Filter):
         if self.requirements[TemplateInfo.Aa.value] > self.requirements[TemplateInfo.Ap.value]:
             if self.requirements[TemplateInfo.fp__.value] < self.requirements[TemplateInfo.fa__.value]:
                 if self.requirements[TemplateInfo.fp_.value] > self.requirements[TemplateInfo.fa_.value]:
+                    self.selectivity = (self.requirements[TemplateInfo.fa_.value] -
+                                        self.requirements[TemplateInfo.fa__.value])/ \
+                                       (self.requirements[TemplateInfo.fp_.value] -
+                                        self.requirements[TemplateInfo.fp__.value])  # K = Awp/ Awa
+
                     return True, ret
                 else:
                     ret = "fp+ must be greater than fa+"

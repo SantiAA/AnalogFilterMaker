@@ -56,13 +56,7 @@ class BackEnd:
     def get_template(self, filtro):
         my_filter = self._parse_filter(filtro)
         if my_filter.get_type() is FilterTypes.LowPass.value:
-            fa = my_filter.get_req_value(TemplateInfo.fa.value)
-            fp = my_filter.get_req_value(TemplateInfo.fp.value)
-            Ap = my_filter.get_req_value(TemplateInfo.Ap.value)
-            Aa = my_filter.get_req_value(TemplateInfo.Aa.value)
-            sq1 = Square(Dot(0, Ap), Dot(0, INFINITE), Dot(fp, INFINITE), Dot(fp,  Ap))
-            sq2 = Square(Dot(fa, -INFINITE), Dot(fa,  Aa), Dot(INFINITE, Aa), Dot(INFINITE, -INFINITE))
-            return [sq1, sq2]
+            pass
         elif my_filter.get_type() is FilterTypes.HighPass.value:
             fa = my_filter.get_req_value(TemplateInfo.fa.value)
             fp = my_filter.get_req_value(TemplateInfo.fp.value)

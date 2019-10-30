@@ -49,8 +49,9 @@ class ChebyII(Approximation):
             self.information[TemplateInfo.fa.value], self.information[TemplateInfo.fp.value] = \
                 self.information[TemplateInfo.fp.value], self.information[TemplateInfo.fa.value]
 
-        self.__selectivity__(filter_in_use.get_type())
+        filter_in_use.load_requirements(self.information)
 
+        self.selectivity = filter_in_use.get_selectivity()  # revisaaar
         return True
 
     def calculate(self, filter_in_use: Filter, kwargs):
