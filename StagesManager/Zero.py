@@ -1,6 +1,11 @@
-
 class Zero:
-    def __init__(self, wo, n):
-        self.wo = wo
+    def __init__(self, im, n):
+        self.im = im
         self.n = n
         self.used = False
+
+    def get_msg(self):
+        using = ""
+        if not self.used:
+            using = " (used)"
+        return "fo: " + str(abs(self.im)) + " - n: " + str(self.n) + using
