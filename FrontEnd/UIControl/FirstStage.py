@@ -11,6 +11,7 @@ from FrontEnd.UIs.FilterConfigurations.Config import Config
 from FrontEnd.UIs.FilterConfigurations.Template import Template
 from FrontEnd.UIs.Testing.ApproximationTesting import ApproximationTesting
 from FrontEnd.UIs.Testing.BackEndTesting import BackEndTesting
+from FrontEnd.UIs.UIConfigurations.ParameterLayout import DefaultRadioGroup
 
 
 class FirstStage(QMainWindow):
@@ -20,11 +21,10 @@ class FirstStage(QMainWindow):
         self.ui_manager = ui_manager
         self.a = 0
         self.filters = {}
-        self.backend = BackEnd()
+        self.backend = BackEndTesting()
         self.filters_received, self.approximations_received = self.backend.get_util()
 
         self.showingGraphs = []
-        self.current_template = Template()
 
     def start(self):
         """
@@ -39,8 +39,7 @@ class FirstStage(QMainWindow):
             self.comboFilter.addItem(filter)
             self.filters[filter] = Config(filter, self.filters_received[filter], self.approximations_received[filter])
 
-        self.update_filter_type()
-        self.show()
+
         self.addApproxButton.clicked.connect(self.add_approx)
         self.removeApproxButton.clicked.connect(self.remove_approx)
         self.filterTypeLabel.clicked.connect(self.filter_type_label_clicked)
@@ -59,7 +58,13 @@ class FirstStage(QMainWindow):
         self.comboGraph.currentIndexChanged.connect(self.combo_graph_changed)
         self.load_project_button.clicked.connect(self.load_project_clicked)
         self.templateCheckBox.toggled.connect(self.template_toggled)
+        self.nextButton.clicked.connect(self.ui_manager.next_window)
         self.templateCheckBox.hide()
+        self.group_box = DefaultRadioGroup(self.__ui_template_activation_)
+        self.radioButtonsLayout.addWidget(self.group_box)
+        self.templates = []
+        self.update_filter_type()
+        self.show()
 
     def load_project_clicked(self):
         self.ui_manager.load_current_state()
@@ -68,7 +73,8 @@ class FirstStage(QMainWindow):
         self.showingGraphs = []
         self.showingGraphs = configuration_dict["showing_graphs"]
         self.fill_combo_graph()
-        self.redraw_graphs()
+        self.__update_active_approx_combo__()
+        self.redraw()
 
     def get_current_state_config(self):
         self.window_configuration = {}
@@ -82,6 +88,7 @@ class FirstStage(QMainWindow):
 
     def combo_graph_changed(self):
         self.redraw_graphs()
+        self._template_ploting_w_graphs_()
 
     def fill_combo_graph(self):
         self.comboGraph.clear()
@@ -137,20 +144,33 @@ class FirstStage(QMainWindow):
                                                 parameter.check_box.hide()
 
     def template_toggled(self):
-        self.current_template.enabled = not self.current_template.enabled
-        self.redraw_template()
-
-    def redraw_template(self):
-        if self.current_template.enabled:
-            mpl_squares = self.current_template.get_matplotlib_squares()
-            if mpl_squares is not None:
-                for square in mpl_squares:
-                    square.set_linewidth(3)
-                    self.plot_rectangle(square)
+        if self.sender().isChecked():
+            for template in self.templates:
+                template.enabled = template.name == self.comboGraph.currentText()
         else:
-            self.redraw_graphs()
+            for template in self.templates:
+                template.enabled = False
+        self.redraw()
+
+    def redraw(self):
+        self.redraw_graphs()
+        for template in self.templates:
+            if template.enabled:
+                mpl_squares = template.get_matplotlib_squares()
+                if mpl_squares is not None:
+                    for square in mpl_squares:
+                        square.set_linewidth(3)
+                        self.plot_rectangle(square, template)
+
+
 
     def plot_template_button_clicked(self):
+        if len(self.showingGraphs) == 0:
+            self.__update_templates__()
+
+        else:
+            self._template_ploting_w_graphs_()
+        """
         if len(self.current_template.squares) == 0:
             self.templateCheckBox.show()
         self.filter = self.filters[self.comboFilter.currentText()]
@@ -174,7 +194,73 @@ class FirstStage(QMainWindow):
             msg.setWindowTitle("Error")
             msg.exec_()
 
+        """
 
+    def _template_ploting_w_graphs_(self):
+
+        self.group_box.hide()
+
+        self.any_coincidence = False
+
+        for template in self.templates:
+            coincidence = template.name == self.comboGraph.currentText()
+            if self.templateCheckBox.isChecked():
+                template.enabled = coincidence
+            if coincidence:
+                self.any_coincidence = True
+
+        if self.any_coincidence:
+            self.templateCheckBox.show()
+            self.plotTemplateButton.setText("Toggle Template ->")
+            self.plotTemplateButton.setCheckable(False)
+            self.plotTemplateButton.setStyleSheet("font: 63 10pt; color:rgb(255, 255, 255); border: 0px solid blue;")
+        else:
+            self.templateCheckBox.hide()
+            self.plotTemplateButton.setText("Plot Template")
+            self.plotTemplateButton.setCheckable(True)
+            self.plotTemplateButton.setStyleSheet("font: 63 10pt; color:rgb(255, 255, 255); padding: 8px; bottom-margin:3px;")
+        self.redraw()
+
+    def __update_templates__(self):
+        self.filter = self.filters[self.comboFilter.currentText()]
+        dict = self.filter.make_feature_dictionary()
+        self.templates_dict = self.__ask_for_templates__([self.filter.name, dict])
+        self.templates = []
+        for key in self.templates_dict.keys():
+            self.templates.append(Template(key, self.templates_dict[key], False))
+        self.group_box.clear_layout()
+        for template in self.templates:
+            self.group_box.add_radio_button(template.name)
+        self.group_box.add_radio_button("None")
+        self.group_box.first_activation()
+        self.__ui_template_activation_()
+
+    def __ui_template_activation_(self):
+        group_name = self.group_box.enabled_text
+        for template in self.templates:
+            template.enabled = template.name == group_name
+
+        self.redraw()
+        self.templateCheckBox.hide()
+
+    def __ask_for_templates__(self, param_list):
+        """
+        if len(self.current_template.squares) == 0:
+            self.templateCheckBox.show()
+            """
+
+        validated, error_string = self.backend.validate_filter(param_list)
+        if validated:
+            templates = self.backend.get_template(param_list)
+            return templates
+        else:
+            msg = QMessageBox()
+            msg.setIcon(QMessageBox.Critical)
+            msg.setText("Error")
+            msg.setInformativeText(error_string)
+            msg.setWindowTitle("Error")
+            msg.exec_()
+            return None
 
     def save_as_current_state_clicked(self):
         self.ui_manager.save_as_current_state()
@@ -195,7 +281,6 @@ class FirstStage(QMainWindow):
         """
         Changes the filter template image and requirements whenever the current selected filter type is changed.
         """
-        self.current_template = Template()
         self.comboGraph.clear()
         self.showingGraphs = []
         self.__update_active_approx_combo__()
@@ -226,6 +311,9 @@ class FirstStage(QMainWindow):
         if len(self.showingGraphs) == 0:
             self.toggleApprox.hide()
 
+        self.__update_templates__()
+        self._template_ploting_w_graphs_()
+
     def update_approximation(self):
         for filters in self.filters.values():  # Clearing requirement widgets
             for approx in filters.approximation_list:
@@ -254,6 +342,7 @@ class FirstStage(QMainWindow):
             self.redraw_graphs()
         if len(self.showingGraphs) == 0:
             self.toggleApprox.hide()
+
 
     def add_approx(self):
         """
@@ -289,8 +378,9 @@ class FirstStage(QMainWindow):
                         self.showingGraphs.append(new_graph)
             self.fill_combo_graph()
             self.__update_active_approx_combo__()
+            self.__update_templates__()
             self.redraw_graphs()
-
+            self._template_ploting_w_graphs_()
 
 
         else:
@@ -320,14 +410,15 @@ class FirstStage(QMainWindow):
             if item.widget() is not None:
                 item.widget().deleteLater()
 
-    def plot_rectangle(self, square):
+    def plot_rectangle(self, square, template):
 
         self.graph_widget.canvas.axes.set_title(self.comboGraph.currentText())
         self.graph_widget.canvas.axes.set_xscale('log')
         self.graph_widget.canvas.axes.grid(True, which="both")
         self.graph_widget.canvas.axes.add_patch(square)
-        self.graph_widget.canvas.axes.set_xlim(self.current_template.find_axes_limits()[0])
-        self.graph_widget.canvas.axes.set_ylim(self.current_template.find_axes_limits()[1])
+        axes = template.find_axes_limits()
+        self.graph_widget.canvas.axes.set_xlim(axes[0])
+        self.graph_widget.canvas.axes.set_ylim(axes[1])
         self.graph_widget.canvas.draw()  # Redraws
 
     def redraw_graphs(self):
@@ -348,8 +439,6 @@ class FirstStage(QMainWindow):
                         self.graph_widget.canvas.axes.grid(True, which="both")
                         self.graph_widget.canvas.axes.set_title(self.comboGraph.currentText())
                         self.graph_widget.canvas.draw()  # Redraws
-            if self.current_template.enabled:
-                self.redraw_template()
         except:
             a = 0
 

@@ -51,9 +51,11 @@ class BackEndTesting:
         rect1 = Square(Dot(0, -INFINITE), Dot(0, 300), Dot(50000, 300), Dot(50000, -INFINITE))
         rect2 = Square(Dot(300000, 20), Dot(300000, INFINITE), Dot(450000, INFINITE), Dot(450000, 20))
         rect3 = Square(Dot(2000000, -INFINITE), Dot(2000000, 300), Dot(INFINITE, 300), Dot(INFINITE, -INFINITE))
-        return [rect1, rect2, rect3]
+        dict = {"Attenuation Curves": [rect1, rect2, rect3],
+                "Poles and Zeros": [rect1, rect3]}
+        return dict
 
-    def get_graphs(self, filter,
+    def get_graphics(self, filter,
                    approximation):  ##IMPORTANTE. SI ES UN TRANSICIONAL. LOS DATOS DE QUE APROXIMACIONES SE USAN SE DEVUELVEN COMO CUALQUIER OTRA COSA. MIN Y MAX SON NONE.
         # EJEMPLO:
         # Approx 1: [[None, None, False], "Cheby"]

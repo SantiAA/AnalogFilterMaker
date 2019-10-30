@@ -1,6 +1,6 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QHBoxLayout, QLabel, QSlider, QWidget, QSizePolicy, QDoubleSpinBox, QVBoxLayout, \
-    QCheckBox, QComboBox
+    QCheckBox, QComboBox, QRadioButton
 
 
 class FilterParameterLayout(QWidget):
@@ -195,3 +195,52 @@ class DefaultComboBox(QWidget):
 
     def get_default_value(self):
         return None
+
+
+class DefaultRadioGroup(QWidget):
+    def __init__(self,callback):
+        QWidget.__init__(self)
+        self.layout = QHBoxLayout()
+        self.setLayout(self.layout)
+        self.group_buttons = []
+        self.enabled_text = ""
+        self.callback = callback
+
+    def add_radio_button(self, string):
+        radio_button = QRadioButton()
+        radio_button.setStyleSheet("font-size: 14px; color:rgb(255, 255, 255);")
+        radio_button.setText(string)
+        radio_button.setChecked(False)
+        self.group_buttons.append(radio_button)
+        self.layout.addWidget(radio_button)
+        radio_button.toggled.connect(self.radio_button_toggled)
+
+    def radio_button_toggled(self):
+        self.enabled_text = self.sender().text()
+        for button in self.group_buttons:
+            if button.text() != self.enabled_text:
+                button.setChecked(False)
+        self.callback()
+
+    def first_activation(self):
+        self.group_buttons[len(self.group_buttons)-1].setChecked(True)
+
+    def hide(self):
+        for button in self.group_buttons:
+            button.hide()
+
+    def show(self):
+        for button in self.group_buttons:
+            button.show()
+
+
+    def clear_layout(self):
+        for button in self.group_buttons:
+            button.setParent(None)
+
+        self.group_buttons = []
+        self.setLayout(self.layout)
+        self.group_buttons = []
+        self.enabled_text = ""
+
+

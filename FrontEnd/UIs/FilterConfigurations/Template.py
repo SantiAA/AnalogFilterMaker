@@ -4,10 +4,11 @@ from BackEnd.Output.Dot import INFINITE
 
 
 class Template:
-    def __init__(self, squares=[], enabled=True):
+    def __init__(self, name, squares=[], enabled=True):
         self.squares = []
         self.squares = squares
         self.enabled = enabled
+        self.name = name
 
     def find_axes_limits(self):
         max_x_dot = 0

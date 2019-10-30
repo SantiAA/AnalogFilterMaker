@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1097</width>
-    <height>769</height>
+    <height>800</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -45,7 +45,7 @@
        <enum>QLayout::SetMaximumSize</enum>
       </property>
       <item>
-       <layout class="QVBoxLayout" name="leftLayout" stretch="20,2,1,70,1,5,1">
+       <layout class="QVBoxLayout" name="leftLayout" stretch="20,2,1,70,1,5,0,1">
         <item>
          <layout class="QVBoxLayout" name="verticalLayout_3" stretch="20,5,15,10,5,45">
           <property name="sizeConstraint">
@@ -104,6 +104,20 @@ bottom-margin:3px;
               </property>
               <property name="text">
                <string>LOAD</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="nextButton">
+              <property name="styleSheet">
+               <string notr="true">font: 63 8pt &quot;Open Sans Semibold&quot;;
+color:rgb(255, 255, 255);
+padding: 8px;
+bottom-margin:3px;
+</string>
+              </property>
+              <property name="text">
+               <string>NEXT</string>
               </property>
              </widget>
             </item>
@@ -330,6 +344,9 @@ bottom-margin:3px;
            </spacer>
           </item>
          </layout>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="radioButtonsLayout"/>
         </item>
         <item>
          <spacer name="verticalSpacer_12">
