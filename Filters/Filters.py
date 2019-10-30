@@ -16,6 +16,7 @@ from numpy import imag
 from numpy import real
 
 # AFM project modules
+from BackEnd.Output.plots import GraphValues
 
 
 class FilterTypes(Enum):
@@ -161,26 +162,26 @@ class Filter(object):
         f_n = w_n/(2*pi)
         mag_n = 20 * log10(abs(h_n))
         phase_n = angle(h_n)
-        graphs[GraphTypes.Module.value] = [[f, -mag, False, False, True], ["Frequency [Hz]", "Amplitude [dB]"]]
-        graphs[GraphTypes.Attenuation.value] = [[f, -mag, False, False, True], ["Frequency [Hz]", "Attenuation[dB]"]]   # se pasa una lista de graphvalues
+        graphs[GraphTypes.Module.value] = [GraphValues([f, -mag, False, False, True]), ["Frequency [Hz]", "Amplitude [dB]"]]
+        graphs[GraphTypes.Attenuation.value] = [GraphValues([f, -mag, False, False, True]), ["Frequency [Hz]", "Attenuation[dB]"]]   # se pasa una lista de graphvalues
         if self.filter is FilterTypes.GroupDelay:
-            graphs[GraphTypes.NormalizedGd.value] = [[f, -2 * pi * diff(unwrap(phase_n)) / diff(w_n), False, False, True],
+            graphs[GraphTypes.NormalizedGd.value] = [GraphValues([f, -2 * pi * diff(unwrap(phase_n)) / diff(w_n), False, False, True]),
                                              ["Frequency[Hz]", "Group delay [s]"]]  # -d(Phase)/df = -dP/dw * dw/df = -dP/dw * 2pi
         else:
-            graphs[GraphTypes.NormalizedAt.value] = [[f_n, -mag_n, False, False, True], ["Frequency[Hz]", "Attenuation[dB]"]]
-        graphs[GraphTypes.Phase.value] = [[f, phase, False, False, True], ["Frequency[Hz]", "Phase[deg]"]]
-        graphs[GraphTypes.GroupDelay.value] = [[f, -2*pi*diff(unwrap(phase))/diff(w), False, False, True], ["Frequency[Hz]", "Group delay [s]"]]  # -d(Phase)/df = -dP/dw * dw/df = -dP/dw * 2pi
-        graphs[GraphTypes.PolesZeros.value] = [[real(self.denormalized["Zeros"]), imag(self.denormalized["Zeros"]), False, True, False, "Zeros"],
-                                [real(self.denormalized["Poles"]), imag(self.denormalized["Poles"]), True, True, False, "Poles"], ["Re(s)", "Im(s)"]]
+            graphs[GraphTypes.NormalizedAt.value] = [GraphValues([f_n, -mag_n, False, False, True]), ["Frequency[Hz]", "Attenuation[dB]"]]
+        graphs[GraphTypes.Phase.value] = [GraphValues([f, phase, False, False, True]), ["Frequency[Hz]", "Phase[deg]"]]
+        graphs[GraphTypes.GroupDelay.value] = [GraphValues([f, -2*pi*diff(unwrap(phase))/diff(w), False, False, True]), ["Frequency[Hz]", "Group delay[s]"]]  # -d(Phase)/df = -dP/dw * dw/df = -dP/dw * 2pi
+        graphs[GraphTypes.PolesZeros.value] = [GraphValues([real(self.denormalized["Zeros"]), imag(self.denormalized["Zeros"]), False, True, False, "Zeros"]),
+                                GraphValues([real(self.denormalized["Poles"]), imag(self.denormalized["Poles"]), True, True, False, "Poles"]), ["Re(s)[rad/sec]", "Im(s)[rad/sec]"]]
         t, imp = signal.impulse(trans_func)
-        graphs[GraphTypes.Impulse.value] = [[t, imp, False, False, False], ["t[s]", "V[V]"]]
+        graphs[GraphTypes.Impulse.value] = [GraphValues([t, imp, False, False, False]), ["t[s]", "V[V]"]]
         t, step = signal.step(trans_func)
-        graphs[GraphTypes.Step.value] = [[t, step, False, False, False], ["t[s]", "V[V]"]]
+        graphs[GraphTypes.Step.value] = [GraphValues([t, step, False, False, False]), ["t[s]", "V[V]"]]
         graphs[GraphTypes.StagesQ.value] = []
         if len(self.denormalized["StagesQ"]):   # los filtros de primer orden no tienen Q
             i = 0
             while i < len(self.denormalized["StagesQ"]):
-                graphs[GraphTypes.StagesQ.value].append([[0, self.denormalized["StagesQ"][i]], [i+1, i+1], True, False, False])
+                graphs[GraphTypes.StagesQ.value].append(GraphValues([[0, self.denormalized["StagesQ"][i]]), [i+1, i+1], True, False, False])
                 i += 1
             graphs[GraphTypes.StagesQ.value].append(["Q", "Q N°"])
         return graphs

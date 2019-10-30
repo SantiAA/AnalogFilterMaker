@@ -72,9 +72,9 @@ class Gauss(Approximation):
         data = json.load(plots_file)
         n = 0
         for n_i in data:
-            tol = data[n_i]["Group delay"][where(data[n_i]["w"] >= 1)[0]]
+            tol = 1 - data[n_i]["Group delay"][where(data[n_i]["w"] >= 1)[0]]
             # wt = data[n_i]["w"][where(data[n_i]["Group Delay"] <= self.information[TemplateInfo.tol])[0]]
-            if tol >= self.information[TemplateInfo.tol.value]:
+            if tol <= self.information[TemplateInfo.tol.value]:
                 n = int(n_i)
                 break
         return n
