@@ -34,7 +34,7 @@ class Legendre(Approximation):
         Approximation.__init__(self, "Legendre")
         self.application = [FilterTypes.HighPass.value, FilterTypes.LowPass.value, FilterTypes.BandPass.value, FilterTypes.BandReject.value]
         self.information = {}
-        self.dict["Denorm."] = [(0, 100, False, type(int)), 0]
+        self.dict["Denorm."] = [(0, 100, False, int()), 0]
 
     def load_information(self, filter_in_use: Filter):
 

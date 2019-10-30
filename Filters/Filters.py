@@ -138,7 +138,6 @@ class Filter(object):
         if len(self.denormalized["StagesQ"]):
             self.denormalized["MaxQ"] = amax(self.denormalized["StagesQ"])
 
-
     def load_normalized_z_p_k(self, z, p, k):
         self.normalized["Zeros"] = z
         self.normalized["Poles"] = p

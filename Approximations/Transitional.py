@@ -16,8 +16,8 @@ class Transitional(Approximation):
     def __init__(self):
         Approximation.__init__(self, "Transitional")
         self.application = [FilterTypes.HighPass.value, FilterTypes.LowPass.value, FilterTypes.BandPass.value, FilterTypes.BandReject.value]
-        self.dict["Denorm."] = [(0, 100, False, type(int)), 0]
-        self.dict["m"] = [(0, 100, False, type(int)), 50]
+        self.dict["Denorm."] = [(0, 100, False, int()), 0]
+        self.dict["m"] = [(0, 100, False, int()), 50]
         approximations = ["Butterworth", "Cauer", "Chebyshev I", "Chebyshev II", "Legendre"]
         self.extra_combos.append(approximations)
         self.extra_combos.append(approximations)
