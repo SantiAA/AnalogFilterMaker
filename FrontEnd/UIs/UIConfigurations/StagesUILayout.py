@@ -24,8 +24,12 @@ class StagesUILayout(QWidget):
         self.stages = []
 
 
+    def left_click(self):
+        for stage in self.stages:
+            stage.set_checked(False)
+
     def add_stage(self):
-        new_stage = DefaultStageUI(len(self.stages)+1, self.w_width)
+        new_stage = DefaultStageUI(len(self.stages)+1, self.w_width, self.left_click)
         self.stages.append(new_stage)
         self.group_box_layout.addWidget(new_stage)
 
@@ -58,7 +62,7 @@ class StagesUILayout(QWidget):
 
 
 class DefaultStageUI(QWidget):
-    def __init__(self, id, width):
+    def __init__(self, id, width, left_click_callback):
         QWidget.__init__(self)
         vbox = QVBoxLayout()
         self.setLayout(vbox)
@@ -79,7 +83,7 @@ class DefaultStageUI(QWidget):
         self.graphWidget.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
         self.__update_size__()
         vbox.addWidget(self.graphWidget)
-        self.radioButton = QRadioButton("")
+        self.radioButton = RightRadioButton(left_click_callback)
 
         self.radioButton.setSizePolicy(QSizePolicy.Maximum, QSizePolicy.Maximum)
         vbox.addWidget(self.radioButton)
@@ -98,6 +102,24 @@ class DefaultStageUI(QWidget):
 
     def is_checked(self):
         return self.radioButton.isChecked()
+
+    def set_checked(self, checked):
+        self.radioButton.setChecked(checked)
+
+
+class RightRadioButton (QRadioButton):
+    def __init__(self, left_click):
+        QRadioButton.__init__(self)
+        self.left_click = left_click
+
+    def mousePressEvent(self, QMouseEvent):
+        if QMouseEvent.button() == Qt.LeftButton:
+            self.left_click()
+            self.setChecked(True)
+
+        elif QMouseEvent.button() == Qt.RightButton:
+            self.setChecked(not self.isChecked())
+            print("Right Button Clicked")
 
 class StagesGraph(QWidget):
 
