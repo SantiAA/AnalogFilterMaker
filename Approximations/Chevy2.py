@@ -34,9 +34,20 @@ class ChebyII(Approximation):
             self.information[each] = filter_in_use.get_req_value(each)
 
         if filter_in_use.get_type() is FilterTypes.BandReject.value:
+            self.information[TemplateInfo.fa__.value],  self.information[TemplateInfo.fp__.value] = \
+                self.information[TemplateInfo.fp__.value],  self.information[TemplateInfo.fa__.value]
+            self.information[TemplateInfo.fa_.value], self.information[TemplateInfo.fp_.value] = \
+                self.information[TemplateInfo.fp_.value], self.information[TemplateInfo.fa_.value]
             self.__adjust_w__(False)
         elif filter_in_use.get_type() is FilterTypes.BandPass.value:
+            self.information[TemplateInfo.fa__.value],  self.information[TemplateInfo.fp__.value] = \
+                self.information[TemplateInfo.fp__.value],  self.information[TemplateInfo.fa__.value]
+            self.information[TemplateInfo.fa_.value], self.information[TemplateInfo.fp_.value] = \
+                self.information[TemplateInfo.fp_.value], self.information[TemplateInfo.fa_.value]
             self.__adjust_w__(True)
+        else:
+            self.information[TemplateInfo.fa.value], self.information[TemplateInfo.fp.value] = \
+                self.information[TemplateInfo.fp.value], self.information[TemplateInfo.fa.value]
 
         self.__selectivity__(filter_in_use.get_type())
 
