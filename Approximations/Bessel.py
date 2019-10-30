@@ -51,7 +51,7 @@ class Bessel(Approximation):
             """ First search the order and the normalizer 'cut' frequency """
             z_norm, p_norm, k_norm = signal.bessel(normalized_n, useful_w, analog=True, output='zpk')
             if filter_in_use.get_type() is FilterTypes.GroupDelay.value:
-                z, p, k = signal.bessel(normalized_n, useful_w/self.information[TemplateInfo.gd.value], 'low', True, 'zpk')
+                z, p, k = signal.bessel(normalized_n, useful_w/(self.information[TemplateInfo.gd.value]*10e-6), 'low', True, 'zpk')
                 filter_in_use.load_z_p_k(z, p, k)
             else:
                 print("Bessel.py: Invalid filter type passed to Bessel aproximation")

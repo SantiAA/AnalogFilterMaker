@@ -1,6 +1,7 @@
 # python native modules
 
 # third-party modules
+from numpy import where
 
 # AFM project modules
 from Filters.Filters import *
@@ -22,14 +23,20 @@ class HighPass(Filter):
             TemplateInfo.k.value: 1
         }
 
-    def validate_requirements(self) -> bool:
+    def validate_requirements(self) -> (bool, str):
+        ret = ""
         for each in self.requirements:
             if self.requirements[each] is None:
-                return False  # Check if every spec was loaded
+                ret = "Please enter a value for " + each[:where(" [")]
+                return False, ret  # Check if every spec was loaded
 
         if self.requirements[TemplateInfo.Aa.value] > self.requirements[TemplateInfo.Ap.value]:
             if self.requirements[TemplateInfo.fp.value] > self.requirements[TemplateInfo.fa.value]:
-                return True
+                return True, ret
+            else:
+                ret = "fp must be greater than fa"
+        else:
+            ret = "Aa must be greater than Ap"
 
         """ If there is something wrong in the attenuations or frequencies I return False"""
-        return False
+        return False, ret
