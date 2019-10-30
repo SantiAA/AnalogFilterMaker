@@ -10,6 +10,7 @@ from Approximations.Cauer import Cauer
 from Approximations.Bessel import Bessel
 from Approximations.Gauss import Gauss
 from Approximations.Legendre import Legendre
+from Approximations.Transitional import Transitional
 
 from Filters.Filters import Filter
 from Filters.LowPass import LowPass
@@ -28,7 +29,7 @@ class BackEnd:
     def __init__(self):
         self.lp = LowPass
         self.all_filters = [LowPass(), HighPass(), BandPass(), BandReject(), GroupDelay()]
-        self.all_approximations = [Bessel(), Butterworth(), ChevyI(), ChebyII(), Cauer(), Gauss(), Legendre()]
+        self.all_approximations = [Bessel(), Butterworth(), ChevyI(), ChebyII(), Cauer(), Gauss(), Legendre(), Transitional()]
         self.dynamic_filters = []
         self.fil_dict = {}
         self.filters_specs = {}

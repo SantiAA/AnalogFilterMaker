@@ -139,14 +139,14 @@ class Approximation(object):
             self.information[TemplateInfo.fa__.value] = wa__
 
     def __selectivity__(self, filter_in_use: FilterTypes):
-        if filter_in_use is FilterTypes.HighPass:
+        if filter_in_use is FilterTypes.HighPass.value:
             self.selectivity = self.information[TemplateInfo.fa.value] / self.information[TemplateInfo.fp.value]  # K = wa/wp
-        elif filter_in_use is FilterTypes.LowPass:
+        elif filter_in_use is FilterTypes.LowPass.value:
             self.selectivity = self.information[TemplateInfo.fp.value] / self.information[TemplateInfo.fa.value]  # K = wp/wa
-        elif filter_in_use is FilterTypes.BandPass:
+        elif filter_in_use is FilterTypes.BandPass.value:
             self.selectivity = (self.information[TemplateInfo.fp_.value] - self.information[TemplateInfo.fp__.value]) / \
                                (self.information[TemplateInfo.fa_.value] - self.information[TemplateInfo.fa__.value])  # K = Awa/ Awp
-        elif filter_in_use is FilterTypes.BandReject:
+        elif filter_in_use is FilterTypes.BandReject.value:
             self.selectivity = (self.information[TemplateInfo.fa_.value] - self.information[TemplateInfo.fa__.value]) / \
                                (self.information[TemplateInfo.fp_.value] - self.information[TemplateInfo.fp__.value])  # K = Awp/ Awa
 
