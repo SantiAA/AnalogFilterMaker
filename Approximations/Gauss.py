@@ -91,7 +91,7 @@ class Gauss(Approximation):
 
     def _gauss_des(self, z_n, p_n):
         """ Returns zeros, poles and gain of Gauss denormalized approximation """
-        p = p_n/self.information[TemplateInfo.gd.value]
+        p = p_n/(self.information[TemplateInfo.gd.value]*10e-6)     # user's group delay in us
         k = prod(abs(p))
         return z_n, p, k
 

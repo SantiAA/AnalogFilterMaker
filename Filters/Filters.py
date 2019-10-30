@@ -22,23 +22,23 @@ class FilterTypes(Enum):
     LowPass = "Low Pass"
     HighPass = "High Pass"
     BandPass = "Band Pass"
-    BandReject = "Band Reject"
+    BandReject = "Band Stop"
     GroupDelay = "Group Delay"
 
 
 class TemplateInfo(Enum):
-    Ap = "Ap"
-    Aa = "Aa"
-    fa = "fa"
-    fp = "fp"
-    fa_ = "fa+"
-    fa__ = "fa-"
-    fp_ = "fp+"
-    fp__ = "fp-"
-    gd = "Group delay"
-    ft = "ft"
-    tol = "Tolerance"
-    k = "Gain"
+    Ap = "Ap [dB]"
+    Aa = "Aa [dB]"
+    fa = "fa [Hz]"
+    fp = "fp [Hz]"
+    fa_ = "fa+ [Hz]"
+    fa__ = "fa- [Hz]"
+    fp_ = "fp+ [Hz]"
+    fp__ = "fp- [Hz]"
+    gd = "Group delay [us]"
+    ft = "ft [Hz]"
+    tol = "Tolerance []"
+    k = "Gain [dB]"
 
 
 class GraphTypes(Enum):
@@ -106,7 +106,7 @@ class Filter(object):
         if not self.validate_requirements():
             return False
 
-    def validate_requirements(self) -> bool:
+    def validate_requirements(self) -> (bool, str):
         pass
 
     def get_req_value(self, key: TemplateInfo):
@@ -117,7 +117,7 @@ class Filter(object):
 
     def load_z_p_k(self, z, p, k):
         self.denormalized["Zeros"] = z.copy()
-        self.denormalized["Gain"] = k
+        self.denormalized["Gain"] = k*pow(10,self.requirements[TemplateInfo.k.value]/20)    # ganancia del usuario en dB
         self.denormalized["Order"] = len(p)
         self.denormalized["StagesQ"] = []
         max_q = 0

@@ -51,10 +51,7 @@ class BackEnd:
 
     def validate_filter(self, filter) -> (bool, str):  # Recibo [FilterType, data] VER
         my_filter = self._parse_filter(filter)
-        if my_filter.validate_requirements():
-            return True, ""
-        else:
-            return False, "BackEnd.py: I don't know the error yet, sorry"
+        return my_filter.validate_requirements()
 
     def get_template(self, filtro):
         my_filter = self._parse_filter(filtro)
