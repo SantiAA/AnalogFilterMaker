@@ -1,13 +1,16 @@
 # python native modules
 from enum import Enum
 
-from numpy import conjugate, amax, amin
+from numpy import conjugate, amax, amin, pi
 from numpy import argmin
 from numpy import full
 from numpy import log10
 from enum  import Enum
 
 # AFM project modules
+from scipy import signal
+
+from BackEnd.Output.plots import GraphValues
 from Filters.Filters import Filter
 from StagesManager.Pole import Pole
 from StagesManager.Stage import Stage
@@ -128,27 +131,30 @@ class StagesManager(object):
             return False, "Stage" + str(i + 1) + "doesn't exist."
     def get_z_p_plot(self):
         """" Returns poles and zeros diagram with number of repeticiones of each pole and zero """
+        repeated_z = []
+        z = []
+        repeated_p = []
+        p = []
+        i = 0
+        while i < len(self.z_pairs):
+            count = self.z_pairs.count(self.z_pairs[i])
+            for j in range(count)
+            repeated_z.append(count*self.z_pairs[i].n)
+            z.append(self.z_pairs[i])
+            i += count
+        i = 0
+        while i < len(self.p_pairs):
+            count = self.p_pairs.count(self.p_pairs[i])
+            repeated_p.append(count)
+            p.append(self.denormalized["Poles"][i])
+            i += count
 
-
-# i = 0
-# while i < len(self.denormalized["Zeros"]):
-#     count = self.denormalized["Zeros"].count(self.denormalized["Zeros"][i])
-#     repeated_z.append(count)
-#     z.append(self.denormalized["Zeros"][i])
-#     i += count
-# i = 0
-# while i < len(self.denormalized["Poles"]):
-#     count = self.denormalized["Poles"].count(self.denormalized["Poles"][i])
-#     repeated_p.append(count)
-#     p.append(self.denormalized["Poles"][i])
-#     i += count
-
-# graphs[GraphTypes.PolesZeros.value] = [[GraphValues(real(z),
-#                                                     imag(z), True, False, False,
-#                                                     "Zeros", repeated_z),
-#                                         GraphValues(real(p),
-#                                                     imag(p), True, True, False,
-#                                                     "Poles", repeated_p)], ["Re(s)[rad/sec]", "Im(s)[rad/sec]"]]
+        graphs[GraphTypes.PolesZeros.value] = [[GraphValues(real(z),
+                                                            imag(z), True, False, False,
+                                                            "Zeros", repeated_z),
+                                                GraphValues(real(p),
+                                                            imag(p), True, True, False,
+                                                            "Poles", repeated_p)], ["Re(s)[rad/sec]", "Im(s)[rad/sec]"]]
 
 
     def get_z_p_dict(self):
@@ -166,28 +172,40 @@ class StagesManager(object):
 
     def get_stages_plot(self, i, type: ShowType):
         plot_list = [[], []]
-        k_max = 0
         if type is ShowType.Accumulative.value:
             z = []
             p = []
             for s in self.sos:
                 z += s.z
-
-
-
-        for st in self.sos:
-            plot_list[0].append(st.get_tf_plot())
-        plot_list[1] = ["Frequency [Hz]", "Amplitude [dB]"]
+                p += s.p
+            transf = signal.ZerosPolesGain(z,p,self.k_tot)
+            w, mag = transf.freqresp(n=3000)
+            f = w/(2*pi)
+            plot_list = [[GraphValues(f, mag, False, False, True)], ["Frequency [Hz]", "Amplitude [dB]"]]
+        else:
+            if type is ShowType.Superposed:
+                i = list(range(len(self.sos)))
+            for st in self.sos[i]:
+                plot_list[0].append(st.get_tf_plot())
+            plot_list[1] = ["Frequency [Hz]", "Amplitude [dB]"]
         return plot_list
 
     def get_dr(self, vi_min, vo_max):
         """Returns a tuple:
             (True, dr) if everytihing ok, (False, err_str) if error
             Could fail because of: Invalid vi values, or not all stages loaded"""
-        ret = self._validate_vi(vi_min, vo_max)
-        ok = False
-
+        valid = self._validate_vi(vi_min, vo_max)
+        ok = valid[0]
+        ret = valid[1]
+        if valid[0]:
+            max_rd = 0
+            for i in range(len(self.sos)):
+                rd = self._get_stg_dr(i, vi_min, vo_max)
+                if rd > max_rd:
+                    max_rd = rd
+                ret = str(max_rd)
         return ok, ret
+
     def _get_stg_dr(self, i, vi_min, vo_max):
         """ Returns stage i dynamic range """
         partial_gain = 0
@@ -206,12 +224,8 @@ class StagesManager(object):
                 if q > 0:
                     ret["Q"][0] = str(q)
                 ret["fo"][0] = str(self.sos[i].p.fo)
-                ret["DR"][0] = str(self._get_stg_dr(i, vi_min, vo_max))
-
-
-        else:
-            # ret = vacio
-            pass
+                if self._validate_vi(vi_min, vo_max)[0]:
+                    ret["DR"][0] = str(self._get_stg_dr(i, vi_min, vo_max))
         return ret
 
     @staticmethod

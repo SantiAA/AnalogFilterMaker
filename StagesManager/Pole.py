@@ -8,6 +8,9 @@ class Pole:
         else:
             self.q = -1
 
+    def __eq__(self, other):
+        return self.p == other.p
+
     def get_msg(self):
         aux = ""
         if self.q > 0:
@@ -15,3 +18,5 @@ class Pole:
         if not self.used:
             aux += " (used)"
         return "fo: " + str(self.fo) + aux
+
+
