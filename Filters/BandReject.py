@@ -60,9 +60,9 @@ class BandReject(Filter):
         fp__ = self.requirements[TemplateInfo.fp__.value]
         Ap = self.requirements[TemplateInfo.Ap.value]
         Aa = self.requirements[TemplateInfo.Aa.value]
-        sq1 = Square(Dot(0, -INFINITE), Dot(0, Aa), Dot(fa__, Aa), Dot(fa__, -INFINITE))
-        sq2 = Square(Dot(fp__, Ap), Dot(fp__, INFINITE), Dot(fp_, INFINITE), Dot(fp_, Ap))
-        sq3 = Square(Dot(fa_, -INFINITE), Dot(fa_, Aa), Dot(INFINITE, Aa), Dot(INFINITE, -INFINITE))
+        sq1 = Square(Dot(0, Ap), Dot(0, INFINITE), Dot(fp__, INFINITE), Dot(fp__, Ap))
+        sq2 = Square(Dot(fa__, -INFINITE), Dot(fa__, Aa), Dot(fa_, Aa), Dot(fa_, -INFINITE))
+        sq3 = Square(Dot(fp_, Ap), Dot(fp_, INFINITE), Dot(INFINITE, INFINITE), Dot(INFINITE, -INFINITE))
 
         sq1_n = Square(Dot(0, Ap), Dot(0, INFINITE), Dot(self.normalized_freqs[0], INFINITE), Dot(self.normalized_freqs[0], Ap))
         sq2_n = Square(Dot(self.normalized_freqs[1], -INFINITE), Dot(self.normalized_freqs[1], Aa), Dot(INFINITE, Aa), Dot(INFINITE, -INFINITE))
