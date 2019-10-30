@@ -5,6 +5,8 @@ from numpy import where
 
 # AFM project modules
 from Filters.Filters import *
+from BackEnd.Output.Dot import Dot, INFINITE
+from BackEnd.Output.Square import Square
 
 
 class BandReject(Filter):
@@ -39,7 +41,7 @@ class BandReject(Filter):
                                         self.requirements[TemplateInfo.fa__.value])/ \
                                        (self.requirements[TemplateInfo.fp_.value] -
                                         self.requirements[TemplateInfo.fp__.value])  # K = Awp/ Awa
-
+                    self.normalized_freqs = [1, 1 / self.selectivity]
                     return True, ret
                 else:
                     ret = "fp+ must be greater than fa+"
@@ -50,3 +52,21 @@ class BandReject(Filter):
 
         """ If there is something wrong in the attenuations or frequencies I return False"""
         return False, ret
+
+    def get_templates(self):
+        fa_ = self.requirements[TemplateInfo.fa_.value]
+        fa__= self.requirements[TemplateInfo.fa__.value]
+        fp_ = self.requirements[TemplateInfo.fp_.value]
+        fp__ = self.requirements[TemplateInfo.fp__.value]
+        Ap = self.requirements[TemplateInfo.Ap.value]
+        Aa = self.requirements[TemplateInfo.Aa.value]
+        sq1 = Square(Dot(0, Ap), Dot(0, INFINITE), Dot(fp__, INFINITE), Dot(fp__, Ap))
+        sq2 = Square(Dot(fa__, -INFINITE), Dot(fa__, Aa), Dot(fa_, Aa), Dot(fa_, -INFINITE))
+        sq3 = Square(Dot(fp_, Ap), Dot(fp_, INFINITE), Dot(INFINITE, INFINITE), Dot(INFINITE, -INFINITE))
+
+        sq1_n = Square(Dot(0, Ap), Dot(0, INFINITE), Dot(self.normalized_freqs[0], INFINITE), Dot(self.normalized_freqs[0], Ap))
+        sq2_n = Square(Dot(self.normalized_freqs[1], -INFINITE), Dot(self.normalized_freqs[1], Aa), Dot(INFINITE, Aa), Dot(INFINITE, -INFINITE))
+
+        denorm_template, norm_temlate = [sq1, sq2, sq3], [sq1_n, sq2_n]
+        return {GraphTypes.Attenuation.value: denorm_template,
+                GraphTypes.NormalizedAt.value: norm_temlate}

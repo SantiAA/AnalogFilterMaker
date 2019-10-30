@@ -21,8 +21,7 @@ from Filters.GroupDelay import GroupDelay
 from Filters.Filters import FilterTypes
 from Filters.Filters import TemplateInfo
 
-from BackEnd.Output.Dot import Dot, INFINITE
-from BackEnd.Output.Square import Square
+from Filters.Filters import GraphTypes
 
 
 class BackEnd:
@@ -55,39 +54,7 @@ class BackEnd:
 
     def get_template(self, filtro):
         my_filter = self._parse_filter(filtro)
-        if my_filter.get_type() is FilterTypes.LowPass.value:
-            pass
-        elif my_filter.get_type() is FilterTypes.HighPass.value:
-            fa = my_filter.get_req_value(TemplateInfo.fa.value)
-            fp = my_filter.get_req_value(TemplateInfo.fp.value)
-            Ap = my_filter.get_req_value(TemplateInfo.Ap.value)
-            Aa = my_filter.get_req_value(TemplateInfo.Aa.value)
-            req = my_filter.get_requirements()
-            sq1 = Square(Dot(0, -INFINITE), Dot(0, Aa), Dot(fa, Aa), Dot(fa, -INFINITE))
-            sq2 = Square(Dot(fp, Ap), Dot(fp, INFINITE), Dot(INFINITE, INFINITE), Dot(INFINITE, Aa))
-            return [sq1, sq2]
-        elif my_filter.get_type() is FilterTypes.BandPass.value:
-            fa_ = my_filter.get_req_value(TemplateInfo.fa_.value)
-            fp_ = my_filter.get_req_value(TemplateInfo.fp_.value)
-            fa__ = my_filter.get_req_value(TemplateInfo.fa__.value)
-            fp__ = my_filter.get_req_value(TemplateInfo.fp__.value)
-            Ap = my_filter.get_req_value(TemplateInfo.Ap.value)
-            Aa = my_filter.get_req_value(TemplateInfo.Aa.value)
-            sq1 = Square(Dot(0, -INFINITE), Dot(0, Aa), Dot(fa__, Aa), Dot(fa__, -INFINITE))
-            sq2 = Square(Dot(fp__, Ap), Dot(fp__, INFINITE), Dot(fp_, INFINITE), Dot(fp_, Ap))
-            sq3 = Square(Dot(fa_, -INFINITE), Dot(fa_, Aa), Dot(INFINITE, Aa), Dot(INFINITE, -INFINITE))
-            return [sq1, sq2, sq3]
-        elif my_filter.get_type() is FilterTypes.BandReject.value:
-            fa_ = my_filter.get_req_value(TemplateInfo.fa_.value)
-            fp_ = my_filter.get_req_value(TemplateInfo.fp_.value)
-            fa__ = my_filter.get_req_value(TemplateInfo.fa__.value)
-            fp__ = my_filter.get_req_value(TemplateInfo.fp__.value)
-            Ap = my_filter.get_req_value(TemplateInfo.Ap.value)
-            Aa = my_filter.get_req_value(TemplateInfo.Aa.value)
-            sq1 = Square(Dot(0, Ap), Dot(0, INFINITE), Dot(fp__, INFINITE), Dot(fp__, Ap))
-            sq2 = Square(Dot(fa__, -INFINITE), Dot(fa__, Aa), Dot(fa_, Aa), Dot(fa_, -INFINITE))
-            sq3 = Square(Dot(fp_, Ap), Dot(fp_, INFINITE), Dot(INFINITE, INFINITE), Dot(INFINITE, Ap))
-            return [sq1, sq2, sq3]
+        return my_filter.get_templates()
 
     def get_graphics(self, filtro, aproximacion):
         my_filter = self._parse_filter(filtro)

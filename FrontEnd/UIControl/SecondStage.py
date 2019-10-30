@@ -2,6 +2,7 @@ from PyQt5.QtGui import QIcon, QPixmap
 from PyQt5.QtWidgets import QMainWindow, QHBoxLayout, QRadioButton
 from PyQt5.uic import loadUi
 
+from BackEnd.BackEnd import BackEnd
 from FrontEnd.UIs.Testing.BackEndTesting import BackEndTesting
 from FrontEnd.UIs.UIConfigurations.StagesUILayout import StagesUILayout
 
