@@ -24,7 +24,7 @@ class BandReject(Filter):
             TemplateInfo.Aa.value: 40, TemplateInfo.Ap.value: 5,
             TemplateInfo.fp_.value: 45000, TemplateInfo.fp__.value: 2000, TemplateInfo.fa_.value: 30000,
             TemplateInfo.fa__.value: 3000,
-            TemplateInfo.k.value: 1
+            TemplateInfo.k.value: 0
         }
 
     def validate_requirements(self) -> (bool, str):
@@ -38,9 +38,10 @@ class BandReject(Filter):
             if self.requirements[TemplateInfo.fp__.value] < self.requirements[TemplateInfo.fa__.value]:
                 if self.requirements[TemplateInfo.fp_.value] > self.requirements[TemplateInfo.fa_.value]:
                     self.selectivity = (self.requirements[TemplateInfo.fa_.value] -
-                                        self.requirements[TemplateInfo.fa__.value])/ \
+                                        self.requirements[TemplateInfo.fa__.value]) / \
                                        (self.requirements[TemplateInfo.fp_.value] -
-                                        self.requirements[TemplateInfo.fp__.value])  # K = Awp/ Awa
+                                        self.requirements[TemplateInfo.fp__.value])
+                                         # K = Awp/ Awa
                     self.normalized_freqs = [1, 1 / self.selectivity]
                     return True, ret
                 else:

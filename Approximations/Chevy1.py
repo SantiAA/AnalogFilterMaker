@@ -42,7 +42,7 @@ class ChevyI(Approximation):
         p = []
         k = 0
         """ First I calculate the Normalized LowPass, to get the useful w """
-        normalized_n, useful_w = signal.cheb1ord(1, self.selectivity, self.information[TemplateInfo.Ap.value],
+        normalized_n, useful_w = signal.cheb1ord(1, 1/self.selectivity, self.information[TemplateInfo.Ap.value],
                                                  self.information[TemplateInfo.Aa.value], analog=True)
         if self.fixed_n > 0:
             normalized_n = self.fixed_n
@@ -51,13 +51,14 @@ class ChevyI(Approximation):
 
         while True:
             """ Fist I calculate the Normalized LowPass """
-            z_norm, p_norm, k_norm = signal.cheby1(normalized_n, useful_w, analog=True, output='zpk')
+            z_norm, p_norm, k_norm = signal.cheby1(normalized_n, self.information[TemplateInfo.Ap.value],
+                                                   2*np.pi*useful_w, analog=True, output='zpk')
             """ Now check the desnomalization cte """
             w, h = signal.freqs_zpk(z_norm, p_norm, k_norm)
             h = 20 * np.log10(abs(h))
             i = [abs(j + self.information[TemplateInfo.Aa.value]) for j in h]
-            wa = w[i.index(min(i))]
-            denorm_cte = (wa * (1 - self.denorm / 100) + self.denorm / (self.selectivity * 100))
+            fa = w[i.index(min(i))]/(2*np.pi)
+            denorm_cte = (fa * (1 - self.denorm / 100) + self.denorm / (self.selectivity * 100))/fa
             _z = z_norm * denorm_cte
             _p = p_norm * denorm_cte
             _k = k_norm * (denorm_cte ** (len(p_norm) - len(z_norm)))
@@ -66,25 +67,25 @@ class ChevyI(Approximation):
             if filter_in_use.get_type() is FilterTypes.LowPass.value:
                 """ If the approximation support the filter I continue """
                 """ And transform the normalized low pass to the desire one """
-                z, p, k = signal.lp2lp_zpk(_z, _p, _k, 2*np.pi*self.information[TemplateInfo.fp.value])
+                z, p, k = signal.lp2lp_zpk(_z, _p, _k, self.information[TemplateInfo.fp.value])
                 filter_in_use.load_z_p_k(z, p, k)
 
             elif filter_in_use.get_type() is FilterTypes.HighPass.value:
-                z, p, k = signal.lp2hp_zpk(_z, _p, _k, 2*np.pi*self.information[TemplateInfo.fp.value])
+                z, p, k = signal.lp2hp_zpk(_z, _p, _k, 4*np.pi**2*self.information[TemplateInfo.fp.value])
                 filter_in_use.load_z_p_k(z, p, k)
 
             elif filter_in_use.get_type() is FilterTypes.BandPass.value:
                 Awp = self.information[TemplateInfo.fp_.value] - self.information[TemplateInfo.fp__.value]
                 w0 = np.sqrt(self.information[TemplateInfo.fp_.value] * self.information[TemplateInfo.fp__.value])
 
-                z, p, k = signal.lp2bp_zpk(_z, _p, _k, 2*np.pi*w0, 2*np.pi*Awp)  # Desnormalizado
+                z, p, k = signal.lp2bp_zpk(_z, _p, _k, 2*np.pi*w0, Awp)  # Desnormalizado
                 filter_in_use.load_z_p_k(z, p, k)
 
             elif filter_in_use.get_type() is FilterTypes.BandReject.value:
                 Awp = self.information[TemplateInfo.fp_.value] - self.information[TemplateInfo.fp__.value]
                 w0 = np.sqrt(self.information[TemplateInfo.fp_.value] * self.information[TemplateInfo.fp__.value])
 
-                z, p, k = signal.lp2bs_zpk(_z, _p, _k, 2*np.pi*w0, 2*np.pi*Awp)  # Desnormalizado
+                z, p, k = signal.lp2bs_zpk(_z, _p, _k, 2*np.pi*w0, (2*np.pi)**2*Awp)  # Desnormalizado
                 filter_in_use.load_z_p_k(z, p, k)
             else:
                 print("Chevy1.py: Invalid filter type passed to Chebyshev aproximation")
@@ -92,4 +93,5 @@ class ChevyI(Approximation):
             if self.q_max >= filter_in_use.get_max_q() or normalized_n == self.n_max or self.fixed_n > 0:
                 break
             normalized_n = normalized_n + 1
-        filter_in_use.load_normalized_z_p_k(z_norm, p_norm, k_norm)
+        # filter_in_use.load_normalized_z_p_k(z_norm, p_norm, k_norm)
+        filter_in_use.load_normalized_z_p_k(_z, _p, _k)

@@ -24,7 +24,7 @@ class BandPass(Filter):
             TemplateInfo.Aa.value: 40, TemplateInfo.Ap.value: 5,
             TemplateInfo.fp_.value: 30000, TemplateInfo.fp__.value: 3000, TemplateInfo.fa_.value: 45000,
             TemplateInfo.fa__.value: 2000,
-            TemplateInfo.k.value: 1
+            TemplateInfo.k.value: 0
         }
 
     def validate_requirements(self) -> (bool, str):
