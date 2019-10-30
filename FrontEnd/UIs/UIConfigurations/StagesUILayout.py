@@ -28,7 +28,7 @@ class StagesUILayout(QWidget):
         new_stage = DefaultStageUI(len(self.stages)+1, self.w_width)
         self.stages.append(new_stage)
         self.group_box_layout.addWidget(new_stage)
-        self.group_box_layout.addStretch()
+
 
     def get_number_of_checked(self):
         checked = 0
@@ -70,7 +70,7 @@ class DefaultStageUI(QWidget):
 
         self.label.setStyleSheet("font-size: 14px; color:rgb(255, 255, 255);")
         self.label.setAlignment(Qt.AlignCenter)
-        self.label.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
+        self.label.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Preferred)
         self.label.setMargin(0)
         self.label.setContentsMargins(0,0,0,0)
         vbox.addWidget(self.label)
@@ -109,7 +109,7 @@ class StagesGraph(QWidget):
         self.canvas = FigureCanvas(self.figure)
         vertical_layout = QVBoxLayout()
         vertical_layout.addWidget(self.canvas)
-
+      
 
         self.canvas.axes = self.canvas.figure.add_subplot(111)
         self.canvas.axes.axis('off')

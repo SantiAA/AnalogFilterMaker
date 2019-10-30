@@ -1,4 +1,4 @@
-from PyQt5.QtGui import QIcon
+from PyQt5.QtGui import QIcon, QColor
 from PyQt5.QtWidgets import *
 
 from matplotlib.backends.backend_qt5agg import FigureCanvas
@@ -16,6 +16,7 @@ class GraphWidget(QWidget):
         self.y_label = "Y"
         self.title = " "
         self.figure = Figure()
+        self.figure.patch.set_facecolor((40/255, 55/255, 57/255,1))
         self.canvas = FigureCanvas(self.figure)
 
         self.toolbar = NavigationToolbar(self.canvas, self)  # Toolbar to work on the graphs
@@ -24,5 +25,5 @@ class GraphWidget(QWidget):
         vertical_layout.addWidget(self.toolbar)  # Adding toolbar to the widget
 
         self.canvas.axes = self.canvas.figure.add_subplot(111)
-
+        #self.canvas.axes.set_facecolor([40, 55, 57])
         self.setLayout(vertical_layout)
