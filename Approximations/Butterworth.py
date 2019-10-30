@@ -16,7 +16,7 @@ class Butterworth(Approximation):
     def __init__(self):
         Approximation.__init__(self, "Butterworth")
         self.application = [FilterTypes.HighPass.value, FilterTypes.LowPass.value, FilterTypes.BandPass.value, FilterTypes.BandReject.value]
-        self.dict["Denorm"] = [(0, 100, False, type(int)), 0]
+        self.dict["Denorm."] = [(0, 100, False, type(int)), 0]
 
     def load_information(self, filter_in_use: Filter):
 
@@ -60,25 +60,25 @@ class Butterworth(Approximation):
             _k = k_norm*(denorm_cte**(len(p_norm)-len(z_norm)))
             """" Next we transform the LowPass into the requested filter """
             if filter_in_use.get_type() is FilterTypes.LowPass.value:
-                z, p, k = signal.lp2lp_zpk(_z, _p, _k, self.information[TemplateInfo.fp.value])
+                z, p, k = signal.lp2lp_zpk(_z, _p, _k, 2*np.pi*self.information[TemplateInfo.fp.value])
                 filter_in_use.load_z_p_k(z, p, k)
 
             elif filter_in_use.get_type() is FilterTypes.HighPass.value:
-                z, p, k = signal.lp2hp_zpk(_z, _p, _k, self.information[TemplateInfo.fp.value])
+                z, p, k = signal.lp2hp_zpk(_z, _p, _k, 2*np.pi*self.information[TemplateInfo.fp.value])
                 filter_in_use.load_z_p_k(z, p, k)
 
             elif filter_in_use.get_type() is FilterTypes.BandPass.value:
                 Awp = self.information[TemplateInfo.fp_.value] - self.information[TemplateInfo.fp__.value]
                 w0 = np.sqrt(self.information[TemplateInfo.fp_.value] * self.information[TemplateInfo.fp__.value] )
 
-                z, p, k = signal.lp2bp_zpk(_z, _p, _k, w0, Awp)  # Desnormalizado
+                z, p, k = signal.lp2bp_zpk(_z, _p, _k, 2*np.pi*w0, 2*np.pi*Awp)  # Desnormalizado
                 filter_in_use.load_z_p_k(z, p, k)
 
             elif filter_in_use.get_type() is FilterTypes.BandReject.value:
                 Awp = self.information[TemplateInfo.fp_.value] - self.information[TemplateInfo.fp__.value]
                 w0 = np.sqrt(self.information[TemplateInfo.fp_.value] * self.information[TemplateInfo.fp__.value])
 
-                z, p, k = signal.lp2bs_zpk(_z, _p, _k, w0, Awp)  # Desnormalizado
+                z, p, k = signal.lp2bs_zpk(_z, _p, _k, 2*np.pi*w0, 2*np.pi*Awp)  # Desnormalizado
                 filter_in_use.load_z_p_k(z, p, k)
 
             else:

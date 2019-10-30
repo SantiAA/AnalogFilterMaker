@@ -75,25 +75,25 @@ class ChebyII(Approximation):
 
             if filter_in_use.get_type() is FilterTypes.LowPass.value:
                 """ And transform the normalized low pass to the desire one """
-                z, p, k = signal.lp2lp_zpk(_z, _p, _k, self.information[TemplateInfo.fa.value])
+                z, p, k = signal.lp2lp_zpk(_z, _p, _k, 2*np.pi*self.information[TemplateInfo.fa.value])
                 filter_in_use.load_z_p_k(z, p, k)
 
             elif filter_in_use.get_type() is FilterTypes.HighPass.value:
-                z, p, k = signal.lp2hp_zpk(_z, _p, _k, self.information[TemplateInfo.fa.value])
+                z, p, k = signal.lp2hp_zpk(_z, _p, _k, 2*np.pi*self.information[TemplateInfo.fa.value])
                 filter_in_use.load_z_p_k(z, p, k)
 
             elif filter_in_use.get_type() is FilterTypes.BandPass.value:
                 Awa = self.information[TemplateInfo.fa_.value] - self.information[TemplateInfo.fa__.value]
                 w0 = np.sqrt(self.information[TemplateInfo.fa_.value] * self.information[TemplateInfo.fa__.value])
 
-                z, p, k = signal.lp2bp_zpk(_z, _p, _k, w0, Awa)  # Desnormalizado
+                z, p, k = signal.lp2bp_zpk(_z, _p, _k, 2*np.pi*w0, 2*np.pi*Awa)  # Desnormalizado
                 filter_in_use.load_z_p_k(z, p, k)
 
             elif filter_in_use.get_type() is FilterTypes.BandReject.value:
                 Awa = self.information[TemplateInfo.fa_.value] - self.information[TemplateInfo.fa__.value]
                 w0 = np.sqrt(self.information[TemplateInfo.fa_.value] * self.information[TemplateInfo.fa__.value])
 
-                z, p, k = signal.lp2bs_zpk(_z, _p, _k, w0, Awa)  # Desnormalizado
+                z, p, k = signal.lp2bs_zpk(_z, _p, _k, 2*np.pi*w0, 2*np.pi*Awa)  # Desnormalizado
                 filter_in_use.load_z_p_k(z, p, k)
 
             else:

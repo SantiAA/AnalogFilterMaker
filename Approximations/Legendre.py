@@ -5,6 +5,7 @@ Approximation base class
 # python native modules
 
 # third-party modules
+import numpy as np
 
 from sympy import *
 from scipy import signal
@@ -54,7 +55,7 @@ class Legendre(Approximation):
         p = []
         k = 0
         """ First I calculate the Normalized LowPass, to get the useful w """
-        n, useful_w = self._legord(self.information[TemplateInfo.fp.value], self.information[TemplateInfo.fa.value],
+        n, useful_w = self._legord(2*np.pi*self.information[TemplateInfo.fp.value], 2*np.pi*self.information[TemplateInfo.fa.value],
                                    self.information[TemplateInfo.Ap.value], self.information[TemplateInfo.Aa.value], self.n_max)
         if self.fixed_n > 0:
             n = self.fixed_n
@@ -88,14 +89,14 @@ class Legendre(Approximation):
                 Awp = self.information[TemplateInfo.fp_.value] - self.information[TemplateInfo.fp__.value]
                 w0 = sqrt(self.information[TemplateInfo.fp_.value] * self.information[TemplateInfo.fp__.value])
 
-                z, p, k = signal.lp2bp_zpk(_z, _p, _k, w0, Awp)
+                z, p, k = signal.lp2bp_zpk(_z, _p, _k, 2*np.pi*w0, 2*np.pi*Awp)
                 filter_in_use.load_normalized_z_p_k(z_n, p_n, k_n)
 
             elif filter_in_use.get_type() is FilterTypes.BandReject.value:
                 Awp = self.information[TemplateInfo.fp_.value] - self.information[TemplateInfo.fp__.value]
                 w0 = sqrt(self.information[TemplateInfo.fp_.value] * self.information[TemplateInfo.fp__.value])
 
-                z, p, k = signal.lp2bs_zpk(_z, _p, _k, w0, Awp)
+                z, p, k = signal.lp2bs_zpk(_z, _p, _k, 2*np.pi*w0, 2*np.pi*Awp)
                 filter_in_use.load_normalized_z_p_k(z_n, p_n, k_n)
             else:
                 print("Legendre.py: Invalid filter type passed to Legendre aproximation")

@@ -35,7 +35,7 @@ class Bessel(Approximation):
         p = []
         k = 0
         """ First I calculate the Normalized LowPass, to get the useful w """
-        normalized_n, useful_w = self._bessord(self.information[TemplateInfo.ft.value], self.information[TemplateInfo.tol.value],
+        normalized_n, useful_w = self._bessord(2*np.pi*self.information[TemplateInfo.ft.value], self.information[TemplateInfo.tol.value],
                                                self.information[TemplateInfo.gd.value], self.n_max)
         if self.fixed_n > 0:
             normalized_n = self.fixed_n
@@ -46,7 +46,7 @@ class Bessel(Approximation):
             """ First search the order and the normalizer 'cut' frequency """
             z_norm, p_norm, k_norm = signal.bessel(normalized_n, useful_w, analog=True, output='zpk')
             if filter_in_use.get_type() is FilterTypes.GroupDelay.value:
-                z, p, k = signal.bessel(normalized_n, useful_w/(self.information[TemplateInfo.gd.value]*10e-6), 'low', True, 'zpk')
+                z, p, k = signal.bessel(normalized_n, useful_w/(self.information[TemplateInfo.gd.value]), 'low', True, 'zpk')
                 filter_in_use.load_z_p_k(z, p, k)
             else:
                 print("Bessel.py: Invalid filter type passed to Bessel aproximation")
@@ -57,7 +57,7 @@ class Bessel(Approximation):
         filter_in_use.load_normalized_z_p_k(z_norm, p_norm, k_norm)
 
     def _bessord(self, frg, tol, tau, max_order):
-        wrgn = 2*np.pi*frg*tau
+        wrgn = frg*tau
         n = 0
         while True:  # do{}while() statement python style
             n = n+1

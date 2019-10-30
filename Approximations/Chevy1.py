@@ -66,25 +66,25 @@ class ChevyI(Approximation):
             if filter_in_use.get_type() is FilterTypes.LowPass.value:
                 """ If the approximation support the filter I continue """
                 """ And transform the normalized low pass to the desire one """
-                z, p, k = signal.lp2lp_zpk(_z, _p, _k, self.information[TemplateInfo.fp.value])
+                z, p, k = signal.lp2lp_zpk(_z, _p, _k, 2*np.pi*self.information[TemplateInfo.fp.value])
                 filter_in_use.load_z_p_k(z, p, k)
 
             elif filter_in_use.get_type() is FilterTypes.HighPass.value:
-                z, p, k = signal.lp2hp_zpk(_z, _p, _k, self.information[TemplateInfo.fp.value])
+                z, p, k = signal.lp2hp_zpk(_z, _p, _k, 2*np.pi*self.information[TemplateInfo.fp.value])
                 filter_in_use.load_z_p_k(z, p, k)
 
             elif filter_in_use.get_type() is FilterTypes.BandPass.value:
                 Awp = self.information[TemplateInfo.fp_.value] - self.information[TemplateInfo.fp__.value]
                 w0 = np.sqrt(self.information[TemplateInfo.fp_.value] * self.information[TemplateInfo.fp__.value])
 
-                z, p, k = signal.lp2bp_zpk(_z, _p, _k, w0, Awp)  # Desnormalizado
+                z, p, k = signal.lp2bp_zpk(_z, _p, _k, 2*np.pi*w0, 2*np.pi*Awp)  # Desnormalizado
                 filter_in_use.load_z_p_k(z, p, k)
 
             elif filter_in_use.get_type() is FilterTypes.BandReject.value:
                 Awp = self.information[TemplateInfo.fp_.value] - self.information[TemplateInfo.fp__.value]
                 w0 = np.sqrt(self.information[TemplateInfo.fp_.value] * self.information[TemplateInfo.fp__.value])
 
-                z, p, k = signal.lp2bs_zpk(_z, _p, _k, w0, Awp)  # Desnormalizado
+                z, p, k = signal.lp2bs_zpk(_z, _p, _k, 2*np.pi*w0, 2*np.pi*Awp)  # Desnormalizado
                 filter_in_use.load_z_p_k(z, p, k)
             else:
                 print("Chevy1.py: Invalid filter type passed to Chebyshev aproximation")
