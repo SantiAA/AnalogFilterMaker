@@ -22,7 +22,7 @@ class HighPass(Filter):
         self.defaults = {
             TemplateInfo.Aa.value: 40, TemplateInfo.Ap.value: 5, TemplateInfo.fa.value: 2000,
             TemplateInfo.fp.value: 20000,
-            TemplateInfo.k.value: 1
+            TemplateInfo.k.value: 0
         }
 
     def validate_requirements(self) -> (bool, str):

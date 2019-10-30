@@ -14,7 +14,7 @@ class SecondStage(QMainWindow):
         self.ui_manager = ui_manager
         self.a = 0
         self.filters = {}
-        self.backend = BackEndTesting()
+        self.backend = BackEnd()
 
     def start(self):
         QMainWindow.__init__(self)

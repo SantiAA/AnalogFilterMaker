@@ -115,7 +115,7 @@ class Filter(object):
 
     def load_z_p_k(self, z, p, k):
         self.denormalized["Zeros"] = self._agrup_roots(z)
-        self.denormalized["Gain"] = k*pow(10, self.requirements[TemplateInfo.k.value]/20)    # ganancia del usuario en dB
+        self.denormalized["Gain"] = k
         self.denormalized["Order"] = len(p)
         self.denormalized["StagesQ"] = []
         max_q = 0
@@ -154,6 +154,16 @@ class Filter(object):
 
     def get_all_graphs(self):
         graphs = {}
+        k = self.denormalized["Gain"]*pow(10, self.requirements[TemplateInfo.k.value]/20)
+        trans_func = signal.ZerosPolesGain(self.denormalized["Zeros"], self.denormalized["Poles"], k)
+        w, h = trans_func.freqresp(n=3000)
+        f = w / (2 * pi)
+        mag = 20 * log10(abs(h))
+        phase = angle(h)
+        graphs[GraphTypes.Module.value] = [[GraphValues(f, mag, False, False, True)],
+                                           ["Frequency [Hz]", "Amplitude [dB]"]]
+        graphs[GraphTypes.Phase.value] = [[GraphValues(f, phase, False, False, True)], ["Frequency[Hz]", "Phase[deg]"]]
+
         trans_func = signal.ZerosPolesGain(self.denormalized["Zeros"], self.denormalized["Poles"], self.denormalized["Gain"])
         norm_trans_func = signal.ZerosPolesGain(self.normalized["Zeros"], self.normalized["Poles"], self.normalized["Gain"])
         w, h = trans_func.freqresp(n=3000)
@@ -164,14 +174,12 @@ class Filter(object):
         f_n = w_n/(2*pi)
         mag_n = 20 * log10(abs(h_n))
         phase_n = angle(h_n)
-        graphs[GraphTypes.Module.value] = [[GraphValues(f, mag, False, False, True)], ["Frequency [Hz]", "Amplitude [dB]"]]
         graphs[GraphTypes.Attenuation.value] = [[GraphValues(f, -mag, False, False, True)], ["Frequency [Hz]", "Attenuation[dB]"]]   # se pasa una lista de graphvalues
         if self.filter is FilterTypes.GroupDelay:
             graphs[GraphTypes.NormalizedGd.value] = [[GraphValues(f, -2 * pi * diff(unwrap(phase_n)) / diff(w_n), False, False, True)],
-                                             ["Frequency[Hz]", "Group delay [s]"]]  # -d(Phase)/df = -dP/dw * dw/df = -dP/dw * 2pi
+                                             ["Frequency[Hz]", "Group delay [us]"]]  # -d(Phase)/df = -dP/dw * dw/df = -dP/dw * 2pi
         else:
             graphs[GraphTypes.NormalizedAt.value] = [[GraphValues(f_n, -mag_n, False, False, True)], ["Frequency[Hz]", "Attenuation[dB]"]]
-        graphs[GraphTypes.Phase.value] = [[GraphValues(f, phase, False, False, True)], ["Frequency[Hz]", "Phase[deg]"]]
         graphs[GraphTypes.GroupDelay.value] = [[GraphValues(f, -2*pi*diff(unwrap(phase))/diff(w), False, False, True)], ["Frequency[Hz]", "Group delay[s]"]]  # -d(Phase)/df = -dP/dw * dw/df = -dP/dw * 2pi
         t, imp = signal.impulse(trans_func)
         graphs[GraphTypes.Impulse.value] = [[GraphValues(t, imp, False, False, False)], ["t[s]", "V[V]"]]
@@ -202,7 +210,7 @@ class Filter(object):
             p.append(self.denormalized["Poles"][i])
             i += count
         graphs[GraphTypes.PolesZeros.value] = [[GraphValues(real(z),
-                                                            imag(z), False, True, False,
+                                                            imag(z), True, False, False,
                                                             "Zeros", repeated_z),
                                                 GraphValues(real(p),
                                                             imag(p), True, True, False,
