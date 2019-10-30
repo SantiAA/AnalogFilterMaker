@@ -162,7 +162,7 @@ class StagesManager(object):
             ret["Zeros"][key2].append(z)
         return ret
 
-    def get_stages_plot(self, i, ):
+    def get_stages_plot(self, i,s ):
         plot_list = [[], []]
         for st in self.sos:
             plot_list[0].append(st.get_tf_plot())

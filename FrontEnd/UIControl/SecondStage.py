@@ -23,7 +23,7 @@ class SecondStage(QMainWindow):
         QMainWindow.__init__(self)
         loadUi('FrontEnd/UIs/secondstage.ui', self)
         self.setWindowTitle("Filter Design Tool")
-
+        self.showing_options = []
         self.__place_button_images__()
         self.__define_showing_group__()
         self.graph_widget = self.graphWidget
@@ -36,23 +36,25 @@ class SecondStage(QMainWindow):
         self.nextButton.clicked.connect(self.right_shift)
         self.backButton.clicked.connect(self.left_shift)
         self.goGain.clicked.connect(self.set_gain)
-        self.stages_manager = StagesManager()
-        self.__plot_p_z_graph__()
+        self.__plot_p_z_graph__(self.stages_manager.get_z_p_plot())
         self.poles_and_zeros_dict = self.stages_manager.get_z_p_dict()
         self.__fill_poles_and_zeros_combos__()
         self.all_loaded = False
         self.param_vbox = QVBoxLayout()
         self.param_group_box.setLayout(self.param_vbox)
+        self.__redefine_const_params_()
         self.selected_amount_changed()
-        self.showing_options = []
+
+
         self.show()
 
     def update_rd(self):
-        rd_answer = self.stages_manager.get_dr(self.vminSpin.value(), self.vmaxSpin.value())
-        if rd_answer[0] == False:
-            self.__show_error__(rd_answer[1])
+        validated, value = self.stages_manager.get_dr(self.vminSpin.value(), self.vmaxSpin.value())
+        if validated == False:
+            self.__show_error__(value)
         else:
-            self.rd.setText(str(round(rd_answer[1],2)))
+            self.rd.setText(str(round(value)))
+            self.__redefine_const_params_()
 
     def __show_error__(self, error):
         msg = QMessageBox()
@@ -68,19 +70,24 @@ class SecondStage(QMainWindow):
         if self.stages_ui_layout.get_number_of_checked() == 1:
             self.gainSpin.show()
             self.goGain.setText("GO")
-            self.goGain.setSyleSheet("font: 63 9pt; color:rgb(255, 255, 255);")
+            self.goGain.setStyleSheet("font: 63 9pt; color:rgb(255, 255, 255);")
         else:
             self.gainSpin.hide()
             self.goGain.setText("N/A")
-            self.goGain.setSyleSheet("font: 63 10pt;color:rgb(255, 255, 255);border: 0px solid blue;")
+            self.goGain.setStyleSheet("font: 63 10pt;color:rgb(255, 255, 255);border: 0px solid blue;")
+
+
+
+    def __redefine_const_params_(self):
+        params = self.stages_manager.get_const_data(self.stages_ui_layout.get_selected_ids_array(),self.vminSpin.value(), self.vmaxSpin.value())
+        self.clear_layout(self.param_vbox)
+        for key in params.keys():
+            self.param_vbox.addWidget(HorizontalParameter(key, params[key][0], params[key][1]))
+        self.__redraw__()
 
     def set_gain(self):
         self.stages_manager.set_gain(self.stages_ui_layout.get_selected_ids_array()[0], self.gainSpin.value())
-        params = self.stages_manager.get_const_data(self.stages_ui_layout.get_selected_ids_array(), self.vminSpin.value(), self.vmaxSping.value())
-        self.clear_layout(self.param_vbox)
-        for key, value in params:
-            self.param_vbox.addWidget(HorizontalParameter(key, value[0], value[1]))
-        self.__redraw__()
+        self.__redefine_const_params_()
 
     def right_shift(self):
         self.stages_manager.shift_stages(self.stages_ui_layout.get_selected_ids_array(), False)
@@ -170,21 +177,22 @@ class SecondStage(QMainWindow):
         self.combo2.clear()
         self.combo2.addItem("")
         self.combo2.model().item(0).setEnabled(False)
-        self.title_combo_1.setText(self.poles_and_zeros_dict.keys()[0])
-        self.title_combo_2.setText(self.poles_and_zeros_dict.keys()[1])
+        keys = list(self.poles_and_zeros_dict.keys())
+        self.title_combo_1.setText(keys[0])
+        self.title_combo_2.setText(keys[1])
 
         for i in range(0, 2):
-            for key in self.poles_and_zeros_dict.keys()[i]:
+            for key in self.poles_and_zeros_dict[keys[i]]:
                 if i == 0:
                     self.combo1.addItem(key)
                     self.combo1.model().item(self.combo1.findText(key)).setEnabled(False)
-                    for sing in self.poles_and_zeros_dict[key]:
+                    for sing in self.poles_and_zeros_dict[keys[i]][key]:
                         self.combo1.addItem(sing.get_msg())
                 if i == 1:
                     self.combo2.addItem(key)
                     self.combo2.model().item(self.combo2.findText(key)).setEnabled(False)
-                    for sing in self.poles_and_zeros_dict[key]:
-                        self.combo1.addItem(sing.get_msg())
+                    for sing in self.poles_and_zeros_dict[keys[i]][key]:
+                        self.combo2.addItem(sing.get_msg())
 
     def __place_button_images__(self):
         pixmap = QPixmap("FrontEnd/UIs/figs/button_figs/next.png")
@@ -203,7 +211,7 @@ class SecondStage(QMainWindow):
         self.showing_group.setLayout(hbox)
 
         for show_type in ShowType:
-            radiobutton = QRadioButton(show_type.value)
+            radiobutton = QRadioButton(show_type.name)
             hbox.addWidget(radiobutton)
             radiobutton.setStyleSheet("font: 63 7pt ; color:rgb(255, 255, 255);")
             self.showing_options.append(radiobutton)
@@ -228,8 +236,9 @@ class SecondStage(QMainWindow):
             if radio_but.isChecked():
                 show_type = radio_but.text()
 
-        graphs = self.stages_manager.get_stages_plot(self.stages_ui_layout.get_selected_ids_array(), show_type)
-        self.__plot_graph__(graphs)
+        if len(self.stages_ui_layout.get_selected_ids_array() )> 0:
+            graphs = self.stages_manager.get_stages_plot(self.stages_ui_layout.get_selected_ids_array(), show_type)
+            self.__plot_graph__(graphs)
 
     def __plot_graph__(self, graph):
         self.__fix_axes_titles_position__(self.graph_widget, graph[1][0], graph[1][1])

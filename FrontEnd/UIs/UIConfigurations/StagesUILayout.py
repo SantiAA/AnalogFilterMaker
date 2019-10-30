@@ -31,14 +31,15 @@ class StagesUILayout(QWidget):
             stage.set_checked(False)
 
     def add_stage(self, stage, i):
-        new_stage = DefaultStageUI(len(self.stages)+1, self.w_width, self.left_click, stage, i, self.changed_selected_amount_callback)
+        new_stage = DefaultStageUI( self.w_width, self.left_click, stage, i, self.changed_selected_amount_callback)
         self.stages.append(new_stage)
         self.group_box_layout.addWidget(new_stage)
 
     def delete_all_stages(self):
         for stage in self.stages:
-            self.stages.remove(stage)
             stage.setParent(None)
+
+        self.stages = []
 
     def get_number_of_checked(self):
         checked = 0
@@ -179,6 +180,19 @@ class HorizontalParameter(QWidget):
         self.label_title = QLabel(title)
         self.value_label = QLabel(value)
         self.units_label = QLabel(units)
+
+        self.label_title.setStyleSheet("font-size: 16px; color: rgb(149, 205, 212);")
+        self.label_title.setAlignment(Qt.AlignCenter)
+        self.label_title.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Preferred)
+
+        self.value_label.setStyleSheet("font-size: 14px; color:rgb(255, 255, 255);")
+        self.value_label.setAlignment(Qt.AlignCenter)
+        self.value_label.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Preferred)
+
+        self.units_label.setStyleSheet("font-size: 14px; color:rgb(255, 255, 255);")
+        self.units_label.setAlignment(Qt.AlignCenter)
+        self.units_label.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Preferred)
+
         self.layout.addWidget(self.label_title)
         self.layout.addWidget(self.value_label)
         self.layout.addWidget(self.units_label)

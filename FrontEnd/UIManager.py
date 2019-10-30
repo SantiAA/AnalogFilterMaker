@@ -7,14 +7,16 @@ from BackEnd.BackEnd import BackEnd
 from FrontEnd.UIControl.FirstStage import FirstStage, QMessageBox
 from FrontEnd.UIControl.SecondStage import SecondStage
 from FrontEnd.UIControl.UIMainWindow import UIMainWindow
+from FrontEnd.UIs.Testing.BackEndTesting import BackEndTesting
+from FrontEnd.UIs.Testing.StagesManagerTesting import StagesManagerTesting
 from StagesManager import StagesManager
 
 
 class UIManager:
     def __init__(self):
         self.active_window = None
-        self.back_end = BackEnd()
-        self.stages_manager = StagesManager()
+        self.back_end = BackEndTesting()
+        self.stages_manager = StagesManagerTesting()
         self.list_of_windows = [FirstStage(self, self.back_end, self.stages_manager), SecondStage(self, self.back_end, self.stages_manager)]  # Sequence of windows to show
         self.window_iterator = -1
         self.project_path = None
