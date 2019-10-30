@@ -219,6 +219,8 @@ class Filter(object):
 
     @staticmethod
     def _agrup_roots(p):
+        if len(p) is 0:
+            return p
         new_p = []
         p = sorted(p, key=lambda x: x.real)  # ordeno por parte real creciente
         while len(p):

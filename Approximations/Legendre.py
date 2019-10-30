@@ -6,11 +6,13 @@ Approximation base class
 
 # third-party modules
 import numpy as np
+from matplotlib import pyplot as plt
 
 from sympy import *
 from scipy import signal
 from scipy import special
 
+from numpy import pi
 from numpy import polymul
 from numpy import polyadd
 from numpy import polyint
@@ -54,70 +56,73 @@ class Legendre(Approximation):
         z = []
         p = []
         k = 0
+        n = 0
         """ First I calculate the Normalized LowPass, to get the useful w """
-        n, useful_w = self._legord(2*np.pi*self.information[TemplateInfo.fp.value], 2*np.pi*self.information[TemplateInfo.fa.value],
-                                   self.information[TemplateInfo.Ap.value], self.information[TemplateInfo.Aa.value], self.n_max)
+
         if self.fixed_n > 0:
             n = self.fixed_n
-        elif n > self.n_max:
-            n = self.n_max
+        else:
+            n, useful_w = self._legord(1, 1/self.selectivity,
+                                       self.information[TemplateInfo.Ap.value], self.information[TemplateInfo.Aa.value],
+                                       self.n_max)
 
         while True:
-            z_n, p_n, k_n = self._get_tf(n)
-
+            zpk_n = self._get_tf(n)
+            z_n, p_n, k_n = zpk_n.zeros, zpk_n.poles, abs(zpk_n.gain)
             """ Now check the desnomalization cte """
             w, h = signal.freqs_zpk(z_n, p_n, k_n)
             h = 20 * log10(abs(h))
             i = [abs(j + self.information[TemplateInfo.Aa.value]) for j in h]
             wa = w[i.index(min(i))]
-            denorm_cte = (wa * (1 - self.denorm / 100) + self.denorm / (self.selectivity * 100))
+            denorm_cte = (wa * (1 - self.denorm / 100) + self.denorm / (self.selectivity * 100))/wa
             _z = z_n * denorm_cte
             _p = p_n * denorm_cte
             _k = k_n * (denorm_cte ** (len(p_n) - len(z_n)))
+            # _p = [complex(a[0], a[1]) for a in _p]
             """" Next we transform the LowPass into the requested filter """
 
             if filter_in_use.get_type() is FilterTypes.LowPass.value:
                 """ If the approximation support the filter I continue """
                 z, p, k = signal.lp2lp_zpk(_z, _p, _k, 2*pi*self.information[TemplateInfo.fp.value])
-                filter_in_use.load_normalized_z_p_k(z_n, p_n, k_n)
+                filter_in_use.load_z_p_k(z, p, k)
 
             elif filter_in_use.get_type() is FilterTypes.HighPass.value:
-                z, p, k = signal.lp2hp_zpk(_z, _p, _k, 2*pi*self.information[TemplateInfo.fp.value])
-                filter_in_use.load_normalized_z_p_k(z_n, p_n, k_n)
+                z, p, k = signal.lp2hp_zpk(_z, _p, _k, (2*pi)**2*self.information[TemplateInfo.fp.value])
+                filter_in_use.load_z_p_k(z, p, k)
 
             elif filter_in_use.get_type() is FilterTypes.BandPass.value:
                 Awp = self.information[TemplateInfo.fp_.value] - self.information[TemplateInfo.fp__.value]
                 w0 = sqrt(self.information[TemplateInfo.fp_.value] * self.information[TemplateInfo.fp__.value])
 
-                z, p, k = signal.lp2bp_zpk(_z, _p, _k, 2*np.pi*w0, 2*np.pi*Awp)
-                filter_in_use.load_normalized_z_p_k(z_n, p_n, k_n)
+                z, p, k = signal.lp2bp_zpk(_z, _p, _k, 2*pi*w0, Awp)
+                filter_in_use.load_z_p_k(z, p, k)
 
             elif filter_in_use.get_type() is FilterTypes.BandReject.value:
                 Awp = self.information[TemplateInfo.fp_.value] - self.information[TemplateInfo.fp__.value]
                 w0 = sqrt(self.information[TemplateInfo.fp_.value] * self.information[TemplateInfo.fp__.value])
 
-                z, p, k = signal.lp2bs_zpk(_z, _p, _k, 2*np.pi*w0, 2*np.pi*Awp)
-                filter_in_use.load_normalized_z_p_k(z_n, p_n, k_n)
+                z, p, k = signal.lp2bs_zpk(_z, _p, _k, 2*pi*w0, (2*pi)**2*Awp)
+                filter_in_use.load_z_p_k(z, p, k)
             else:
                 print("Legendre.py: Invalid filter type passed to Legendre aproximation")
                 return
             if self.q_max >= filter_in_use.get_max_q() or n == self.n_max or self.fixed_n > 0:
                 break
             n = n + 1
-        filter_in_use.load_normalized_z_p_k(z_n, p_n, k_n)
+        # filter_in_use.load_normalized_z_p_k(z_norm, p_norm, k_norm)
+        filter_in_use.load_normalized_z_p_k(_z, _p, _k)
 
-    def _legord(self, f_p, f_a, a_p, a_a, n_max: int):
+    def _legord(self, w_p, w_a, a_p, a_a, n_max: int):
         n = 0
         use_w = 0
         for k in range(1, n_max+1):
             transfer_function = self._get_tf(k)
-            w, mag, phase = transfer_function.bode(n=2000)
-            i_p = where(w >= 2*pi*f_p)[0]
+            w, mag, phase = transfer_function.bode(w=np.logspace(log10(w_p)-1, log10(w_a)+1, num=2000))
+            i_p = where(w >= w_p)[0][0]
             mag_p = mag[i_p]
-            i_a = where(w >= 2*pi*f_a)[0]
+            i_a = where(w >= w_a)[0][0]
             mag_a = mag[i_a]
-            if mag_p >= -a_p and mag_a <= -a_a\
-                    or k == n_max:
+            if mag_a <= -a_a or k == n_max:
                 n = k
                 use_w = w[i_p]
                 break
@@ -148,7 +153,7 @@ class Legendre(Approximation):
         :return: The Legendre Approximation Denominator
         """
         epsilon = self._epsilon() ** 2
-        ln = self._odd_poly(n) if (n % 2) else self._even_poly
+        ln = self._odd_poly(n) if (n % 2) else self._even_poly(n)
         ln = epsilon * ln
         return polyadd(poly1d([1]), ln)
 
