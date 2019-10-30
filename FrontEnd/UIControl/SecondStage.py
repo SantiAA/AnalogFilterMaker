@@ -11,12 +11,13 @@ from StagesManager.StagesManager import StagesManager, ShowType
 
 class SecondStage(QMainWindow):
 
-    def __init__(self, ui_manager):
+    def __init__(self, ui_manager, backend, stages_manager):
         self.graph_widget = None
         self.ui_manager = ui_manager
         self.a = 0
         self.filters = {}
-        self.backend = BackEnd()
+        self.backend = backend
+        self.stages_manager = stages_manager
 
     def start(self):
         QMainWindow.__init__(self)
