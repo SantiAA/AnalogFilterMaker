@@ -24,6 +24,9 @@ class UIManager:
             "window_iterator": self.window_iterator,
             "active_window_configuration": {}
         }
+        self.configuration_dicts = []
+        for i in range (0, len(self.list_of_windows)):
+            self.configuration_dicts.append(None)
 
 
     def begin(self):
@@ -38,6 +41,8 @@ class UIManager:
         Closes the current active window and shows the next one from the window sequence.
         """
         if len(self.list_of_windows) > self.window_iterator + 1:
+            if self.window_iterator > -1:
+                self.configuration_dicts[self.window_iterator] = self.active_window.get_current_state_config()
             self.active_window.close()
             self.window_iterator += 1
             self.active_window = self.list_of_windows[self.window_iterator]
@@ -52,6 +57,8 @@ class UIManager:
             self.window_iterator -= 1
             self.active_window = self.list_of_windows[self.window_iterator]
             self.active_window.start()
+            if self.configuration_dicts[self.window_iterator] is not None:
+                self.active_window.load_current_state(self.configuration_dicts[self.window_iterator])
 
     def load_current_state(self):
         try:
@@ -60,9 +67,10 @@ class UIManager:
             self.project_path = filename
             self.active_window.close()
             self.window_iterator  = configuration_dict["window_iterator"]
+            self.configuration_dicts = configuration_dict["window_configurations"]
             self.active_window = self.list_of_windows[self.window_iterator]
             self.active_window.start()
-            self.active_window.load_current_state(configuration_dict["active_window_configuration"])
+            self.active_window.load_current_state(self.configuration_dicts[self.window_iterator])
         except:
             msg = QMessageBox()
             msg.setIcon(QMessageBox.Critical)
@@ -74,7 +82,9 @@ class UIManager:
     def save_as_current_state(self):
         try:
             self.program_state["window_iterator"] = self.window_iterator
-            self.program_state["active_window_configuration"] = self.active_window.get_current_state_config()
+            self.configuration_dicts[self.window_iterator] = self.active_window.get_current_state_config()
+            self.program_state["window_configurations"] = self.configuration_dicts
+            # self.program_state["active_window_configuration"] = self.active_window.get_current_state_config()
             Save = self.program_state  # Saves the desired class AND a chosen attribute
             path = QFileDialog.getSaveFileName(None, 'Save Project File', os.getenv('HOME'), "Filter Design Tool Project File (*.fdtpf)")[0]
             pickle.dump(Save, open(path, "wb"))  # Creates the file and puts the data into the file
@@ -89,7 +99,11 @@ class UIManager:
 
     def save_current_state(self):
         self.program_state["window_iterator"] = self.window_iterator
-        self.program_state["active_window_configuration"] = self.active_window.get_current_state_config()
+        self.configuration_dicts[self.window_iterator] = self.active_window.get_current_state_config()
+        self.program_state["window_configurations"] = self.configuration_dicts
+        #self.program_state["active_window_configuration"] = self.active_window.get_current_state_config()
         Save = self.program_state  # Saves the desired class AND a chosen attribute
         if self.project_path is not None:
             pickle.dump(Save, open(self.project_path, "wb"))  # Creates the file and puts the data into the file
+        else:
+            self.save_as_current_state()

@@ -26,11 +26,9 @@ class GraphWidget2(QWidget):
         vertical_layout = QVBoxLayout()
         vertical_layout.addWidget(self.canvas)
 
-  # Adding toolbar to the widget
-
         self.canvas.axes = self.canvas.figure.add_subplot(111)
         self.figure.tight_layout()
-        #self.canvas.axes.set_facecolor([40, 55, 57])
+
         self.setLayout(vertical_layout)
         self.figure.tight_layout()
         self.canvas.axes.tick_params(direction='in', length=.2, width=.2, labelsize=8, colors='w')

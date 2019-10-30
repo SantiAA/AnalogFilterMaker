@@ -49,6 +49,9 @@ class StagesUILayout(QWidget):
 
         return checked
 
+
+
+
     def get_selected_ids_array(self):
         selected_ids_array = []
         for stage in self.stages:
@@ -133,6 +136,7 @@ class RightRadioButton (QRadioButton):
     def __init__(self, left_click, changed_selected_amount_callback):
         QRadioButton.__init__(self)
         self.left_click = left_click
+        self.setChecked(True)
         self.changed_selected_amount_callback = changed_selected_amount_callback
 
     def mousePressEvent(self, QMouseEvent):
@@ -159,7 +163,7 @@ class StagesGraph(QWidget):
 
         self.figure.tight_layout()
         self.canvas.axes = self.canvas.figure.add_subplot(111)
-        self.canvas.axes.axis('off')
+        #self.canvas.axes.axis('off')
         self.setLayout(vertical_layout)
 
 
