@@ -1,3 +1,4 @@
+from PyQt5 import QtGui
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QWidget, QHBoxLayout, QGroupBox, QVBoxLayout, QLabel, QRadioButton, QSizePolicy
 from PyQt5.QtGui import QIcon
@@ -93,11 +94,17 @@ class DefaultStageUI(QWidget):
         self.label.setMargin(0)
         self.label.setContentsMargins(0,0,0,0)
         vbox.addWidget(self.label)
+
+
+        self.mathLabel = MathTextLabel(self.stage.get_tf_tex(), self)
+        vbox.addWidget(self.mathLabel, alignment=Qt.AlignHCenter)
+        '''
         self.graphWidget = StagesGraph()
 
         self.graphWidget.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
         self.__update_size__()
         vbox.addWidget(self.graphWidget)
+        '''
         self.radioButton = RightRadioButton(left_click_callback, changed_selected_amount)
 
         self.radioButton.setSizePolicy(QSizePolicy.Maximum, QSizePolicy.Maximum)
@@ -176,6 +183,36 @@ class HorizontalParameter(QWidget):
         self.layout.addWidget(self.value_label)
         self.layout.addWidget(self.units_label)
 
+
+class MathTextLabel(QWidget):
+
+    def __init__(self, mathText, parent=None, **kwargs):
+        super(QWidget, self).__init__(parent, **kwargs)
+
+        l=QVBoxLayout(self)
+        l.setContentsMargins(0,0,0,0)
+
+        r,g,b,a=self.palette().base().color().getRgbF()
+
+        self._figure=Figure(edgecolor=(r,g,b), facecolor=(r,g,b))
+        self._canvas=FigureCanvas(self._figure)
+        l.addWidget(self._canvas)
+        self._figure.clear()
+        text=self._figure.suptitle(
+            mathText,
+            x=0.0,
+            y=1.0,
+            horizontalalignment='left',
+            verticalalignment='top',
+            size=QtGui.QFont().pointSize()*2
+        )
+        self._canvas.draw()
+
+        (x0,y0),(x1,y1)=text.get_window_extent().get_points()
+        w=x1-x0; h=y1-y0
+
+        self._figure.set_size_inches(w/80, h/80)
+        self.setFixedSize(w,h)
 
 
 
