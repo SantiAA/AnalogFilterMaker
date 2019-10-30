@@ -6,7 +6,7 @@ from StagesManager import Zero, Pole
 
 
 class Stage:
-    def __init__(self, i, z: Zero, p: Pole):
+    def __init__(self, z: Zero, p: Pole):
         self.k = 1
         self.z = z
         self.pole = p

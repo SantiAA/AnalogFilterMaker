@@ -10,6 +10,7 @@ from enum  import Enum
 # AFM project modules
 from Filters.Filters import Filter
 from StagesManager.Pole import Pole
+from StagesManager.Stage import Stage
 from StagesManager.Zero import Zero
 
 class ShowType(Enum):
@@ -24,6 +25,9 @@ class StagesManager(object):
         self.p_pairs = [] # va a tener arreglo de Poles
         self.z_pairs = [] # va a tener arreglos de Zeros
         self.sos = []
+        self.k_tot = 0
+
+    def load_filter(self, fil: Filter):
         """ Guarda todos los polos y ceros agrupados en etapas de 1/2do orden """
         z, p, self.k_tot, q = fil.get_z_p_k_q()
         saved = False
@@ -51,6 +55,7 @@ class StagesManager(object):
         self.p_pairs.sort(key=lambda x: x.q, reverse=True)  # ordeno polos por Q decreciente
         self.z_pairs.sort(key=lambda x: x.n, reverse=True)  # ordeno ceros por orden decreciente
 
+
     def auto_max_rd(self, vi_min, vi_max):
         # agrupo todas
         self.sos = []
@@ -77,9 +82,9 @@ class StagesManager(object):
                         self.sos.append({"Poles": self.p_pairs[i], "Zeros": None, "Gain": 1})
                 # ver que hacer con los polos y ceros de primer orden aaaaaaaaa
         else:
-            self.sos = [{"Poles": p, "Zeros": None, "Gain": 1} for p in self.p_pairs]
+            # TIENE QUE SER UNA LISTA DE STAGES self.sos = [{"Poles": p, "Zeros": None, "Gain": 1} for p in self.p_pairs]
         """" The order of the stages depends on the input signal """
-        self.sos.sort(key=lambda x:x["Poles"][1], reverse=True) # ordena por Q decreciente
+        self.sos.sort(key=lambda x:x.p.q, reverse=True) # ordena por Q decreciente
         # k a la primera celda
 
         return self.sos
@@ -90,7 +95,11 @@ class StagesManager(object):
 
     def add_stage(self, p_str: str, z_str: str) -> (bool,str):
         """ Devuelve True es valida la etapa solicitada, False si no """
-
+        if True:
+            z = find(z_str)
+            p = find(p_str)
+            self.sos.append(Stage(z, p))
+        else:
         # self.sos[i]["Poles"] = p
         # self.sos[i]["Zeros"] = z
 
@@ -104,13 +113,6 @@ class StagesManager(object):
             self.sos.remove(self.sos[indexes])
         else:
             print("Indexes list out of range!")
-
-    def calc_rd(self):
-        # vi_max = self.requirements[StageInfo.Vo_max]
-        # for s in self.sos:
-        #     vi_max /= s["Gain"]
-        # rd = 20*log10(vi_max/self.requirements[StageInfo.Vi_min]
-        return rd
 
     def set_gain(self, i, k) -> (bool, str):
         if i < len(self.sos):
@@ -162,8 +164,17 @@ class StagesManager(object):
             ret["Zeros"][key2].append(z)
         return ret
 
-    def get_stages_plot(self, i, ):
+    def get_stages_plot(self, i, type: ShowType):
         plot_list = [[], []]
+        k_max = 0
+        if type is ShowType.Accumulative.value:
+            z = []
+            p = []
+            for s in self.sos:
+                z += s.z
+
+
+
         for st in self.sos:
             plot_list[0].append(st.get_tf_plot())
         plot_list[1] = ["Frequency [Hz]", "Amplitude [dB]"]
@@ -173,25 +184,10 @@ class StagesManager(object):
         """Returns a tuple:
             (True, dr) if everytihing ok, (False, err_str) if error
             Could fail because of: Invalid vi values, or not all stages loaded"""
-        ret = ""
+        ret = self._validate_vi(vi_min, vo_max)
         ok = False
-        if vi_min < vo_max:
-            if vi_min <= 2:
-                if vo_max >= 3:
-                    max_rd = 0
-                    for i in range(len(self.sos)):
-                        rd = self._get_stg_dr(i, vi_min, vo_max)
-                        if rd > max_rd:
-                            max_rd = rd
-                    ok = True
-                else:
-                    ret = "Vo max should be greater than 3V"
-            else:
-                ret = "Vi min should be smaller than 2V (go to a less noisy place!)"
-        else:
-            ret = "Vo_max must be greater than vi_min"
-        return ok, ret
 
+        return ok, ret
     def _get_stg_dr(self, i, vi_min, vo_max):
         """ Returns stage i dynamic range """
         partial_gain = 0
@@ -217,3 +213,19 @@ class StagesManager(object):
             # ret = vacio
             pass
         return ret
+
+    @staticmethod
+    def _validate_vi(vi_min, vo_max):
+        ok = False
+        ret = ""
+        if vi_min < vo_max:
+            if vi_min <= 2:
+                if vo_max >= 3:
+                    ok = True
+                else:
+                    ret = "Vo max should be greater than 3V"
+            else:
+                ret = "Vi min should be smaller than 2V (go to a less noisy place!)"
+        else:
+            ret = "Vo_max must be greater than vi_min"
+        return ok, ret
