@@ -59,7 +59,7 @@ border: 0px solid blue;
              </widget>
             </item>
             <item>
-             <widget class="GraphWidget2" name="widget_2" native="true"/>
+             <widget class="GraphWidget2" name="z_p_diagram" native="true"/>
             </item>
            </layout>
           </item>
@@ -252,7 +252,7 @@ color:rgb(255, 255, 255);</string>
           <item>
            <layout class="QVBoxLayout" name="verticalLayout_3" stretch="85,15">
             <item>
-             <widget class="QGroupBox" name="groupBox">
+             <widget class="QGroupBox" name="param_group_box">
               <property name="styleSheet">
                <string notr="true">color:rgb(255, 255, 255)</string>
               </property>

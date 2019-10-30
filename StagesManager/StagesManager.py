@@ -101,6 +101,7 @@ class StagesManager(object):
         pass
 
     def calc_rd(self):
+        #valida
         # vi_max = self.requirements[StageInfo.Vo_max]
         # for s in self.sos:
         #     vi_max /= s["Gain"]
@@ -142,7 +143,7 @@ class StagesManager(object):
         pass
 
 
-    def get_dr(self),vi_min, vi_max):
+    def get_dr(self,vi_min, vi_max):
         """Returns a tuple:
             (True, dr) if everytihing ok, (False, err_str) if error
             Could fail because of: Invalid vi values, or not all stages loaded"""
@@ -150,7 +151,7 @@ class StagesManager(object):
 
     def get_const_data(self, i):
         """Returns a dictionary with string values of the stage i"""
-        # ret = { "Q": "", "fo": "", "DR": ""}
+        # ret = { "Q": ["", unit], "fo": "", "DR": ""}
         if type(i) is int:
             pass
         else:
