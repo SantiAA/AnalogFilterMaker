@@ -26,10 +26,10 @@ class Stage:
         ret = "H(s)=\\frac{"
         i=0
         for i in range(len(num), 0):
-            ret += str(num[i]) + "s^" + str(i)
+            ret += "{0.2f}".format(num[i]) + "s^" + str(i)
         ret += "}{"
         for i in range(len(den), 0):
-            ret += str(den[i]) + "s^" + str(i)
+            ret += "{0.2f}".format(den[i]) + "s^" + str(i)
         ret += "}"
         return ret
 

@@ -1,16 +1,21 @@
 # python native modules
 from enum import Enum
 
-from numpy import conjugate, amax
+from numpy import conjugate, amax, amin
 from numpy import argmin
 from numpy import full
 from numpy import log10
-
+from enum  import Enum
 
 # AFM project modules
 from Filters.Filters import Filter
 from StagesManager.Pole import Pole
 from StagesManager.Zero import Zero
+
+class ShowType(Enum):
+    Selected = 0,
+    Accumulative = 1,
+    Superposed = 2
 
 
 class StagesManager(object):
@@ -77,7 +82,6 @@ class StagesManager(object):
         self.sos.sort(key=lambda x:x["Poles"][1], reverse=True) # ordena por Q decreciente
         # k a la primera celda
 
-            pass
         return self.sos
 
     def get_stages(self):
@@ -86,6 +90,7 @@ class StagesManager(object):
 
     def add_stage(self, p_str: str, z_str: str) -> (bool,str):
         """ Devuelve True es valida la etapa solicitada, False si no """
+
         # self.sos[i]["Poles"] = p
         # self.sos[i]["Zeros"] = z
 
@@ -157,29 +162,58 @@ class StagesManager(object):
             ret["Zeros"][key2].append(z)
         return ret
 
-    def get_stages_plot(self):
-        plot_list = [[],[]]
+    def get_stages_plot(self, i, ):
+        plot_list = [[], []]
         for st in self.sos:
             plot_list[0].append(st.get_tf_plot())
         plot_list[1] = ["Frequency [Hz]", "Amplitude [dB]"]
         return plot_list
 
-    def get_dr(self, vi_min, vi_max):
+    def get_dr(self, vi_min, vo_max):
         """Returns a tuple:
             (True, dr) if everytihing ok, (False, err_str) if error
             Could fail because of: Invalid vi values, or not all stages loaded"""
-        for st in self.sos:
-
-
-
-    def _get_stg_dr(self, i, vi_min, vi_max):
-
-
-    def get_const_data(self, i):
-        """Returns a dictionary with string values of the stage i"""
-        # ret = { "Q": "", "fo": "", "DR": ""}
-        if type(i) is int:
-            pass
+        ret = ""
+        ok = False
+        if vi_min < vo_max:
+            if vi_min <= 2:
+                if vo_max >= 3:
+                    max_rd = 0
+                    for i in range(len(self.sos)):
+                        rd = self._get_stg_dr(i, vi_min, vo_max)
+                        if rd > max_rd:
+                            max_rd = rd
+                    ok = True
+                else:
+                    ret = "Vo max should be greater than 3V"
+            else:
+                ret = "Vi min should be smaller than 2V (go to a less noisy place!)"
         else:
+            ret = "Vo_max must be greater than vi_min"
+        return ok, ret
+
+    def _get_stg_dr(self, i, vi_min, vo_max):
+        """ Returns stage i dynamic range """
+        partial_gain = 0
+        for j in range(i): # recorro todas las etapas hasta la que quiero calcular el rango dinamico
+            partial_gain += self.sos[j].k
+        vi_max = amin(vo_max, vo_max/partial_gain)
+        vi_min = amax(vi_min, vi_min/partial_gain) # vi_min: minimo valor a la entrada tal que la salida no este en el piso de ruido y la entrada no este en el piso de ruido
+        return 20*log10(vi_max/vi_min)
+
+    def get_const_data(self, i, vi_min, vo_max):
+        """Returns a dictionary with string values of the stage i"""
+        ret = {"Q": ["", ""], "fo": ["", "Hz"], "DR": ["", "dB"]}
+        if type(i) is int:
+            if i < len(self.sos):
+                q = self.sos[i].p.q
+                if q > 0:
+                    ret["Q"][0] = str(q)
+                ret["fo"][0] = str(self.sos[i].p.fo)
+                ret["DR"][0] = str(self._get_stg_dr(i, vi_min, vo_max))
+
+
+        else:
+            # ret = vacio
             pass
         return ret
