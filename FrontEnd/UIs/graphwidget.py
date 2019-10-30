@@ -29,6 +29,6 @@ class GraphWidget(QWidget):
         self.canvas.axes = self.canvas.figure.add_subplot(111)
         self.figure.tight_layout()
         #self.canvas.axes.set_facecolor([40, 55, 57])
-        self.canvas.axes.tick_params(direction='out', length=1, width=1, labelsize=10, colors='w')
+        self.canvas.axes.tick_params(direction='out', length=1, width=1, labelsize=8, colors='w')
         self.setLayout(vertical_layout)
         self.figure.tight_layout()

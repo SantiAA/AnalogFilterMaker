@@ -24,8 +24,8 @@ class BackEndTesting:
         # ApproximationTesting vendria a ser la clase Approximation
         self.approx = {
             "Low pass": [ApproximationTesting("Butterworth", {
-                "Max Q": [(0, 100, False,type(int)), 50],
-                "n": [[0, 10, True,type(float)], 5]
+                "Max Q": [(0, 100, False,int()), 50],
+                "n": [[0, 10, True,float()], 5]
             }),
                          ApproximationTesting("Chebyshev", {
                              "MaxQcH": [[0, 57, False, float()], 27],
@@ -71,8 +71,8 @@ class BackEndTesting:
             ["freq", "module"]]
 
         graph_dict[GraphTypes.PolesZeros.value] = [
-            [GraphValues([50, 500, 5000, 50000], [10, 100, 1000, 10000], True, False,False, "Zeros"),  # GRAF CEROS
-             GraphValues([550, 5050, 50500, 550000], [150, 1500, 10050, 100500], True, True,False, "Poles")],  # GRAF POLOS
+            [GraphValues([50, 500, 5000, 50000], [10, 100, 1000, 10000], True, False,False, "Zeros",[2,2,1,1]),  # GRAF CEROS
+             GraphValues([550000, 555, 10, 550000], [150545, 222222, 888877, 100500], True, True,False, "Poles",[2,3,1,2])],  # GRAF POLOS
             ["Re", "Im"]]
         ####IMPORTANTEE: PARA LOS POLOS Y CEROS AGREGAR UN PARAMETRO "ZEROS" O "POLOS" COMO ESTA EN EL EJEMPLO. ES PARA QUE QUEDEN LAS LEGENDS BIEN
         return graph_dict

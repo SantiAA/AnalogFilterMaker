@@ -41,7 +41,6 @@ class ApproximationParameterLayout(QWidget):
         self.check_box.setStyleSheet("font-size: 12px; color:rgb(255, 255, 255);")
         self.check_box.setText("Fixed")
 
-
         self.check_box.toggled.connect(self.check_box_toggled)
         self.rows = [InternalApproximationLayoutRow(self.label, self.check_box), self.widget]
         if not toggleable:
@@ -169,10 +168,11 @@ class DefaultSlider(QWidget):
     def get_default_value(self):
         return self.default_value
 
+
 class DefaultSliderWithSpinBox(QWidget):
     def __init__(self, min=0, max=100, default_value=50):
         self.decimals = 3
-        self.multiplier = 10**self.decimals
+        self.multiplier = 10 ** self.decimals
         self.min = min
         self.max = max
         self.default_value = default_value
@@ -208,10 +208,10 @@ class DefaultSliderWithSpinBox(QWidget):
         self.spin_box.setValue(round(val / self.multiplier, self.decimals))
 
     def get_value(self):
-        return round(self.slider.value()/self.multiplier, self.decimals)
+        return round(self.slider.value() / self.multiplier, self.decimals)
 
     def set_value(self, value):
-        self.slider.setValue(int(value * self.multiplier ))
+        self.slider.setValue(int(value * self.multiplier))
         self.spin_box.setValue(round(value, self.decimals))
 
     def get_min(self):
@@ -257,7 +257,7 @@ class DefaultComboBox(QWidget):
 
 
 class DefaultRadioGroup(QWidget):
-    def __init__(self,callback):
+    def __init__(self, callback):
         QWidget.__init__(self)
         self.layout = QHBoxLayout()
         self.setLayout(self.layout)
@@ -282,7 +282,7 @@ class DefaultRadioGroup(QWidget):
         self.callback()
 
     def first_activation(self):
-        self.group_buttons[len(self.group_buttons)-1].setChecked(True)
+        self.group_buttons[len(self.group_buttons) - 1].setChecked(True)
 
     def hide(self):
         for button in self.group_buttons:
@@ -292,7 +292,6 @@ class DefaultRadioGroup(QWidget):
         for button in self.group_buttons:
             button.show()
 
-
     def clear_layout(self):
         for button in self.group_buttons:
             button.setParent(None)
@@ -301,5 +300,3 @@ class DefaultRadioGroup(QWidget):
         self.setLayout(self.layout)
         self.group_buttons = []
         self.enabled_text = ""
-
-

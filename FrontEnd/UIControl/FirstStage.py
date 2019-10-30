@@ -21,7 +21,7 @@ class FirstStage(QMainWindow):
         self.ui_manager = ui_manager
         self.a = 0
         self.filters = {}
-        self.backend = BackEnd()
+        self.backend = BackEndTesting()
         self.filters_received, self.approximations_received = self.backend.get_util()
 
         self.showingGraphs = []
@@ -424,7 +424,7 @@ class FirstStage(QMainWindow):
     def redraw_graphs(self):
         try:
             self.graph_widget.canvas.axes.clear()
-            self.graph_widget.canvas.axes.set_title(self.comboGraph.currentText())
+            self.graph_widget.canvas.axes.set_title(self.comboGraph.currentText(), color="w")
 
             self.graph_widget.canvas.axes.grid(True, which="both")
 
@@ -437,7 +437,7 @@ class FirstStage(QMainWindow):
                         self.__plot_graph__(graph_values, "ID: " + str(graph.id) + ". ")
 
                         self.graph_widget.canvas.axes.grid(True, which="both")
-                        self.graph_widget.canvas.axes.set_title(self.comboGraph.currentText())
+                        self.graph_widget.canvas.axes.set_title(self.comboGraph.currentText(), color="w")
                         self.graph_widget.canvas.draw()  # Redraws
         except:
             a = 0
@@ -458,12 +458,22 @@ class FirstStage(QMainWindow):
                                                        label=complete_legend)
 
             else:
+                n_array_text = []
+                for n in graph_data.n_array:
+                    string_gen = ""
+                    if n>1:
+                        string_gen += str(n)
+                    n_array_text.append(string_gen)
                 if not graph_data.x_marks:
                     self.graph_widget.canvas.axes.scatter(graph_data.x_values, graph_data.y_values,
                                                           label=complete_legend)
+                    for i in range(0, len(n_array_text)):
+                        self.graph_widget.canvas.axes.annotate(n_array_text[i], (graph_data.x_values[i], graph_data.y_values[i]))
                 else:
                     self.graph_widget.canvas.axes.scatter(graph_data.x_values, graph_data.y_values, marker='x',
                                                           label=complete_legend)
+                    for i in range(0, len(n_array_text)):
+                        self.graph_widget.canvas.axes.annotate(n_array_text[i], (graph_data.x_values[i], graph_data.y_values[i]))
         self.graph_widget.canvas.axes.legend(loc='best')
 
     # Funciones que configuran y muestran los titulos de los ejes.

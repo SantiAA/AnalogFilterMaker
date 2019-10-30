@@ -1,5 +1,5 @@
 from PyQt5.QtGui import QIcon, QPixmap
-from PyQt5.QtWidgets import QMainWindow, QHBoxLayout, QRadioButton
+from PyQt5.QtWidgets import QMainWindow, QHBoxLayout, QRadioButton, QWidget
 from PyQt5.uic import loadUi
 
 from BackEnd.BackEnd import BackEnd
@@ -14,7 +14,7 @@ class SecondStage(QMainWindow):
         self.ui_manager = ui_manager
         self.a = 0
         self.filters = {}
-        self.backend = BackEnd()
+        self.backend = BackEndTesting()
 
     def start(self):
         QMainWindow.__init__(self)
@@ -64,5 +64,6 @@ class SecondStage(QMainWindow):
         radiobutton = QRadioButton("Overlapping Stages")
         hbox.addWidget(radiobutton)
         radiobutton.setStyleSheet("font: 63 7pt ; color:rgb(255, 255, 255);")
+
 
 

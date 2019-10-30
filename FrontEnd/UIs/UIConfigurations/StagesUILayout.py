@@ -116,5 +116,24 @@ class StagesGraph(QWidget):
         self.setLayout(vertical_layout)
 
 
+class UIStageData(QWidget):
+    def __init__(self):
+        QWidget.__init__(self)
+        self.layout = QVBoxLayout()
+        self.setLayout(self.layout)
+        self.enabled_text = ""
+
+
+
+class HorizontalParameter(QWidget):
+    def __init__(self, fixed, title, value, units):
+        QWidget.__init__(self)
+        self.layout = QHBoxLayout()
+        self.setLayout(self.layout)
+        self.label = QLabel(title)
+        self.widget = None
+
+
+
 
 
