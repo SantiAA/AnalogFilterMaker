@@ -13,9 +13,9 @@ from StagesManager.Pole import Pole
 from StagesManager.Zero import Zero
 
 class ShowType(Enum):
-    Selected = 0,
-    Accumulative = 1,
-    Superposed = 2
+    Selected = "Selected",
+    Accumulative = "Accumulative",
+    Superposed = "Superposed"
 
 
 class StagesManager(object):
