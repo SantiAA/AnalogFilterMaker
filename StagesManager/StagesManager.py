@@ -11,12 +11,6 @@ from numpy import log10
 from Filters.Filters import Filter
 
 
-class SignalTypes(Enum):
-    LowSignal = "Low Signal (Vi \\approx Vimin)"
-    HighSignal = "High Signal (Vi >> Vimin)"
-    MedSignal = "Intermmediate Signal"
-
-
 class StageInfo(Enum):
     Vi_min = "Vi min (Noise floor)"
     Vo_max = "Vo max (Saturation)"
@@ -88,7 +82,7 @@ class StagesManager(object):
         """ Returns tuple with 1st/2nd order poles and 1st/2nd order zeros """
         return self.z_pairs, self.p_pairs
 
-    def get_max_rd_stages(self, sig_type: SignalTypes):
+    def auto_max_rd(self):
         # agrupo todas
         self.sos = []
         """ To agrupate nearest poles and zeros """
@@ -116,21 +110,16 @@ class StagesManager(object):
         else:
             self.sos = [{"Poles": p, "Zeros": None, "Gain": 1} for p in self.p_pairs]
         """" The order of the stages depends on the input signal """
-        if sig_type is SignalTypes.LowSignal:
-            self.sos.sort(key=lambda x:x["Poles"][1], reverse=True) # ordena por Q decreciente
-            # k a la primera celda
-        elif sig_type is SignalTypes.HighSignal:
-            self.sos.sort(key=lambda x:x["Poles"][1], reverse=True) # ordena por Q creciente
-            # k a la ultima celda
-        elif sig_type is SignalTypes.MedSignal:
-            # preguntarle a dani
+        self.sos.sort(key=lambda x:x["Poles"][1], reverse=True) # ordena por Q decreciente
+        # k a la primera celda
+
             pass
         return self.sos
 
-    def load_stage(self, i, p, z):
+    def add_stage(self, p: Pole, z: Zero) -> (bool,str):
         """ Devuelve True si ya estan cargadas todas las etapas, False si no """
-        self.sos[i]["Poles"] = p
-        self.sos[i]["Zeros"] = z
+        # self.sos[i]["Poles"] = p
+        # self.sos[i]["Zeros"] = z
 
     def swap_stages(self, i, j):
         get = self.sos[i], self.sos[j]
@@ -146,3 +135,35 @@ class StagesManager(object):
 
     def set_gain(self, i, k):
         self.sos[i]["Gain"] = k
+
+    def get_z_p_plot(self):
+        """" Returns poles and zeros diagram with number of repeticiones of each pole and zero """
+
+    def get_z_p_dict(self):
+        """ Returns a dictionary with all zeros and poles:
+         { "Poles": {"1st order": [Poles], "2nd order": [Poles]}
+           "Zeros": {"1st order": [Zeros], "2nd order": [Zeros]} } """
+
+        # i = 0
+        # while i < len(self.denormalized["Zeros"]):
+        #     count = self.denormalized["Zeros"].count(self.denormalized["Zeros"][i])
+        #     repeated_z.append(count)
+        #     z.append(self.denormalized["Zeros"][i])
+        #     i += count
+        # i = 0
+        # while i < len(self.denormalized["Poles"]):
+        #     count = self.denormalized["Poles"].count(self.denormalized["Poles"][i])
+        #     repeated_p.append(count)
+        #     p.append(self.denormalized["Poles"][i])
+        #     i += count
+
+        # graphs[GraphTypes.PolesZeros.value] = [[GraphValues(real(z),
+        #                                                     imag(z), True, False, False,
+        #                                                     "Zeros", repeated_z),
+        #                                         GraphValues(real(p),
+        #                                                     imag(p), True, True, False,
+        #                                                     "Poles", repeated_p)], ["Re(s)[rad/sec]", "Im(s)[rad/sec]"]]
+    def get_stages_plot(self):
+        pass
+
+
