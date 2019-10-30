@@ -14,13 +14,9 @@ from Filters.Filters import Filter
 class Butterworth(Approximation):
 
     def __init__(self):
-        Approximation.__init__(self, "Butterwoth")
+        Approximation.__init__(self, "Butterworth")
         self.application = [FilterTypes.HighPass.value, FilterTypes.LowPass.value, FilterTypes.BandPass.value, FilterTypes.BandReject.value]
-        self.dict = {
-            "Q max": [(0, 10, False), 10],
-            "Fixed N": [(0, 20, True), 10],
-            "Denorm.": [(0, 100, False), 0]
-        }
+        self.dict["Denorm"] = [(0, 100, False, type(int)), 0]
 
     def load_information(self, filter_in_use: Filter):
 
