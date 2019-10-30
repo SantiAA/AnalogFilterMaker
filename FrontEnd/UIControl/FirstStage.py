@@ -5,23 +5,21 @@ from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import *
 from PyQt5.uic import loadUi
 
-from BackEnd.BackEnd import BackEnd
 from FrontEnd.UIControl.FinalGraph import FinalGraph
 from FrontEnd.UIs.FilterConfigurations.Config import Config
 from FrontEnd.UIs.FilterConfigurations.Template import Template
-from FrontEnd.UIs.Testing.ApproximationTesting import ApproximationTesting
-from FrontEnd.UIs.Testing.BackEndTesting import BackEndTesting
 from FrontEnd.UIs.UIConfigurations.ParameterLayout import DefaultRadioGroup
 
 
 class FirstStage(QMainWindow):
 
-    def __init__(self, ui_manager):
+    def __init__(self, ui_manager, backend, stages_manager):
         self.graph_widget = None
         self.ui_manager = ui_manager
         self.a = 0
         self.filters = {}
-        self.backend = BackEnd()
+        self.backend = backend
+        self.stages_manager = stages_manager
         self.filters_received, self.approximations_received = self.backend.get_util()
 
         self.showingGraphs = []
@@ -58,13 +56,31 @@ class FirstStage(QMainWindow):
         self.comboGraph.currentIndexChanged.connect(self.combo_graph_changed)
         self.load_project_button.clicked.connect(self.load_project_clicked)
         self.templateCheckBox.toggled.connect(self.template_toggled)
-        self.nextButton.clicked.connect(self.ui_manager.next_window)
+        self.nextButton.clicked.connect(self.next_stage())
         self.templateCheckBox.hide()
         self.group_box = DefaultRadioGroup(self.__ui_template_activation_)
         self.radioButtonsLayout.addWidget(self.group_box)
         self.templates = []
         self.update_filter_type()
         self.show()
+
+    def next_stage(self):
+
+        self.filter = self.filters[self.comboFilter.currentText()]
+        dict = self.filter.make_feature_dictionary()
+        validated, error_string = self.backend.validate_filter([self.filter.name, dict])
+        if validated:
+            backend_filter = self.backend._parse_filter([self.filter.name, dict])
+            self.stages_manager.load_filter(backend_filter)
+        else:
+            msg = QMessageBox()
+            msg.setIcon(QMessageBox.Critical)
+            msg.setText("Error")
+            msg.setInformativeText(error_string)
+            msg.setWindowTitle("Error")
+            msg.exec_()
+
+        self.ui_manager.next_window()
 
     def load_project_clicked(self):
         self.ui_manager.load_current_state()
@@ -348,7 +364,7 @@ class FirstStage(QMainWindow):
         """
         Appends user selected approximation to active approximations and applies it to the filter.
         """
-        #self.comboFilter.model().item(1).setEnabled(False)
+
         self.toggleApprox.show()
         properties = []
         self.graphics_returned = []

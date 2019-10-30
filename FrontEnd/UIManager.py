@@ -3,21 +3,26 @@ import pickle
 
 from PyQt5.QtWidgets import *
 
+from BackEnd.BackEnd import BackEnd
 from FrontEnd.UIControl.FirstStage import FirstStage, QMessageBox
 from FrontEnd.UIControl.SecondStage import SecondStage
 from FrontEnd.UIControl.UIMainWindow import UIMainWindow
+from StagesManager import StagesManager
 
 
 class UIManager:
     def __init__(self):
         self.active_window = None
-        self.list_of_windows = [FirstStage(self), SecondStage(self)]  # Sequence of windows to show
+        self.back_end = BackEnd()
+        self.stages_manager = StagesManager()
+        self.list_of_windows = [FirstStage(self, self.back_end, self.stages_manager), SecondStage(self, self.back_end, self.stages_manager)]  # Sequence of windows to show
         self.window_iterator = -1
         self.project_path = None
         self.program_state = {
             "window_iterator": self.window_iterator,
             "active_window_configuration": {}
         }
+
 
     def begin(self):
         """
