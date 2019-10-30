@@ -24,23 +24,23 @@ class BackEndTesting:
         # ApproximationTesting vendria a ser la clase Approximation
         self.approx = {
             "Low pass": [ApproximationTesting("Butterworth", {
-                "Max Q": [[0, 100, False], 50],
-                "n": [[0, 10, True], 5]
+                "Max Q": [(0, 100, False,type(int)), 50],
+                "n": [[0, 10, True,type(float)], 5]
             }),
                          ApproximationTesting("Chebyshev", {
-                             "MaxQcH": [[0, 57, False], 27],
-                             "NChe": [[0, 5, True], 2],
-                             "Rango Desn": [[0, 100, False], 50]}),
+                             "MaxQcH": [[0, 57, False, float()], 27],
+                             "NChe": [[0, 5, True,float()], 2],
+                             "Rango Desn": [[0, 100, False, float()], 50]}),
                          ApproximationTesting("Transicional", {
-                             "Max Q": [[0, 100, False], 50],
-                             "n": [[0, 10, True], 5]
+                             "Max Q": [[0, 100, False, float()], 50],
+                             "n": [[0, 10, True, int()], 5]
                          }, [["Chebyshev", "Gauss"], ["Butterworth", "Legendre"]])
                          ###IMPORTANTE, PARA LOS TRANSICIONALES PASAR 2 COMO ULTIMO ARGUMENTO. (COMO ESTA EN EL EJEMPLO) (2 VENDRIAN A SER LOS COMBO BOX EXTRAS)
                          ]
             ,
             "High pass": [ApproximationTesting("Butterworth", {
-                "Max Q2": [[0, 100, False], 50],
-                "n2": [[0, 10, True], 5]})]
+                "Max Q2": [[0, 100, False,float()], 50],
+                "n2": [[0, 10, True,float()], 5]})]
         }
         return self.dict, self.approx
 

@@ -412,7 +412,7 @@ class FirstStage(QMainWindow):
 
     def plot_rectangle(self, square, template):
 
-        self.graph_widget.canvas.axes.set_title(self.comboGraph.currentText())
+        self.graph_widget.canvas.axes.set_title(self.comboGraph.currentText(), color="w")
         self.graph_widget.canvas.axes.set_xscale('log')
         self.graph_widget.canvas.axes.grid(True, which="both")
         self.graph_widget.canvas.axes.add_patch(square)
@@ -473,12 +473,12 @@ class FirstStage(QMainWindow):
 
     def __fix_x_title_position__(self, widget, label):
         ticklabelpad = mpl.rcParams['xtick.major.pad']
-        widget.canvas.axes.annotate(label, xy=(1, 0), xytext=(20, -ticklabelpad),
+        widget.canvas.axes.annotate(label, xy=(1, 0), xytext=(-15, -ticklabelpad),
                                     ha='left', va='top',
-                                    xycoords='axes fraction', textcoords='offset points')
+                                    xycoords='axes fraction', color="w", textcoords='offset points')
 
     def __fix_y_title_position__(self, widget, label):
         ticklabelpad = mpl.rcParams['ytick.major.pad']
-        widget.canvas.axes.annotate(label, xy=(0, 1), xytext=(-30, -ticklabelpad + 10),
+        widget.canvas.axes.annotate(label, xy=(0, 1), xytext=(15, -ticklabelpad + 5),
                                     ha='left', va='bottom',
-                                    xycoords='axes fraction', textcoords='offset points', rotation=0)
+                                    xycoords='axes fraction', color="w",textcoords='offset points', rotation=0)
