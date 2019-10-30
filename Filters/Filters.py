@@ -182,7 +182,7 @@ class Filter(object):
         if len(self.denormalized["StagesQ"]):   # los filtros de primer orden no tienen Q
             i = 0
             while i < len(self.denormalized["StagesQ"]):
-                graphs[GraphTypes.StagesQ.value].append(GraphValues([[0, self.denormalized["StagesQ"][i]]), [i+1, i+1], True, False, False])
+                graphs[GraphTypes.StagesQ.value].append(GraphValues([[0, self.denormalized["StagesQ"][i]], [i+1, i+1], True, False, False]))
                 i += 1
             graphs[GraphTypes.StagesQ.value].append(["Q", "Q N°"])
         return graphs
