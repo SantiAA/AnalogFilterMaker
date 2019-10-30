@@ -9,3 +9,6 @@ class Zero:
         if not self.used:
             using = " (used)"
         return "fo: " + str(abs(self.im)) + " - n: " + str(self.n) + using
+
+    def __eq__(self, other):
+        return self.im == other.im
