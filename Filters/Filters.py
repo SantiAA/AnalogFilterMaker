@@ -202,7 +202,7 @@ class Filter(object):
             p.append(self.denormalized["Poles"][i])
             i += count
         graphs[GraphTypes.PolesZeros.value] = [[GraphValues(real(z),
-                                                            imag(z), False, True, False,
+                                                            imag(z), True, False, False,
                                                             "Zeros", repeated_z),
                                                 GraphValues(real(p),
                                                             imag(p), True, True, False,
