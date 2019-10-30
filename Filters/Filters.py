@@ -115,7 +115,7 @@ class Filter(object):
 
     def load_z_p_k(self, z, p, k):
         self.denormalized["Zeros"] = z.copy()
-        self.denormalized["Gain"] = k*pow(10,self.requirements[TemplateInfo.k.value]/20)    # ganancia del usuario en dB
+        self.denormalized["Gain"] = k*pow(10, self.requirements[TemplateInfo.k.value]/20)    # ganancia del usuario en dB
         self.denormalized["Order"] = len(p)
         self.denormalized["StagesQ"] = []
         max_q = 0
@@ -135,7 +135,9 @@ class Filter(object):
             # if len_in == len(self.denormalized["StagesQ"]):  # si no le encontre un conjugado
             #    pairs.append([p[0]])  # no lo tiene :(
             #    self.denormalized["StagesQ"].append(-1)
-        self.denormalized["MaxQ"] = amax(self.denormalized["StagesQ"])
+        if len(self.denormalized["StagesQ"]):
+            self.denormalized["MaxQ"] = amax(self.denormalized["StagesQ"])
+
 
     def load_normalized_z_p_k(self, z, p, k):
         self.normalized["Zeros"] = z
@@ -163,7 +165,7 @@ class Filter(object):
         f_n = w_n/(2*pi)
         mag_n = 20 * log10(abs(h_n))
         phase_n = angle(h_n)
-        graphs[GraphTypes.Module.value] = [[GraphValues(f, -mag, False, False, True)], ["Frequency [Hz]", "Amplitude [dB]"]]
+        graphs[GraphTypes.Module.value] = [[GraphValues(f, mag, False, False, True)], ["Frequency [Hz]", "Amplitude [dB]"]]
         graphs[GraphTypes.Attenuation.value] = [[GraphValues(f, -mag, False, False, True)], ["Frequency [Hz]", "Attenuation[dB]"]]   # se pasa una lista de graphvalues
         if self.filter is FilterTypes.GroupDelay:
             graphs[GraphTypes.NormalizedGd.value] = [[GraphValues(f, -2 * pi * diff(unwrap(phase_n)) / diff(w_n), False, False, True)],
