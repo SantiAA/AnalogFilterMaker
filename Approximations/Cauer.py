@@ -17,7 +17,7 @@ class Cauer(Approximation):
         Approximation.__init__(self, "Cauer")
         self.application = [FilterTypes.HighPass.value, FilterTypes.LowPass.value, FilterTypes.BandPass.value, FilterTypes.BandReject.value]
         self.information = {}
-        self.dict["Denorm."] = [(0, 100, False, type(int)), 0]
+        self.dict["Denorm."] = [(0, 100, False, int()), 0]
 
     def load_information(self, filter_in_use: Filter):
 
@@ -51,13 +51,21 @@ class Cauer(Approximation):
 
         while True:
             """ Fist I calculate the Normalized LowPass """
-            z_norm, p_norm, k_norm = signal.ellip(normalized_n, useful_w, analog=True, output='zpk')
+            z_norm, p_norm, k_norm = signal.ellip(normalized_n,self.information[TemplateInfo.Ap.value],
+                                                  self.information[TemplateInfo.Aa.value], 2*np.pi*useful_w, analog=True, output='zpk')
             """ Now check the desnomalization cte """
             w, h = signal.freqs_zpk(z_norm, p_norm, k_norm)
-            h = 20 * np.log10(abs(h))
+            h = -20 * np.log10(abs(h))
+            h = [j for j in h]
             i = [abs(j + self.information[TemplateInfo.Aa.value]) for j in h]
-            wa = w[i.index(min(i))]
-            denorm_cte = (wa * (1 - self.denorm / 100) + self.denorm / (self.selectivity * 100))
+            Aa = 0
+            for point in h:
+                Aa = point
+                if h[h.index(point)+1] > self.information[TemplateInfo.Aa.value]:
+                    break
+            wa = w[h.index(Aa)]
+            fa = wa/(2*np.pi)
+            denorm_cte = (fa * (1 - self.denorm / 100) + self.denorm / (self.selectivity * 100))/fa
             _z = z_norm * denorm_cte
             _p = p_norm * denorm_cte
             _k = k_norm * (denorm_cte ** (len(p_norm) - len(z_norm)))
@@ -66,24 +74,24 @@ class Cauer(Approximation):
             if filter_in_use.get_type() is FilterTypes.LowPass.value:
                 """ If the approximation support the filter I continue """
                 """ And transform the normalized low pass to the desire one """
-                z, p, k = signal.lp2lp_zpk(_z, _p, _k, 2*np.pi*self.information[TemplateInfo.fp.value])
+                z, p, k = signal.lp2lp_zpk(_z, _p, _k, self.information[TemplateInfo.fp.value])
                 filter_in_use.load_z_p_k(z, p, k)
 
-            elif filter_in_use.get_type() is FilterTypes.HighPass:
-                z, p, k = signal.lp2hp_zpk(_z, _p, _k, 2*np.pi*self.information[TemplateInfo.fp.value])
+            elif filter_in_use.get_type() is FilterTypes.HighPass.value:
+                z, p, k = signal.lp2hp_zpk(_z, _p, _k, (2*np.pi)**2*self.information[TemplateInfo.fp.value])
                 filter_in_use.load_z_p_k(z, p, k)
 
             elif filter_in_use.get_type() is FilterTypes.BandPass.value:
                 Awp = self.information[TemplateInfo.fp_.value] - self.information[TemplateInfo.fp__.value]
                 w0 = np.sqrt(self.information[TemplateInfo.fp_.value] * self.information[TemplateInfo.fp__.value])
 
-                z, p, k = signal.lp2bp_zpk(_z, _p, _k, 2*np.pi*w0, 2*np.pi*Awp)  # Desnormalizado
+                z, p, k = signal.lp2bp_zpk(_z, _p, _k, 2*np.pi*w0,Awp)  # Desnormalizado
                 filter_in_use.load_z_p_k(z, p, k)
             elif filter_in_use.get_type() is FilterTypes.BandReject.value:
                 Awp = self.information[TemplateInfo.fp_.value] - self.information[TemplateInfo.fp__.value]
                 w0 = np.sqrt(self.information[TemplateInfo.fp_.value] * self.information[TemplateInfo.fp__.value])
 
-                z, p, k = signal.lp2bs_zpk(_z, _p, _k, 2*np.pi*w0, 2*np.pi*Awp)  # Desnormalizado
+                z, p, k = signal.lp2bs_zpk(_z, _p, _k, 2*np.pi*w0, (2*np.pi)**2*Awp)  # Desnormalizado
                 filter_in_use.load_z_p_k(z, p, k)
             else:
                 print("Cauer.py: Invalid filter type passed to Cauer aproximation")
@@ -92,5 +100,6 @@ class Cauer(Approximation):
                 break
 
             normalized_n = normalized_n + 1
-        filter_in_use.load_normalized_z_p_k(z_norm, p_norm, k_norm)
+        # filter_in_use.load_normalized_z_p_k(z_norm, p_norm, k_norm)
+        filter_in_use.load_normalized_z_p_k(_z, _p, _k)
         filter_in_use.load_z_p_k(z, p, k)

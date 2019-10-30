@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1097</width>
+    <width>1044</width>
     <height>800</height>
    </rect>
   </property>
@@ -21,7 +21,7 @@
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout" stretch="30,70">
       <item>
-       <layout class="QVBoxLayout" name="verticalLayout_2" stretch="45,10,45">
+       <layout class="QVBoxLayout" name="verticalLayout_2" stretch="40,10,50">
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout_9" stretch="5,90,5">
           <item>
@@ -98,7 +98,7 @@ border: 0px solid blue;
             <item>
              <layout class="QVBoxLayout" name="verticalLayout_8">
               <item>
-               <widget class="QLabel" name="label_3">
+               <widget class="QLabel" name="title_combo_1">
                 <property name="styleSheet">
                  <string notr="true">font: 63 6pt &quot;Open Sans Semibold&quot;;
 color:rgb(255, 255, 255);
@@ -121,7 +121,7 @@ color:rgb(255, 255, 255);
                </widget>
               </item>
               <item>
-               <widget class="QLabel" name="label_4">
+               <widget class="QLabel" name="title_combo_2">
                 <property name="styleSheet">
                  <string notr="true">font: 63 6pt &quot;Open Sans Semibold&quot;;
 color:rgb(255, 255, 255);
@@ -205,13 +205,13 @@ border: 0px solid blue;
                </widget>
               </item>
               <item>
-               <widget class="QPushButton" name="pushButton_4">
+               <widget class="QPushButton" name="autostage">
                 <property name="styleSheet">
                  <string notr="true">font: 63 9pt &quot;Open Sans Semibold&quot;;
 color:rgb(255, 255, 255);</string>
                 </property>
                 <property name="text">
-                 <string>Automatic</string>
+                 <string>Auto-Stage (Max RD)</string>
                 </property>
                </widget>
               </item>
@@ -250,7 +250,7 @@ color:rgb(255, 255, 255);</string>
            </spacer>
           </item>
           <item>
-           <layout class="QVBoxLayout" name="verticalLayout_3">
+           <layout class="QVBoxLayout" name="verticalLayout_3" stretch="85,15">
             <item>
              <widget class="QGroupBox" name="groupBox">
               <property name="styleSheet">
@@ -259,7 +259,57 @@ color:rgb(255, 255, 255);</string>
               <property name="title">
                <string>Parameters</string>
               </property>
+              <property name="flat">
+               <bool>false</bool>
+              </property>
              </widget>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_10">
+              <item alignment="Qt::AlignHCenter">
+               <widget class="QLabel" name="label_6">
+                <property name="styleSheet">
+                 <string notr="true">font: 63 8pt &quot;Open Sans Semibold&quot;;
+color:rgb(255, 255, 255);
+border: 0px solid blue;</string>
+                </property>
+                <property name="text">
+                 <string>Gain</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QDoubleSpinBox" name="gainSpin">
+                <property name="styleSheet">
+                 <string notr="true">font: 63 7pt &quot;Open Sans Semibold&quot;;
+color:rgb(255, 255, 255);</string>
+                </property>
+               </widget>
+              </item>
+              <item alignment="Qt::AlignHCenter">
+               <widget class="QLabel" name="label">
+                <property name="styleSheet">
+                 <string notr="true">font: 63 8pt &quot;Open Sans Semibold&quot;;
+color:rgb(255, 255, 255);
+border: 0px solid blue;</string>
+                </property>
+                <property name="text">
+                 <string>dB</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="goGain">
+                <property name="styleSheet">
+                 <string notr="true">font: 63 9pt &quot;Open Sans Semibold&quot;;
+color:rgb(255, 255, 255);</string>
+                </property>
+                <property name="text">
+                 <string>GO</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
             </item>
            </layout>
           </item>
@@ -281,7 +331,177 @@ color:rgb(255, 255, 255);</string>
        </layout>
       </item>
       <item>
-       <layout class="QVBoxLayout" name="rightLayout" stretch="55,4,1,35,4">
+       <layout class="QVBoxLayout" name="rightLayout" stretch="0,55,4,1,35,4">
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_12">
+          <item>
+           <spacer name="horizontalSpacer_17">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
+           <widget class="QLabel" name="label_14">
+            <property name="styleSheet">
+             <string notr="true">font: 63 8pt &quot;Open Sans Semibold&quot;;
+color:rgb(255, 255, 255);
+border: 0px solid blue;</string>
+            </property>
+            <property name="text">
+             <string>Vmin</string>
+            </property>
+           </widget>
+          </item>
+          <item alignment="Qt::AlignHCenter">
+           <widget class="QDoubleSpinBox" name="vminSpin">
+            <property name="styleSheet">
+             <string notr="true">font: 63 8pt &quot;Open Sans Semibold&quot;;
+color:rgb(255, 255, 255);
+border: 0px solid blue;</string>
+            </property>
+           </widget>
+          </item>
+          <item alignment="Qt::AlignLeft">
+           <widget class="QLabel" name="label_13">
+            <property name="styleSheet">
+             <string notr="true">font: 63 8pt &quot;Open Sans Semibold&quot;;
+color:rgb(255, 255, 255);
+border: 0px solid blue;</string>
+            </property>
+            <property name="text">
+             <string>V</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer_18">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item alignment="Qt::AlignRight">
+           <widget class="QLabel" name="label_12">
+            <property name="styleSheet">
+             <string notr="true">font: 63 8pt &quot;Open Sans Semibold&quot;;
+color:rgb(255, 255, 255);
+border: 0px solid blue;</string>
+            </property>
+            <property name="text">
+             <string>Vmax</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QDoubleSpinBox" name="vmaxspin">
+            <property name="styleSheet">
+             <string notr="true">font: 63 8pt &quot;Open Sans Semibold&quot;;
+color:rgb(255, 255, 255);
+border: 0px solid blue;</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="label_11">
+            <property name="styleSheet">
+             <string notr="true">font: 63 8pt &quot;Open Sans Semibold&quot;;
+color:rgb(255, 255, 255);
+border: 0px solid blue;</string>
+            </property>
+            <property name="text">
+             <string>V</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer_19">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
+           <widget class="QPushButton" name="reloadv">
+            <property name="styleSheet">
+             <string notr="true">font: 63 9pt &quot;Open Sans Semibold&quot;;
+color:rgb(255, 255, 255);</string>
+            </property>
+            <property name="text">
+             <string>Reload</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer_20">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
+           <widget class="QLabel" name="label_10">
+            <property name="styleSheet">
+             <string notr="true">font: 63 11pt &quot;Open Sans Semibold&quot;;
+color:rgb(255, 255, 255);
+border: 0px solid blue;</string>
+            </property>
+            <property name="text">
+             <string>RD</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="rd">
+            <property name="styleSheet">
+             <string notr="true">font: 63 11pt &quot;Open Sans Semibold&quot;;
+color:rgb(255, 255, 255);
+border: 0px solid blue;</string>
+            </property>
+            <property name="text">
+             <string>50</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer_21">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
+        </item>
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout_6" stretch="10,80,10">
           <item>
@@ -330,7 +550,7 @@ color:rgb(255, 255, 255);</string>
             </property>
            </spacer>
           </item>
-          <item>
+          <item alignment="Qt::AlignHCenter">
            <widget class="QGroupBox" name="showing_group">
             <property name="styleSheet">
              <string notr="true">color:rgb(255, 255, 255)</string>

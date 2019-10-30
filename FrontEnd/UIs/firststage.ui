@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1097</width>
-    <height>800</height>
+    <height>789</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -40,7 +40,7 @@
    </property>
    <layout class="QGridLayout" name="gridLayout">
     <item row="0" column="0">
-     <layout class="QHBoxLayout" name="horizontalLayout" stretch="30,3,67">
+     <layout class="QHBoxLayout" name="horizontalLayout" stretch="20,3,77">
       <property name="sizeConstraint">
        <enum>QLayout::SetMaximumSize</enum>
       </property>
