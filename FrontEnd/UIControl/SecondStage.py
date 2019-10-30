@@ -6,17 +6,18 @@ from sympy.physics.quantum.tests.test_circuitplot import mpl
 from BackEnd.BackEnd import BackEnd
 from FrontEnd.UIs.Testing.BackEndTesting import BackEndTesting
 from FrontEnd.UIs.UIConfigurations.StagesUILayout import StagesUILayout, HorizontalParameter
-from StagesManager.StagesManager import StagesManager
+from StagesManager.StagesManager import StagesManager, ShowType
 
 
 class SecondStage(QMainWindow):
 
-    def __init__(self, ui_manager):
+    def __init__(self, ui_manager, backend, stages_manager):
         self.graph_widget = None
         self.ui_manager = ui_manager
         self.a = 0
         self.filters = {}
-        self.backend = BackEnd()
+        self.backend = backend
+        self.stages_manager = stages_manager
 
     def start(self):
         QMainWindow.__init__(self)
@@ -63,6 +64,7 @@ class SecondStage(QMainWindow):
 
 
     def selected_amount_changed(self):
+        self.__redraw__()
         if self.stages_ui_layout.get_number_of_checked() == 1:
             self.gainSpin.show()
             self.goGain.setText("GO")
@@ -74,20 +76,23 @@ class SecondStage(QMainWindow):
 
     def set_gain(self):
         self.stages_manager.set_gain(self.stages_ui_layout.get_selected_ids_array()[0], self.gainSpin.value())
-        params = self.stages_manager.get_const_data(self.stages_ui_layout.get_selected_ids_array())
+        params = self.stages_manager.get_const_data(self.stages_ui_layout.get_selected_ids_array(), self.vminSpin.value(), self.vmaxSping.value())
         self.clear_layout(self.param_vbox)
         for key, value in params:
             self.param_vbox.addWidget(HorizontalParameter(key, value[0], value[1]))
+        self.__redraw__()
 
     def right_shift(self):
         self.stages_manager.shift_stages(self.stages_ui_layout.get_selected_ids_array(), False)
         self.stages_ui_layout.delete_all_stages()
         self.__reload_stages__()
+        self.__redraw__()
 
     def left_shift(self):
         self.stages_manager.shift_stages(self.stages_ui_layout.get_selected_ids_array(), True)
         self.stages_ui_layout.delete_all_stages()
         self.__reload_stages__()
+        self.__redraw__()
 
     def __plot_poles_and_zeros__(self):
         z_p_plot = self.stages_manager.get_z_p_plot()
@@ -136,6 +141,7 @@ class SecondStage(QMainWindow):
         self.stages_manager.delete_stages(self.stages_ui_layout.get_selected_ids_array())
         self.stages_ui_layout.delete_all_stages()
         self.__reload_stages__()
+        self.__redraw__()
 
 
 
@@ -143,11 +149,13 @@ class SecondStage(QMainWindow):
         self.stages_manager.auto_max_rd(self.vminSpin.value(), self.vmaxSpin.value())
         self.stages_ui_layout.delete_all_stages()
         self.__reload_stages__()
+        self.__redraw__()
 
     def create_clicked(self):
         self.stages_manager.add_stage(self.combo1.currentText(), self.combo2.currentText())
         self.stages_ui_layout.delete_all_stages()
         self.__reload_stages__()
+        self.__redraw__()
 
     def __reload_stages__(self):
         current_stages = self.stages_manager.get_stages()
@@ -194,20 +202,14 @@ class SecondStage(QMainWindow):
         hbox = QHBoxLayout()
         self.showing_group.setLayout(hbox)
 
-        radiobutton = QRadioButton("Selected")
-        hbox.addWidget(radiobutton)
-        radiobutton.setStyleSheet("font: 63 7pt ; color:rgb(255, 255, 255);")
-        self.showing_options.append(radiobutton)
+        for show_type in ShowType:
+            radiobutton = QRadioButton(show_type.value)
+            hbox.addWidget(radiobutton)
+            radiobutton.setStyleSheet("font: 63 7pt ; color:rgb(255, 255, 255);")
+            self.showing_options.append(radiobutton)
+            radiobutton.clicked.connect(self.__redraw__)
 
-        radiobutton2 = QRadioButton("Accumulative")
-        hbox.addWidget(radiobutton2)
-        radiobutton2.setStyleSheet("font: 63 7pt ; color:rgb(255, 255, 255);")
-        self.showing_options.append(radiobutton2)
-
-        radiobutton3 = QRadioButton("Overlapping Stages")
-        hbox.addWidget(radiobutton3)
-        radiobutton3.setStyleSheet("font: 63 7pt ; color:rgb(255, 255, 255);")
-        self.showing_options.append(radiobutton3)
+        self.showing_options[0].setChecked(True)
 
     def clear_layout(self, layout):
         """
@@ -218,4 +220,50 @@ class SecondStage(QMainWindow):
             item = layout.takeAt(0)
             if item.widget() is not None:
                 item.widget().deleteLater()
+
+
+    def __redraw__(self):
+        show_type = None
+        for radio_but in self.showing_options:
+            if radio_but.isChecked():
+                show_type = radio_but.text()
+
+        graphs = self.stages_manager.get_stages_plot(self.stages_ui_layout.get_selected_ids_array(), show_type)
+        self.__plot_graph__(graphs)
+
+    def __plot_graph__(self, graph):
+        self.__fix_axes_titles_position__(self.graph_widget, graph[1][0], graph[1][1])
+        for graph_data in graph[0]:
+            if graph_data.log:
+                self.graph_widget.canvas.axes.set_xscale('log')
+
+            if not graph_data.scattered:
+                if not graph_data.x_marks:
+                    self.graph_widget.canvas.axes.plot(graph_data.x_values, graph_data.y_values, label=graph_data.extra_information)
+                else:
+                    self.graph_widget.canvas.axes.plot(graph_data.x_values, graph_data.y_values, marker='x',
+                                                       label=graph_data.extra_information)
+
+            else:
+                n_array_text = []
+                for n in graph_data.n_array:
+                    string_gen = ""
+                    if n > 1:
+                        string_gen += str(n)
+                    n_array_text.append(string_gen)
+                if not graph_data.x_marks:
+                    self.graph_widget.canvas.axes.scatter(graph_data.x_values, graph_data.y_values,
+                                                          label=graph_data.extra_information)
+                    for i in range(0, len(n_array_text)):
+                        self.graph_widget.canvas.axes.annotate(n_array_text[i],
+                                                               (graph_data.x_values[i], graph_data.y_values[i]))
+                else:
+                    self.graph_widget.canvas.axes.scatter(graph_data.x_values, graph_data.y_values, marker='x',
+                                                          label=graph_data.extra_information)
+                    for i in range(0, len(n_array_text)):
+                        self.graph_widget.canvas.axes.annotate(n_array_text[i],
+                                                               (graph_data.x_values[i], graph_data.y_values[i]))
+        self.graph_widget.canvas.axes.legend(loc='best')
+
+
 
