@@ -75,6 +75,7 @@ class Filter(object):
             TemplateInfo.fa_.value: (0, 10e9), TemplateInfo.fa__.value: (0, 10e9), TemplateInfo.ft.value: (0, 10e9),
             TemplateInfo.gd.value: (0, 10e9), TemplateInfo.tol.value: (0, 1), TemplateInfo.k.value: (0, 10e9)}
         self.selectivity = 0
+        self.normalized_freqs = []
         self.defaults = []
 
     def get_type(self) -> FilterTypes:

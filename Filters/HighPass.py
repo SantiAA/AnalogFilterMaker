@@ -5,6 +5,8 @@ from numpy import where
 
 # AFM project modules
 from Filters.Filters import *
+from BackEnd.Output.Dot import Dot, INFINITE
+from BackEnd.Output.Square import Square
 
 
 class HighPass(Filter):
@@ -34,6 +36,7 @@ class HighPass(Filter):
             if self.requirements[TemplateInfo.fp.value] > self.requirements[TemplateInfo.fa.value]:
                 self.selectivity = self.requirements[TemplateInfo.fa.value] / self.requirements[
                     TemplateInfo.fp.value]  # K = wa/wp
+                self.normalized_freqs = [1, 1 / self.selectivity]
                 return True, ret
             else:
                 ret = "fp must be greater than fa"
@@ -42,3 +45,18 @@ class HighPass(Filter):
 
         """ If there is something wrong in the attenuations or frequencies I return False"""
         return False, ret
+
+    def get_templates(self):
+        fa = self.requirements[TemplateInfo.fa.value]
+        fp = self.requirements[TemplateInfo.fp.value]
+        Ap = self.requirements[TemplateInfo.Ap.value]
+        Aa = self.requirements[TemplateInfo.Aa.value]
+        sq1 = Square(Dot(0, -INFINITE), Dot(0, Aa), Dot(fa, Aa), Dot(fa, -INFINITE))
+        sq2 = Square(Dot(fp, Ap), Dot(fp, INFINITE), Dot(INFINITE, INFINITE), Dot(INFINITE, Aa))
+
+        sq1_n = Square(Dot(0, Ap), Dot(0, INFINITE), Dot(self.normalized_freqs[0], INFINITE), Dot(self.normalized_freqs[0], Ap))
+        sq2_n = Square(Dot(self.normalized_freqs[1], -INFINITE), Dot(self.normalized_freqs[1], Aa), Dot(INFINITE, Aa), Dot(INFINITE, -INFINITE))
+
+        denorm_template, norm_temlate = [sq1, sq2], [sq1_n, sq2_n]
+        return {GraphTypes.Attenuation.value: denorm_template,
+                GraphTypes.NormalizedAt.value: norm_temlate}
