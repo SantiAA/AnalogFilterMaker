@@ -406,7 +406,7 @@ border: 0px solid blue;</string>
            </widget>
           </item>
           <item>
-           <widget class="QDoubleSpinBox" name="vmaxspin">
+           <widget class="QDoubleSpinBox" name="vmaxSpin">
             <property name="styleSheet">
              <string notr="true">font: 63 8pt &quot;Open Sans Semibold&quot;;
 color:rgb(255, 255, 255);
