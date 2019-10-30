@@ -76,3 +76,7 @@ class BackEndTesting:
             ["Re", "Im"]]
         ####IMPORTANTEE: PARA LOS POLOS Y CEROS AGREGAR UN PARAMETRO "ZEROS" O "POLOS" COMO ESTA EN EL EJEMPLO. ES PARA QUE QUEDEN LAS LEGENDS BIEN
         return graph_dict
+
+
+    def _parse_filter(self, list):
+        return {"hola":2}

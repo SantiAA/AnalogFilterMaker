@@ -56,7 +56,7 @@ class FirstStage(QMainWindow):
         self.comboGraph.currentIndexChanged.connect(self.combo_graph_changed)
         self.load_project_button.clicked.connect(self.load_project_clicked)
         self.templateCheckBox.toggled.connect(self.template_toggled)
-        self.nextButton.clicked.connect(self.next_stage())
+        self.nextButton.clicked.connect(self.next_stage)
         self.templateCheckBox.hide()
         self.group_box = DefaultRadioGroup(self.__ui_template_activation_)
         self.radioButtonsLayout.addWidget(self.group_box)
