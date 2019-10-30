@@ -70,7 +70,8 @@ class Approximation(object):
         }
         for key, value in kwargs.items():
             fun = switcher.get(key, lambda: "Invalid argument")
-            if fun != "Invalid argument":
+            lam = lambda: 0
+            if type(fun) != type(lam):
                 fun(value)
             else:
                 print(key + "is an invalid argument for calculate()")
