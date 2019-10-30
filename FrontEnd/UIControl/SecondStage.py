@@ -189,11 +189,15 @@ class SecondStage(QMainWindow):
                     self.combo1.model().item(self.combo1.findText(key)).setEnabled(False)
                     for sing in self.poles_and_zeros_dict[keys[i]][key]:
                         self.combo1.addItem(sing.get_msg())
+                        if sing.used:
+                            self.combo1.model().item(self.combo1.findText(sing.get_msg())).setEnabled(False)
                 if i == 1:
                     self.combo2.addItem(key)
                     self.combo2.model().item(self.combo2.findText(key)).setEnabled(False)
                     for sing in self.poles_and_zeros_dict[keys[i]][key]:
                         self.combo2.addItem(sing.get_msg())
+                        if sing.used:
+                            self.combo2.model().item(self.combo1.findText(sing.get_msg())).setEnabled(False)
 
     def __place_button_images__(self):
         pixmap = QPixmap("FrontEnd/UIs/figs/button_figs/next.png")
