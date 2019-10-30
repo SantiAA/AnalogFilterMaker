@@ -44,8 +44,8 @@ if __name__ == "__main__":
   7.35074235e-01+1.9413347j,   7.35074235e-01-1.9413347j,
  -5.55111512e-17+2.07692735j]
     # print("pairs: " + str(_agrup_poles(p)))
-    fun = _agrup_poles
-    k = 5
-    for i in range(k, 0, -1):
-        print(str(i-1))
-    print("IMPRIMI DALEEEE")
+    p = []
+    for i in range(5):
+        p += []
+    p += [3,3]
+    print(p)

@@ -6,8 +6,8 @@ from StagesManager import Zero, Pole
 
 
 class Stage:
-    def __init__(self, i, z: Zero, p: Pole):
-        self.k = 1
+    def __init__(self, z: Zero, p: Pole, k):
+        self.k = k
         self.z = z
         self.pole = p
 
@@ -33,6 +33,5 @@ class Stage:
         ret += "}"
         return ret
 
-    def get_dr(self, vi_min, vi_max):
-
-        pass
+    def set_gain(self, k):
+        self.k = k
