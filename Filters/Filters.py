@@ -114,7 +114,7 @@ class Filter(object):
         return self.denormalized["MaxQ"]
 
     def load_z_p_k(self, z, p, k):
-        self.denormalized["Zeros"] = z.copy()
+        self.denormalized["Zeros"] = self._agrup_roots(z)
         self.denormalized["Gain"] = k*pow(10, self.requirements[TemplateInfo.k.value]/20)    # ganancia del usuario en dB
         self.denormalized["Order"] = len(p)
         self.denormalized["StagesQ"] = []
@@ -173,8 +173,6 @@ class Filter(object):
             graphs[GraphTypes.NormalizedAt.value] = [[GraphValues(f_n, -mag_n, False, False, True)], ["Frequency[Hz]", "Attenuation[dB]"]]
         graphs[GraphTypes.Phase.value] = [[GraphValues(f, phase, False, False, True)], ["Frequency[Hz]", "Phase[deg]"]]
         graphs[GraphTypes.GroupDelay.value] = [[GraphValues(f, -2*pi*diff(unwrap(phase))/diff(w), False, False, True)], ["Frequency[Hz]", "Group delay[s]"]]  # -d(Phase)/df = -dP/dw * dw/df = -dP/dw * 2pi
-        graphs[GraphTypes.PolesZeros.value] = [ [GraphValues(real(self.denormalized["Zeros"]), imag(self.denormalized["Zeros"]), False, True, False, "Zeros"),
-                                GraphValues(real(self.denormalized["Poles"]), imag(self.denormalized["Poles"]), True, True, False, "Poles")], ["Re(s)[rad/sec]", "Im(s)[rad/sec]"]]
         t, imp = signal.impulse(trans_func)
         graphs[GraphTypes.Impulse.value] = [[GraphValues(t, imp, False, False, False)], ["t[s]", "V[V]"]]
         t, step = signal.step(trans_func)
@@ -186,6 +184,29 @@ class Filter(object):
                 graphs[GraphTypes.StagesQ.value][0].append(GraphValues(0, self.denormalized["StagesQ"][i], [i+1, i+1], True, False, False))
                 i += 1
             graphs[GraphTypes.StagesQ.value][1] = ["Q", "Q N°"]
+
+        repeated_z = []
+        z = []
+        repeated_p = []
+        p = []
+        i=0
+        while i < len(self.denormalized["Zeros"]):
+            count = self.denormalized["Zeros"].count(self.denormalized["Zeros"][i])
+            repeated_z.append(count)
+            z.append(self.denormalized["Zeros"][i])
+            i += count
+        i = 0
+        while i < len(self.denormalized["Poles"]):
+            count = self.denormalized["Poles"].count(self.denormalized["Poles"][i])
+            repeated_p.append(count)
+            p.append(self.denormalized["Poles"][i])
+            i += count
+        graphs[GraphTypes.PolesZeros.value] = [[GraphValues(real(z),
+                                                            imag(z), False, True, False,
+                                                            "Zeros", repeated_z),
+                                                GraphValues(real(p),
+                                                            imag(p), True, True, False,
+                                                            "Poles", repeated_p)], ["Re(s)[rad/sec]", "Im(s)[rad/sec]"]]
         return graphs
 
     @staticmethod
