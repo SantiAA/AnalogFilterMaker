@@ -14,5 +14,14 @@ if __name__ == "__main__":
     # decimales = 2
     # string2 = f'Qmax= {q_max[0]:.2} hola'
     # print(string2)
-    for i in range(8,0,-1):
-        print(i)
+    val = 300000.555
+    string = f'{val:#3}'
+    print(string)
+    string = f'{val:.1}'
+    print(string)
+    string = f'{val:.0f}'
+    print(string)
+    string = f'{val:.3f}'
+    print(string)
+    string = f'{val:.4f}'
+    print(string)
