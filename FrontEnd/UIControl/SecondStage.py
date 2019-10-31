@@ -234,7 +234,11 @@ class SecondStage(QMainWindow):
         current_stages, selected = self.stages_manager.get_stages()
         i = 0
         for stage in current_stages:
-            self.stages_ui_layout.add_stage(stage,i, selected[i] )
+            if len(selected) > i:
+                sel = selected [i]
+            else:
+                sel = True
+            self.stages_ui_layout.add_stage(stage,i, sel )
             i+=1
 
     def __fill_poles_and_zeros_combos__(self):

@@ -7,7 +7,7 @@ class UIMainWindow(QMainWindow):
     def __init__(self, ui_manager):  # Conecta los componentes del .ui realizado en QT con el programa en python
         QMainWindow.__init__(self)
         loadUi('FrontEnd/UIs/mainscreen.ui', self)
-        self.setWindowTitle("Instrument Automation")
+        self.setWindowTitle("Filter Design Tool")
         self.ui_manager = ui_manager
         self.initButton.clicked.connect(self.initialize)
         self.load_project_button.clicked.connect(self.load_project_clicked)
