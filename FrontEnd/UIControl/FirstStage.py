@@ -121,7 +121,7 @@ class FirstStage(QMainWindow):
 
     def approx_combo_changed(self):
         for graph in self.showingGraphs:
-            if graph.approximation_properties_string == self.activeApproxsCombo.currentText():
+            if graph.get_total_string() == self.activeApproxsCombo.currentText():
                 if graph.enabled:
                     self.toggleApprox.setChecked(True)
                 else:
@@ -471,7 +471,7 @@ class FirstStage(QMainWindow):
         self.graph_widget.canvas.axes.set_xlabel(graph[1][0])
         self.graph_widget.canvas.axes.xaxis.label.set_color('white')
         self.graph_widget.canvas.axes.set_ylabel(graph[1][1])
-        self.graph_widget.canvas.axes.ticklabel_format(useOffset=False)
+        #self.graph_widget.canvas.axes.ticklabel_format(useOffset=False)
         self.graph_widget.canvas.axes.yaxis.label.set_color('white')
         #self.__fix_axes_titles_position__(self.graph_widget, graph[1][0], graph[1][1])
         for graph_data in graph[0]:
@@ -505,7 +505,6 @@ class FirstStage(QMainWindow):
                     for i in range(0, len(n_array_text)):
                         self.graph_widget.canvas.axes.annotate(n_array_text[i], (graph_data.x_values[i], graph_data.y_values[i]))
         self.graph_widget.canvas.axes.legend(loc='best')
-        self.graph_widget.canvas.draw()
         self.graph_widget.figure.tight_layout()
 
 
