@@ -68,7 +68,7 @@ class BackEnd:
         return my_filter.get_templates()
 
     def get_graphics(self, filtro, aproximacion):
-        my_filter = self._parse_filter(filtro, id)
+        my_filter = self._parse_filter(filtro)
         approx_dict = {}
         for key, value in aproximacion[1].items():
             if value[1] is not None:
