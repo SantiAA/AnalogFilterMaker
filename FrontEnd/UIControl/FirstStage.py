@@ -148,12 +148,12 @@ class FirstStage(QMainWindow):
 
                                             parameter.rows[1].hide()
                                             parameter.check_box.show()
-                                            parameter.check_box.setChecked(True)
+                                            parameter.check_box.setChecked(False)
 
                                             if not parameter.toggleable:
                                                 parameter.check_box.hide()
                                         else:
-                                            parameter.set_value(property_tuple[1])
+                                            parameter.set_value(float(property_tuple[1]))
                                             parameter.check_box.show()
                                             parameter.check_box.setChecked(False)
                                             if not parameter.toggleable:
