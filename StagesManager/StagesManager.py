@@ -32,8 +32,10 @@ class StagesManager(object):
         self.unused_z = []
         self.sos = []
         self.k_tot = 0
+        self.selected = []
 
     def load_filter(self, fil: Filter):
+        self.selected = []
         self.p_pairs = []  # va a tener arreglo de Poles
         self.z_pairs = []  # va a tener arreglos de Zeros
         self.unused_p = []
@@ -197,6 +199,8 @@ class StagesManager(object):
         """" Deletes stages indicated by indexes list """
         if amax(indexes) < len(self.sos):
             for i in indexes:
+                if i in self.selected:
+                    self.selected.remove(i)
                 s = self.sos.pop(i)
                 for j in range(len(self.p_pairs)):
                     if self.p_pairs[j] == s.pole:
@@ -375,3 +379,9 @@ class StagesManager(object):
         self.sos = info["Sos"]
         self.z_pairs = info["Zeros"]
         self.p_pairs = info["Poles"]
+
+    def set_selected(self, indexes: list):
+        self.selected = indexes
+
+    def get_selected(self):
+        return self.selected
