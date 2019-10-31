@@ -70,8 +70,13 @@ class FirstStage(QMainWindow):
         dict = self.filter.make_feature_dictionary()
         validated, error_string = self.backend.validate_filter([self.filter.name, dict])
         if validated:
-            backend_filter = self.backend._parse_filter([self.filter.name, dict])
-            self.stages_manager.load_filter(backend_filter)
+            for approximation in self.filter.approximation_list:
+                if approximation.name == self.approxCombo.currentText():
+                    backend_filter = self.backend.get_filter([self.filter.name, dict],
+                                                             [approximation.name,
+                                                              approximation.make_approx_dict(),
+                                                              approximation.extra_combos])
+                    self.stages_manager.load_filter(backend_filter)
         else:
             msg = QMessageBox()
             msg.setIcon(QMessageBox.Critical)

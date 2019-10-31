@@ -9,7 +9,7 @@ from FrontEnd.UIControl.SecondStage import SecondStage
 from FrontEnd.UIControl.UIMainWindow import UIMainWindow
 from FrontEnd.UIs.Testing.BackEndTesting import BackEndTesting
 from FrontEnd.UIs.Testing.StagesManagerTesting import StagesManagerTesting
-from StagesManager import StagesManager
+from StagesManager.StagesManager import StagesManager
 
 
 class UIManager:
