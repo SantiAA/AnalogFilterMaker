@@ -505,7 +505,9 @@ class FirstStage(QMainWindow):
                     for i in range(0, len(n_array_text)):
                         self.graph_widget.canvas.axes.annotate(n_array_text[i], (graph_data.x_values[i], graph_data.y_values[i]))
         self.graph_widget.canvas.axes.legend(loc='best')
+        self.graph_widget.canvas.draw()
         self.graph_widget.figure.tight_layout()
+
 
     # Funciones que configuran y muestran los titulos de los ejes.
     def __fix_axes_titles_position__(self, widget, label_x, label_y):
