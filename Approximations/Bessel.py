@@ -51,7 +51,7 @@ class Bessel(Approximation):
             else:
                 print("Bessel.py: Invalid filter type passed to Bessel aproximation")
                 return
-            if self.q_max >= filter_in_use.get_max_q() or normalized_n == self.n_max or self.fixed_n > 0:
+            if self.q_max < 0 or self.q_max >= filter_in_use.get_max_q() or normalized_n == self.n_max or self.fixed_n > 0:
                 break
             normalized_n = normalized_n + 1
         filter_in_use.load_normalized_z_p_k(z_norm, p_norm, k_norm)
@@ -64,6 +64,6 @@ class Bessel(Approximation):
             z_n, p_n, k_n = signal.bessel(n, wrgn, 'low', True, 'zpk')
             w, h = signal.freqs_zpk(z_n, p_n, k_n)
             g_delay = -np.diff(np.unwrap(np.angle(h)))/np.diff(w)
-            if g_delay >= (1-tol) or n is max_order:
+            if g_delay[0] >= (1-tol) or n is max_order:
                 break
         return n, wrgn

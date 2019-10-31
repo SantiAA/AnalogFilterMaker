@@ -96,7 +96,7 @@ class Cauer(Approximation):
             else:
                 print("Cauer.py: Invalid filter type passed to Cauer aproximation")
                 return
-            if self.q_max >= filter_in_use.get_max_q() or normalized_n == self.n_max or self.fixed_n > 0:
+            if self.q_max < 0 or self.q_max >= filter_in_use.get_max_q() or normalized_n == self.n_max or self.fixed_n > 0:
                 break
 
             normalized_n = normalized_n + 1

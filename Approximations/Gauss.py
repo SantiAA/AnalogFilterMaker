@@ -62,7 +62,7 @@ class Gauss(Approximation):
             else:
                 print("Gauss.py: Invalid filter type passed to Gauss aproximation")
                 return
-            if self.q_max >= filter_in_use.get_max_q() or n == self.n_max or self.fixed_n > 0:
+            if self.q_max < 0 or self.q_max >= filter_in_use.get_max_q() or n == self.n_max or self.fixed_n > 0:
                 break
             n = n + 1
 

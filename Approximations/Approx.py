@@ -20,8 +20,8 @@ class Approximation(object):
         """ Useful to add in the GUI """
         self.name = name  # The name of the approximation
         self.dict = {
-            "Q max": [(0, 100, False, float()), 10],
-            "Fixed N": [(0, 20, True, int()), 10],
+            "Q max": [(0, 100, True, float()), 10],
+            "N": [(0, 20, True, int()), 50],
         }
         self.extra_combos = []  # To change to 2 in 'Transicionales'
         self.application = []  # Approximation's filter type application
@@ -66,7 +66,7 @@ class Approximation(object):
             # "n_max": self._set_n_max,
             "Denorm.": self._set_denorm,
             "Q max": self._set_q_max,
-            "Fixed N": self._set_fixed_n
+            "N": self._set_fixed_n
         }
         for key, value in kwargs.items():
             fun = switcher.get(key, lambda: "Invalid argument")

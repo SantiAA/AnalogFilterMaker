@@ -1,10 +1,11 @@
 # Pendiente aproximaciones
 
-### Probar
+### Debug
   - [ ] Bessel
   - [ ] Butter
   - [ ] Cheby I
   - [ ] Cheby II
   - [ ] Gauss
   - [ ] Legendre
+  - [ ] Transicionales
   

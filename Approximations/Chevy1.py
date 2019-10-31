@@ -17,7 +17,7 @@ class ChevyI(Approximation):
         Approximation.__init__(self, "Chebyshev I")
         self.application = [FilterTypes.HighPass.value, FilterTypes.LowPass.value, FilterTypes.BandPass.value, FilterTypes.BandReject.value]
         self.information = {}
-        self.dict["Denorm."] = [(0, 100, False, int()), 0]
+        self.dict["Denorm."] = [(0, 100, True, int()), 0]
 
     def load_information(self, filter_in_use: Filter):
 
@@ -90,7 +90,7 @@ class ChevyI(Approximation):
             else:
                 print("Chevy1.py: Invalid filter type passed to Chebyshev aproximation")
                 return
-            if self.q_max >= filter_in_use.get_max_q() or normalized_n == self.n_max or self.fixed_n > 0:
+            if self.q_max < 0 or self.q_max >= filter_in_use.get_max_q() or normalized_n == self.n_max or self.fixed_n > 0:
                 break
             normalized_n = normalized_n + 1
         # filter_in_use.load_normalized_z_p_k(z_norm, p_norm, k_norm)
