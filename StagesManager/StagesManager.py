@@ -215,7 +215,6 @@ class StagesManager(object):
         return [[GraphValues(real(z), imag(z), True, False, False, "Zeros", repeated_z), GraphValues(real(p),
                         imag(p), True, True, False, "Poles", repeated_p)], ["Re(s)[rad/sec]", "Im(s)[rad/sec]"]]
 
-
     def get_z_p_dict(self):
         """ Returns a dictionary with all zeros and poles:
          { "Poles": {"1st order": [Poles], "2nd order": [Poles]}
