@@ -466,7 +466,7 @@ class FirstStage(QMainWindow):
         self.graph_widget.canvas.axes.set_xlabel(graph[1][0])
         self.graph_widget.canvas.axes.xaxis.label.set_color('white')
         self.graph_widget.canvas.axes.set_ylabel(graph[1][1])
-        #self.graph_widget.canvas.axes.ticklabel_format(useOffset=False)
+        self.graph_widget.canvas.axes.ticklabel_format(useOffset=False)
         self.graph_widget.canvas.axes.yaxis.label.set_color('white')
         #self.__fix_axes_titles_position__(self.graph_widget, graph[1][0], graph[1][1])
         for graph_data in graph[0]:

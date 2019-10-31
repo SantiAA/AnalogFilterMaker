@@ -2,7 +2,7 @@ from PyQt5.QtGui import QIcon, QPixmap
 from PyQt5.QtWidgets import QMainWindow, QHBoxLayout, QRadioButton, QWidget, QVBoxLayout, QMessageBox
 from PyQt5.uic import loadUi
 from sympy.physics.quantum.tests.test_circuitplot import mpl
-
+import numpy as np
 from BackEnd.BackEnd import BackEnd
 from FrontEnd.UIs.Testing.BackEndTesting import BackEndTesting
 from FrontEnd.UIs.UIConfigurations.StagesUILayout import StagesUILayout, HorizontalParameter
@@ -129,7 +129,13 @@ class SecondStage(QMainWindow):
         self.__plot_p_z_graph__(z_p_plot)
 
     def __plot_p_z_graph__(self, graphs):
-        self.__fix_axes_titles_position__(self.z_p_diagram, graphs[1][0], graphs[1][1])
+        self.z_p_diagram.canvas.axes.set_xlabel(graphs[1][0])
+        self.z_p_diagram.canvas.axes.xaxis.label.set_color('white')
+        self.z_p_diagram.canvas.axes.set_ylabel(graphs[1][1])
+        self.z_p_diagram.canvas.axes.ticklabel_format(useOffset=False)
+        #self.z_p_diagram.canvas.axes.axis('scaled')
+        self.z_p_diagram.canvas.axes.yaxis.label.set_color('white')
+        #self.__fix_axes_titles_position__(self.z_p_diagram, graphs[1][0], graphs[1][1])
         for graph_data in graphs[0]:
             if graph_data.log:
                 self.z_p_diagram.canvas.axes.set_xscale('log')
@@ -139,6 +145,11 @@ class SecondStage(QMainWindow):
                 if n > 1:
                     string_gen += str(n)
                 n_array_text.append(string_gen)
+
+            r = 1.5 * np.amax(np.concatenate((graph_data.x_values, graph_data.y_values, [1])))
+            self.z_p_diagram.canvas.axes.axis('scaled')
+            self.z_p_diagram.canvas.axes.axis([-r, r, -r, r])
+
             if not graph_data.x_marks:
                 self.z_p_diagram.canvas.axes.scatter(graph_data.x_values, graph_data.y_values)
                 for i in range(0, len(n_array_text)):
@@ -178,6 +189,7 @@ class SecondStage(QMainWindow):
         self.stages_ui_layout.delete_all_stages()
         self.__reload_stages__()
         self.__redraw__()
+        self.__fill_poles_and_zeros_combos__()
 
 
 
@@ -274,7 +286,12 @@ class SecondStage(QMainWindow):
             self.__plot_graph__(graphs)
 
     def __plot_graph__(self, graph):
-        self.__fix_axes_titles_position__(self.graph_widget, graph[1][0], graph[1][1])
+        self.graph_widget.canvas.axes.set_xlabel(graph[1][0])
+        self.graph_widget.canvas.axes.xaxis.label.set_color('white')
+        self.graph_widget.canvas.axes.set_ylabel(graph[1][1])
+        #self.graph_widget.canvas.axes.ticklabel_format(useOffset=False)
+        self.graph_widget.canvas.axes.yaxis.label.set_color('white')
+        # self.__fix_axes_titles_position__(self.graph_widget, graph[1][0], graph[1][1])
         self.graph_widget.canvas.axes.grid(True, which="both")
         for graph_data in graph[0]:
             if graph_data.log:
