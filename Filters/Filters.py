@@ -74,7 +74,7 @@ class Filter(object):
             TemplateInfo.Aa.value: (0, 10e9), TemplateInfo.Ap.value: (0, 10e9), TemplateInfo.fa.value: (0, 10e9),
             TemplateInfo.fp.value: (0, 10e9), TemplateInfo.fp_.value: (0, 10e9), TemplateInfo.fp__.value: (0, 10e9),
             TemplateInfo.fa_.value: (0, 10e9), TemplateInfo.fa__.value: (0, 10e9), TemplateInfo.ft.value: (0, 10e9),
-            TemplateInfo.gd.value: (0, 10e9), TemplateInfo.tol.value: (0, 1), TemplateInfo.k.value: (-10e9, 10e9)}
+            TemplateInfo.gd.value: (0, 10e9), TemplateInfo.tol.value: (0, 100), TemplateInfo.k.value: (-10e9, 10e9)}
         self.selectivity = 0
         self.normalized_freqs = []
         self.defaults = []

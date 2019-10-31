@@ -3,6 +3,7 @@
 # third-party modules
 from scipy import signal
 import numpy as np
+from matplotlib import pyplot as plt
 
 # AFM project modules
 from Approximations.Approx import Approximation
@@ -44,9 +45,11 @@ class Bessel(Approximation):
 
         while True:
             """ First search the order and the normalizer 'cut' frequency """
-            z_norm, p_norm, k_norm = signal.bessel(normalized_n, useful_w, analog=True, output='zpk')
+            z_norm, p_norm, k_norm = signal.bessel(normalized_n, 1, analog=True, output='zpk', norm='delay')
+            # w, h = signal.freqs_zpk(z_norm, p_norm, k_norm)
+            # plt.semilogx(w[1:]/(1*np.pi), -np.diff(np.unwrap(np.angle(h))) / np.diff(w))
             if filter_in_use.get_type() is FilterTypes.GroupDelay.value:
-                z, p, k = signal.bessel(normalized_n, useful_w/(self.information[TemplateInfo.gd.value]), 'low', True, 'zpk')
+                z, p, k = signal.bessel(normalized_n, useful_w, 'low', True, 'zpk', norm='delay')
                 filter_in_use.load_z_p_k(z, p, k)
             else:
                 print("Bessel.py: Invalid filter type passed to Bessel aproximation")
@@ -56,14 +59,16 @@ class Bessel(Approximation):
             normalized_n = normalized_n + 1
         filter_in_use.load_normalized_z_p_k(z_norm, p_norm, k_norm)
 
-    def _bessord(self, frg, tol, tau, max_order):
-        wrgn = frg*tau
+    def _bessord(self, wrg, tol, tau_0, max_order):
+        wrgn = wrg*tau_0*1e-6
         n = 0
         while True:  # do{}while() statement python style
             n = n+1
-            z_n, p_n, k_n = signal.bessel(n, wrgn, 'low', True, 'zpk')
-            w, h = signal.freqs_zpk(z_n, p_n, k_n)
+            z_n, p_n, k_n = signal.bessel(n, 1, 'low', analog=True, output='zpk', norm='delay')
+            w, h = signal.freqs_zpk(z_n, p_n, k_n, worN=np.logspace(-1, np.log10(wrgn)+1, num=2000))
             g_delay = -np.diff(np.unwrap(np.angle(h)))/np.diff(w)
-            if g_delay[0] >= (1-tol) or n is max_order:
+            w_prima = [abs(j-wrgn) for j in w]
+            i = w_prima.index(min(w_prima))  # Busco el wrgn (en su defecto el mas cercano)
+            if g_delay[i] >= (1-tol/100) or n is max_order:
                 break
-        return n, wrgn
+        return n, 1/(tau_0*1e-6)
