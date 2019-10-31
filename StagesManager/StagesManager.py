@@ -78,7 +78,7 @@ class StagesManager(object):
                     if self.z_pairs[i].n == 2:  # si el cero es de segundo orden
                         for j in range(len(self.p_pairs)):
                             if self.p_pairs[j].q > 0:  # si el polo es de segundo orden
-                                dist = abs(self.z_pairs[i].imag - self.p_pairs[j].fo)
+                                dist = abs(self.z_pairs[i].im - self.p_pairs[j].fo)
                                 adj_matrix[i][j] = dist         # guardo la distancia entre cada polo y cero de orden 2
                             else:
                                 if p_i is None:
