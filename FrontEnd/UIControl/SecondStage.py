@@ -130,11 +130,16 @@ class SecondStage(QMainWindow):
 
     def __plot_p_z_graph__(self, graphs):
         self.z_p_diagram.canvas.axes.set_xlabel(graphs[1][0])
-        self.z_p_diagram.canvas.axes.xaxis.label.set_color('white')
+        self.z_p_diagram.canvas.axes.xaxis.label.set_color('black')
         self.z_p_diagram.canvas.axes.set_ylabel(graphs[1][1])
         self.z_p_diagram.canvas.axes.ticklabel_format(useOffset=False)
         #self.z_p_diagram.canvas.axes.axis('scaled')
-        self.z_p_diagram.canvas.axes.yaxis.label.set_color('white')
+        self.z_p_diagram.canvas.axes.yaxis.label.set_color('black')
+        self.z_p_diagram.canvas.axes.spines['left'].set_position('zero')
+        self.z_p_diagram.canvas.axes.spines['right'].set_color('none')
+        self.z_p_diagram.canvas.axes.spines['bottom'].set_position('zero')
+        self.z_p_diagram.canvas.axes.spines['top'].set_color('none')
+        self.z_p_diagram.canvas.axes.axis("equal")
         #self.__fix_axes_titles_position__(self.z_p_diagram, graphs[1][0], graphs[1][1])
         for graph_data in graphs[0]:
             if graph_data.log:

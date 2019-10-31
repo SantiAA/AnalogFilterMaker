@@ -50,7 +50,7 @@ class StagesManager(object):
         while len(z):  # guardo en self.z_pairs los pares de ceros complejos conjugados como [wo,n]
             if len(z) > 1:
                 if z[0] == conjugate(z[1]):
-                    self.z_pairs.append(Zero(abs(z[0].im), 2))
+                    self.z_pairs.append(Zero(abs(z[0]), 2))
                     z.remove(z[1])
                     saved = True
             if not saved:

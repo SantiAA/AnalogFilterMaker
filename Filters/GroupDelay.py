@@ -19,7 +19,7 @@ class GroupDelay(Filter):
                              TemplateInfo.gd.value: None}   # Group delay
 
         self.defaults = {TemplateInfo.gd.value: 175, TemplateInfo.tol.value: 0.2,  TemplateInfo.ft.value: 1000,
-                         TemplateInfo.k.value: 1}
+                         TemplateInfo.k.value: 0}
 
     def validate_requirements(self) -> (bool, str):
         ret = ""

@@ -74,7 +74,7 @@ class Filter(object):
             TemplateInfo.Aa.value: (0, 10e9), TemplateInfo.Ap.value: (0, 10e9), TemplateInfo.fa.value: (0, 10e9),
             TemplateInfo.fp.value: (0, 10e9), TemplateInfo.fp_.value: (0, 10e9), TemplateInfo.fp__.value: (0, 10e9),
             TemplateInfo.fa_.value: (0, 10e9), TemplateInfo.fa__.value: (0, 10e9), TemplateInfo.ft.value: (0, 10e9),
-            TemplateInfo.gd.value: (0, 10e9), TemplateInfo.tol.value: (0, 1), TemplateInfo.k.value: (0, 10e9)}
+            TemplateInfo.gd.value: (0, 10e9), TemplateInfo.tol.value: (0, 1), TemplateInfo.k.value: (-10e9, 10e9)}
         self.selectivity = 0
         self.normalized_freqs = []
         self.defaults = []
@@ -177,7 +177,7 @@ class Filter(object):
         phase_n = angle(h_n)
         graphs[GraphTypes.Attenuation.value] = [[GraphValues(f, -mag, False, False, True, extra_info)], ["Frequency [Hz]", "Attenuation[dB]"]]   # se pasa una lista de graphvalues
         if self.filter is FilterTypes.GroupDelay.value:
-            graphs[GraphTypes.NormalizedGd.value] = [[GraphValues(f, -2 * pi * diff(unwrap(phase_n)) / diff(w_n), False, False, True, extra_info)],
+            graphs[GraphTypes.NormalizedGd.value] = [[GraphValues(f[:-1], -2 * pi * diff(unwrap(phase_n)) / diff(w_n), False, False, True, extra_info)],
                                              ["Frequency[Hz]", "Group delay [us]"]]  # -d(Phase)/df = -dP/dw * dw/df = -dP/dw * 2pi
         else:
             graphs[GraphTypes.NormalizedAt.value] = [[GraphValues(f_n, -mag_n, False, False, True, extra_info)], ["Frequency[Hz]", "Attenuation[dB]"]]
