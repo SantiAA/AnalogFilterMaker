@@ -19,8 +19,8 @@ from StagesManager.Zero import Zero
 
 class ShowType(Enum):
     Selected = "Selected",
-    Accumulative = "Accumulative",
-    Superposed = "Superposed"
+    Superposed = "Superposed",
+    Total = "Total"
 
 
 class StagesManager(object):
