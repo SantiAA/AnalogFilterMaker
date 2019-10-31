@@ -209,12 +209,11 @@ class SecondStage(QMainWindow):
             self.poles_and_zeros_dict = self.stages_manager.get_z_p_dict()
             self.__fill_poles_and_zeros_combos__()
 
-
-
     def auto_stage(self):
         self.stages_manager.auto_max_rd(self.vminSpin.value(), self.vmaxSpin.value())
         self.stages_ui_layout.delete_all_stages()
         self.__reload_stages__()
+        self.update_rd()
         self.__redraw__()
 
     def create_clicked(self):

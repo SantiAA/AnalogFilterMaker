@@ -14,8 +14,8 @@ from Filters.Filters import Filter
 class ChebyII(Approximation):
 
     def __init__(self):
-        Approximation.__init__(self, "Chebyshev II")
-        self.application = [FilterTypes.HighPass.value, FilterTypes.LowPass.value, FilterTypes.BandPass.value, FilterTypes.BandReject.value]
+        Approximation.__init__(self, "Chebyshev II")  # Band reject fuera, tira overflow
+        self.application = [FilterTypes.HighPass.value, FilterTypes.LowPass.value, FilterTypes.BandPass.value]
         self.information = {}
         self.dict["Denorm."] = [(0, 100, True, int()), 0]
 
@@ -87,10 +87,10 @@ class ChebyII(Approximation):
                 filter_in_use.load_z_p_k(z, p, k)
 
             elif filter_in_use.get_type() is FilterTypes.BandReject.value:
-                Awa = self.information[TemplateInfo.fa_.value] - self.information[TemplateInfo.fa__.value]
+                Awp = self.information[TemplateInfo.fp_.value] - self.information[TemplateInfo.fp__.value]
                 w0 = np.sqrt(self.information[TemplateInfo.fa_.value] * self.information[TemplateInfo.fa__.value])
 
-                z, p, k = signal.lp2bs_zpk(_z, _p, _k, 2*np.pi*w0, 2*np.pi**Awa)  # Desnormalizado
+                z, p, k = signal.lp2bs_zpk(_z, _p, _k, 2*np.pi*w0, 2*np.pi**Awp)  # Desnormalizado
                 filter_in_use.load_z_p_k(z, p, k)
 
             else:

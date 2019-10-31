@@ -110,7 +110,7 @@ class Approximation(object):
         wp__ = self.information[TemplateInfo.fp__.value]
         wa_ = self.information[TemplateInfo.fa_.value]
         wa__ = self.information[TemplateInfo.fa__.value]
-        if not band_or_stop:
+        if not band_or_stop:  # True is stopband and False passband
             if wa_*wa__ <= wp_*wp__:
                 self.information[TemplateInfo.fp_.value] = wa_*wa__ / wp__
             else:
