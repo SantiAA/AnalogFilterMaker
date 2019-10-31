@@ -40,11 +40,11 @@ class StagesManager(object):
         while len(p):  # guardo en self.p_pairs los pares de polos complejos conjugados como [wo,Q]
             if len(p) > 1:
                 if p[0] == conjugate(p[1]):
-                    self.p_pairs.append(Pole(p))
+                    self.p_pairs.append(Pole(p[0]))
                     p.remove(p[1])
                     saved = True
             if not saved:
-                self.p_pairs.append(p[0])  # si no tiene conjugado deberia ser real
+                self.p_pairs.append(Pole(p[0]))  # si no tiene conjugado deberia ser real
             p.remove(p[0])
             saved = False
         while len(z):  # guardo en self.z_pairs los pares de ceros complejos conjugados como [wo,n]
@@ -173,7 +173,8 @@ class StagesManager(object):
     def delete_stages(self, indexes: list):
         """" Deletes stages indicated by indexes list """
         if amax(indexes) < len(self.sos):
-            self.sos.remove(self.sos[indexes])
+            for i in indexes:
+                self.sos.remove(self.sos[i])
         else:
             print("Indexes list out of range!")
 
@@ -228,7 +229,7 @@ class StagesManager(object):
             ret["Zeros"][key2].append(z)
         return ret
 
-    def get_stages_plot(self, i, type: ShowType):
+    def get_stages_plot(self, indexes, type: ShowType):
         plot_list = [[], []]
         if type is ShowType.Accumulative.value:
             z = []
@@ -236,15 +237,14 @@ class StagesManager(object):
             for s in self.sos:
                 z += s.z
                 p += s.p
-            transf = signal.ZerosPolesGain(z,p,self.k_tot)
+            transf = signal.ZerosPolesGain(z, p, self.k_tot)
             w, mag = transf.freqresp(n=3000)
             f = w/(2*pi)
             plot_list = [[GraphValues(f, mag, False, False, True)], ["Frequency [Hz]", "Amplitude [dB]"]]
         else:
             if type is ShowType.Superposed:
-                i = list(range(len(self.sos)))
-            for st in self.sos[i]:
-                plot_list[0].append(st.get_tf_plot())
+                indexes = list(range(len(self.sos)))
+            plot_list[0] = [self.sos[i].get_tf_plot() for i in indexes]
             plot_list[1] = ["Frequency [Hz]", "Amplitude [dB]"]
         return plot_list
 

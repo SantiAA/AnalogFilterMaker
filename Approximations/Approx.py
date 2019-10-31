@@ -20,7 +20,7 @@ class Approximation(object):
         """ Useful to add in the GUI """
         self.name = name  # The name of the approximation
         self.dict = {
-            "Q max": [(0, 100, True, float()), 10],
+            "Q max": [(0, 20, True, float()), 20],
             "N": [(0, 20, True, int()), 50],
         }
         self.extra_combos = []  # To change to 2 in 'Transicionales'

@@ -46,7 +46,7 @@ class Gauss(Approximation):
         super().calculate(filter_in_use, kwargs)
         """ Using the precalculated plots I get the order """
         if self.fixed_n > 0:
-            n = self.fixed_n
+            n = self.fixed_n if not self.fixed_n%2 else self.fixed_n - 1
         else:
             n = self._ord()
         while True:
@@ -94,7 +94,7 @@ class Gauss(Approximation):
     def _pre_calc(self, n_max: int):
         data = {}
         outfile = open("gauss.json", "w")
-        for i in range(2, n_max + 1):
+        for i in range(2, n_max + 1, 2):
             transfer_function = self._get_tf(i)
             w, mag, phase = transfer_function.bode(n=1500)
             gd = -diff(unwrap(phase)) / diff(w)

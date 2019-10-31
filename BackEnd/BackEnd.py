@@ -69,6 +69,18 @@ class BackEnd:
         self.dynamic_filters.append(my_filter)
         return my_filter.get_all_graphs()
 
+    def get_filter(self, filtro, aproximacion):
+        my_filter = self._parse_filter(filtro)
+        approx_dict = {}
+        for key, value in aproximacion[1].items():
+            if value[1] is not None:
+                approx_dict[key] = value[1]
+        for each in self.all_approximations:
+            if each.name is aproximacion[0]:
+                each.load_information(my_filter)
+                each.calculate(my_filter, approx_dict)
+        return my_filter
+
     def _parse_filter(self, front_end_filter) -> Filter:
         """ Busco el tipo de filtro que esta seleccionado """
         filters = None
