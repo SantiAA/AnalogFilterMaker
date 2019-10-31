@@ -15,7 +15,7 @@ class Pole:
         aux = ""
         if self.q > 0:
             aux += " - Q: " + str(self.q)
-        if not self.used:
+        if self.used:
             aux += " (used)"
         return "fo: " + str(self.fo) + aux
 

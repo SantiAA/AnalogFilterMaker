@@ -142,7 +142,12 @@ class StagesManager(object):
                 p_ind = i_p
                 break
             # self.sos.append(Stage(zero, pole, 1))
-        if not (self.p_pairs[p_ind].q < 0 and self.z_pairs[z_ind].n == 2):
+        n_z = 0
+        n_p = 1
+        if z_ind is not None:
+            n_p = 1 if self.p_pairs[p_ind].q < 0 else 2
+            n_z = self.z_pairs[z_ind].n
+        if n_p >= n_z:
             pole_n_left = 0
             z_n_left = 0
             for p in self.unused_p:
