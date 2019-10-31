@@ -150,11 +150,11 @@ class SecondStage(QMainWindow):
                 if n > 1:
                     string_gen += str(n)
                 n_array_text.append(string_gen)
-
+            """
             r = 1.5 * np.amax(np.concatenate((graph_data.x_values, graph_data.y_values, [1])))
             self.z_p_diagram.canvas.axes.axis('scaled')
             self.z_p_diagram.canvas.axes.axis([-r, r, -r, r])
-
+            """
             if not graph_data.x_marks:
                 self.z_p_diagram.canvas.axes.scatter(graph_data.x_values, graph_data.y_values)
                 for i in range(0, len(n_array_text)):
