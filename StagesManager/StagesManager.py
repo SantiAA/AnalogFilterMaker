@@ -19,8 +19,8 @@ from StagesManager.Zero import Zero
 
 class ShowType(Enum):
     Selected = "Selected",
-    Accumulative = "Accumulative",
-    Superposed = "Superposed"
+    Superposed = "Superposed",
+    Total = "Total"
 
 
 class StagesManager(object):
@@ -291,13 +291,18 @@ class StagesManager(object):
     def get_stages_plot(self, indexes, type: ShowType):
         plot_list = [[], ["", ""]]
         if len(self.sos):
-            if type is ShowType.Accumulative.value:
-                z = []
-                p = []
-                for s in self.sos:
-                    z += s.z
-                    p += s.p
-                transf = signal.ZerosPolesGain(z, p, self.k_tot)
+            if type == ShowType.Accumulative.value[0]:
+                zeros = []
+                poles = []
+                for z in self.z_pairs:
+                    zeros.append(complex(0, z.im))
+                    if z.n == 2:
+                        zeros.append(complex(0, -z.im))
+                for p in self.p_pairs:
+                    poles.append(complex(p.p))
+                    if p.q > 0:
+                        poles.append(conjugate(p.p))
+                transf = signal.ZerosPolesGain(zeros, poles, self.k_tot)
                 w, mag = transf.freqresp(n=3000)
                 f = w/(2*pi)
                 plot_list = [[GraphValues(f, mag, False, False, True)], ["Frequency [Hz]", "Amplitude [dB]"]]
@@ -333,10 +338,11 @@ class StagesManager(object):
         vi_min = amax(vi_min, vi_min/partial_gain) # vi_min: minimo valor a la entrada tal que la salida no este en el piso de ruido y la entrada no este en el piso de ruido
         return 20*log10(vi_max/vi_min)
 
-    def get_const_data(self, i, vi_min, vo_max):
+    def get_const_data(self, indexes, vi_min, vo_max):
         """Returns a dictionary with string values of the stage i"""
         ret = {"Q": ["", ""], "fo": ["", "Hz"], "DR": ["", "dB"]}
-        if type(i) is int:
+        if len(indexes) == 1:
+            i = indexes[0]
             if i < len(self.sos):
                 q = self.sos[i].p.q
                 if q > 0:

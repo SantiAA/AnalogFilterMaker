@@ -17,6 +17,6 @@ class Pole:
             aux += f" - Q: {self.q:.2f}"
         if self.used:
             aux += " (used)"
-        return f"fo:{self.fo:.1f}" + aux
+        return f"fo:{self.fo:.1f}Hz" + aux
 
 
