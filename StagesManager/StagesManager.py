@@ -34,6 +34,12 @@ class StagesManager(object):
         self.k_tot = 0
 
     def load_filter(self, fil: Filter):
+        self.p_pairs = []  # va a tener arreglo de Poles
+        self.z_pairs = []  # va a tener arreglos de Zeros
+        self.unused_p = []
+        self.unused_z = []
+        self.sos = []
+        self.k_tot = 0
         """ Guarda todos los polos y ceros agrupados en etapas de 1/2do orden """
         z, p, self.k_tot, q = fil.get_z_p_k_q()
         saved = False

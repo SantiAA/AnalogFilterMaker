@@ -13,7 +13,8 @@ class Stage:
 
     def get_tf_plot(self):
         z = complex(0, self.z.im) if self.z is not None else []
-        transfer_function = ZerosPolesGain(z, self.pole.p, self.k)
+        k_correct = abs(self.pole.p)**2*self.k
+        transfer_function = ZerosPolesGain(z, self.pole.p, k_correct)
         w, h = transfer_function.freqresp(n=3000)
         f = w/(2*pi)
         mag = 20*log10(h)
@@ -47,7 +48,9 @@ class Stage:
                     ret += f's'
                 if i > 1:
                     ret += f'^{i}'
-        ret += "}$"
+        ret += "}$\n\n"
+        ord = 2 if self.pole.q > 0 else 1
+        ret += f'Q={self.pole.q:.2}    n={ord}'
         return ret
 
     def set_gain(self, k):
