@@ -364,49 +364,52 @@ class FirstStage(QMainWindow):
         """
         Appends user selected approximation to active approximations and applies it to the filter.
         """
+        try:
+            self.toggleApprox.show()
+            properties = []
+            self.graphics_returned = []
+            self.filter = self.filters[self.comboFilter.currentText()]
+            dict = self.filter.make_feature_dictionary()
+            validated, error_string = self.backend.validate_filter([self.filter.name, dict])
+            if validated:
+                for approximation in self.filter.approximation_list:
+                    if approximation.name == self.approxCombo.currentText():
+                        properties.append(["Approximation", approximation.name])
+                        for prop in approximation.parameter_list:
 
-        self.toggleApprox.show()
-        properties = []
-        self.graphics_returned = []
-        self.filter = self.filters[self.comboFilter.currentText()]
-        dict = self.filter.make_feature_dictionary()
-        validated, error_string = self.backend.validate_filter([self.filter.name, dict])
-        if validated:
-            for approximation in self.filter.approximation_list:
-                if approximation.name == self.approxCombo.currentText():
-                    properties.append(["Approximation", approximation.name])
-                    for prop in approximation.parameter_list:
-
-                        if not prop.toggleable or prop.check_box.isChecked():
-                            properties.append([prop.name, str(prop.get_value())])
-                        else:
-                            properties.append([prop.name, "Auto"])
-                    self.graphics_returned = self.backend.get_graphics([self.filter.name, dict], [approximation.name,
-                                                                                          approximation.make_approx_dict(),
-                                                                                          approximation.extra_combos])
-                    self.existing = True
-                    new_graph = FinalGraph(self.graphics_returned, properties, True)
-
-                    found = False
-                    for graph in self.showingGraphs:
-                        if graph.approximation_properties_string == new_graph.approximation_properties_string:
-                            found = True
-                    if not found:
+                            if not prop.toggleable or prop.check_box.isChecked():
+                                properties.append([prop.name, str(prop.get_value())])
+                            else:
+                                properties.append([prop.name, "Auto"])
+                        self.graphics_returned = self.backend.get_graphics([self.filter.name, dict], [approximation.name,
+                                                                                              approximation.make_approx_dict(),
+                                                                                              approximation.extra_combos])
+                        #self.existing = True
+                        new_graph = FinalGraph(self.graphics_returned, properties, True)
+                        """
+                        found = False
+                        for graph in self.showingGraphs:
+                            if graph.approximation_properties_string == new_graph.approximation_properties_string:
+                                found = True
+                        if not found:
+                            """
                         self.showingGraphs.append(new_graph)
-            self.fill_combo_graph()
-            self.__update_active_approx_combo__()
-            self.__update_templates__()
-            self.redraw_graphs()
-            self._template_ploting_w_graphs_()
+                self.fill_combo_graph()
+                self.__update_active_approx_combo__()
+                self.__update_templates__()
+                self.redraw_graphs()
+                self._template_ploting_w_graphs_()
 
 
-        else:
-            msg = QMessageBox()
-            msg.setIcon(QMessageBox.Critical)
-            msg.setText("Error")
-            msg.setInformativeText(error_string)
-            msg.setWindowTitle("Error")
-            msg.exec_()
+            else:
+                msg = QMessageBox()
+                msg.setIcon(QMessageBox.Critical)
+                msg.setText("Error")
+                msg.setInformativeText(error_string)
+                msg.setWindowTitle("Error")
+                msg.exec_()
+        except:
+            pass
 
     def __update_active_approx_combo__(self):
         self.activeApproxsCombo.clear()
@@ -460,7 +463,12 @@ class FirstStage(QMainWindow):
             a = 0
 
     def __plot_graph__(self, graph, legend_string):
-        self.__fix_axes_titles_position__(self.graph_widget, graph[1][0], graph[1][1])
+        self.graph_widget.canvas.axes.set_xlabel(graph[1][0])
+        self.graph_widget.canvas.axes.xaxis.label.set_color('white')
+        self.graph_widget.canvas.axes.set_ylabel(graph[1][1])
+        #self.graph_widget.canvas.axes.ticklabel_format(useOffset=False)
+        self.graph_widget.canvas.axes.yaxis.label.set_color('white')
+        #self.__fix_axes_titles_position__(self.graph_widget, graph[1][0], graph[1][1])
         for graph_data in graph[0]:
             if graph_data.log:
                 self.graph_widget.canvas.axes.set_xscale('log')
