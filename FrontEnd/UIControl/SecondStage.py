@@ -12,6 +12,11 @@ from StagesManager.StagesManager import StagesManager, ShowType
 class SecondStage(QMainWindow):
 
     def __init__(self, ui_manager, backend, stages_manager):
+        self.showing_options = []
+        self.all_loaded = False
+        self.param_vbox = QVBoxLayout()
+        self.illegal_zeros_titles = []
+        self.illegal_pole_titles = []
         self.graph_widget = None
         self.ui_manager = ui_manager
         self.a = 0
@@ -23,7 +28,6 @@ class SecondStage(QMainWindow):
         QMainWindow.__init__(self)
         loadUi('FrontEnd/UIs/secondstage.ui', self)
         self.setWindowTitle("Filter Design Tool")
-        self.showing_options = []
         self.__place_button_images__()
         self.__define_showing_group__()
         self.graph_widget = self.graphWidget
@@ -44,13 +48,9 @@ class SecondStage(QMainWindow):
         self.__plot_p_z_graph__(self.stages_manager.get_z_p_plot())
         self.poles_and_zeros_dict = self.stages_manager.get_z_p_dict()
         self.__fill_poles_and_zeros_combos__()
-        self.all_loaded = False
-        self.param_vbox = QVBoxLayout()
         self.param_group_box.setLayout(self.param_vbox)
         self.__redefine_const_params_()
         self.selected_amount_changed()
-
-
         self.show()
 
 
@@ -208,10 +208,13 @@ class SecondStage(QMainWindow):
         self.__redraw__()
 
     def create_clicked(self):
-        self.stages_manager.add_stage(self.combo1.currentText(), self.combo2.currentText())
-        self.stages_ui_layout.delete_all_stages()
-        self.__reload_stages__()
-        self.__redraw__()
+        if (self.combo1.currentText() not in self.illegal_pole_titles) and (self.combo2.currentText() not in self.illegal_zeros_titles):
+            self.stages_manager.add_stage(self.combo1.currentText(), self.combo2.currentText())
+            self.stages_ui_layout.delete_all_stages()
+            self.__reload_stages__()
+            self.__redraw__()
+        else:
+            self.__show_error__("Illegal pole or zero selection")
 
     def __reload_stages__(self, ):
         current_stages = self.stages_manager.get_stages()
@@ -226,6 +229,7 @@ class SecondStage(QMainWindow):
         self.combo2.clear()
         self.combo2.addItem("")
         self.combo2.model().item(0).setEnabled(False)
+        self.illegal_zeros_titles.append("")
         keys = list(self.poles_and_zeros_dict.keys())
         self.title_combo_1.setText(keys[0])
         self.title_combo_2.setText(keys[1])
@@ -235,17 +239,21 @@ class SecondStage(QMainWindow):
                 if i == 0:
                     self.combo1.addItem(key)
                     self.combo1.model().item(self.combo1.findText(key)).setEnabled(False)
+                    self.illegal_pole_titles.append(key)
                     for sing in self.poles_and_zeros_dict[keys[i]][key]:
                         self.combo1.addItem(sing.get_msg())
                         if sing.used:
                             self.combo1.model().item(self.combo1.findText(sing.get_msg())).setEnabled(False)
+                            self.illegal_pole_titles.append(sing.get_msg())
                 if i == 1:
                     self.combo2.addItem(key)
                     self.combo2.model().item(self.combo2.findText(key)).setEnabled(False)
+                    self.illegal_zeros_titles.append(key)
                     for sing in self.poles_and_zeros_dict[keys[i]][key]:
                         self.combo2.addItem(sing.get_msg())
                         if sing.used:
-                            self.combo2.model().item(self.combo1.findText(sing.get_msg())).setEnabled(False)
+                            self.combo2.model().item(self.combo2.findText(sing.get_msg())).setEnabled(False)
+                            self.illegal_zeros_titles.append(sing.get_msg())
 
     def __place_button_images__(self):
         pixmap = QPixmap("FrontEnd/UIs/figs/button_figs/next.png")

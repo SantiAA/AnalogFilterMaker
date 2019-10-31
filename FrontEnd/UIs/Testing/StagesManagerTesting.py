@@ -42,7 +42,7 @@ class StagesManagerTesting(object):
         """ Returns a dictionary with all zeros and poles:
          { "Poles": {"1st order": [Poles], "2nd order": [Poles]}
            "Zeros": {"1st order": [Zeros], "2nd order": [Zeros]} } """
-        dict = { "Poles": {"1st order": [PoleTesting(10), PoleTesting(5)], "2nd order": [PoleTesting(4), PoleTesting(3), PoleTesting(2)]},
+        dict = { "Poles": {"1st order": [PoleTesting(10, True), PoleTesting(5, True)], "2nd order": [PoleTesting(4), PoleTesting(3), PoleTesting(2)]},
            "Zeros": {"1st order": [ZeroTesting(2,3), ZeroTesting(1,2)], "2nd order": [ZeroTesting(20,1)]} }
         return dict
 

@@ -16,7 +16,7 @@ class UIManager:
     def __init__(self):
         self.active_window = None
         self.back_end = BackEnd()
-        self.stages_manager = StagesManager()
+        self.stages_manager = StagesManagerTesting()
         self.list_of_windows = [FirstStage(self, self.back_end, self.stages_manager), SecondStage(self, self.back_end, self.stages_manager)]  # Sequence of windows to show
         self.window_iterator = -1
         self.project_path = None
