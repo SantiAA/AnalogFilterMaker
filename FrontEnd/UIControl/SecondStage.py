@@ -92,6 +92,8 @@ class SecondStage(QMainWindow):
 
     def selected_amount_changed(self):
         self.__redraw__()
+        self.stages_manager.set_selected(self.stages_ui_layout.get_selected_ids_array())
+
         if self.stages_ui_layout.get_number_of_checked() == 1:
             self.gainSpin.show()
             self.goGain.setText("Set Gain")
@@ -229,10 +231,10 @@ class SecondStage(QMainWindow):
             self.__show_error__("Illegal pole or zero selection")
 
     def __reload_stages__(self, ):
-        current_stages = self.stages_manager.get_stages()
+        current_stages, selected = self.stages_manager.get_stages()
         i = 0
         for stage in current_stages:
-            self.stages_ui_layout.add_stage(stage,i )
+            self.stages_ui_layout.add_stage(stage,i, selected[i] )
             i+=1
 
     def __fill_poles_and_zeros_combos__(self):

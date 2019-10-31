@@ -30,8 +30,8 @@ class StagesUILayout(QWidget):
         for stage in self.stages:
             stage.set_checked(False)
 
-    def add_stage(self, stage, i):
-        new_stage = DefaultStageUI( self.w_width, self.left_click, stage, i, self.changed_selected_amount_callback)
+    def add_stage(self, stage, i, selected = True):
+        new_stage = DefaultStageUI( self.w_width, self.left_click, stage, i, self.changed_selected_amount_callback, selected)
         self.stages.append(new_stage)
         self.group_box_layout.addWidget(new_stage)
 
@@ -81,7 +81,7 @@ class StagesUILayout(QWidget):
 
 
 class DefaultStageUI(QWidget):
-    def __init__(self, width, left_click_callback, stage, i, changed_selected_amount):
+    def __init__(self, width, left_click_callback, stage, i, changed_selected_amount, selected = False):
         QWidget.__init__(self)
         vbox = QVBoxLayout()
         self.setLayout(vbox)
@@ -111,7 +111,7 @@ class DefaultStageUI(QWidget):
         self.__update_size__()
         vbox.addWidget(self.graphWidget)
         '''
-        self.radioButton = RightRadioButton(left_click_callback, changed_selected_amount)
+        self.radioButton = RightRadioButton(left_click_callback, changed_selected_amount, selected)
         #self.radioButton.setAlignment(Qt.AlignCenter)
         self.radioButton.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         vbox.addWidget(self.radioButton)
@@ -138,10 +138,10 @@ class DefaultStageUI(QWidget):
 
 
 class RightRadioButton (QRadioButton):
-    def __init__(self, left_click, changed_selected_amount_callback):
+    def __init__(self, left_click, changed_selected_amount_callback, selected = False):
         QRadioButton.__init__(self)
         self.left_click = left_click
-        self.setChecked(False)
+        self.setChecked(selected)
         self.changed_selected_amount_callback = changed_selected_amount_callback
 
     def mousePressEvent(self, QMouseEvent):
