@@ -101,7 +101,7 @@ class StagesManager(object):
                 for i in range(adj_matrix.shape(1)):
                     if not used_p[i]:
                         if z_1 is None:
-                            self.sos.append(Stage([], self.p_pairs[i], 1))
+                            self.sos.append(Stage(None, self.p_pairs[i], 1))
                         else:   # si hay algun cero de primer oden, se lo agrego a la primera etapa sin ceros que aparezca
                             self.sos.append(Stage(z_1, self.p_pairs[i], 1))
                             self.unused_z.remove(self.z_pairs[i])
@@ -117,8 +117,8 @@ class StagesManager(object):
                     self.unused_p.remove(p_1)
                     p_1 = None
         else:
-            self.sos = [Stage([],p,1) for p in self.p_pairs]
-            self.unused_p.remove(self.p_pairs)
+            self.sos = [Stage(None, p, 1) for p in self.p_pairs]
+            self.unused_p.clear()
         self.sos.sort(key=lambda x:x.p.q) # ordena por Q decreciente
         self.sos[-1].set_gain(self.k_tot) # le pongo toda la ganancia a la ultima etapa
         return self.sos
@@ -131,17 +131,23 @@ class StagesManager(object):
         """ Devuelve True es valida la etapa solicitada, False si no """
         ret = ""
         ok = False
-        zero = None
-        pole = None
-        for z in self.z_pairs:
-            if z_str == z.get_msg():
-                zero = z
+        z_ind = None
+        p_ind = None
+        for i_z in range(len(self.z_pairs)):
+            if z_str == self.z_pairs[i_z].get_msg():
+                z_ind = i_z
                 break
-        for p in self.p_pairs:
-            if p_str == p.get_msg():
-                pole = p
-            self.sos.append(Stage(zero, pole, 1))
-        if not (pole.q < 0 and zero.n == 2):
+        for i_p in range(len(self.p_pairs)):
+            if p_str == self.p_pairs[i_p].get_msg():
+                p_ind = i_p
+                break
+            # self.sos.append(Stage(zero, pole, 1))
+        n_z = 0
+        n_p = 1
+        if z_ind is not None:
+            n_p = 1 if self.p_pairs[p_ind].q < 0 else 2
+            n_z = self.z_pairs[z_ind].n
+        if n_p >= n_z:
             pole_n_left = 0
             z_n_left = 0
             for p in self.unused_p:
@@ -150,6 +156,16 @@ class StagesManager(object):
                 z_n_left += z.n
             if pole_n_left >= z_n_left:
                 ok = True
+                pole = self.p_pairs[p_ind]
+                pole.used = True
+                self.unused_p.remove(pole)
+                if z_ind:
+                    zero = self.z_pairs[z_ind]
+                    zero.used = True
+                    self.unused_z.remove(zero)
+                    self.sos.append(Stage(zero, pole, 1))
+                else:
+                    self.sos.append(Stage(None, pole, 1))
             else:
                 ret = "There must be greater o equal amount of poles than zeros remaing after selection"
         else:
@@ -158,29 +174,34 @@ class StagesManager(object):
 
     def shift_stages(self, indexes: list, left):
         """ Shifts the stages indicated at the indexes list. Shifts left if left == True,shifts rigth otherwise"""
-        if left:
-            step = -1
-            i_lim = 0
-            i = len(self.sos)
-        else:
-            step = 1
-            i_lim = len(self.sos)
-            i = 0
+        if len(self.sos) > 1:
+            if left:
+                step = -1
+                i_lim = 0
+                i = len(self.sos)
+            else:
+                step = 1
+                i_lim = len(self.sos)
+                i = 0
 
-        rep = step
-        while i != i_lim:
-            if i in indexes:
-                while i+rep in indexes:
-                    rep += step
-                self.sos[i], self.sos[i+rep] = (self.sos[i+rep], self.sos[i])
-            i += step
             rep = step
+            while i != i_lim:
+                if i in indexes:
+                    while i+rep in indexes:
+                        rep += step
+                    self.sos[i], self.sos[i+rep] = (self.sos[i+rep], self.sos[i])
+                i += step
+                rep = step
 
     def delete_stages(self, indexes: list):
         """" Deletes stages indicated by indexes list """
         if amax(indexes) < len(self.sos):
             for i in indexes:
-                self.sos.remove(self.sos[i])
+                s = self.sos[i]
+                self.sos.remove(s)
+                for j in range(len(self.p_pairs)):
+                    if self.p_pairs[j] == s.p:
+                        self.p_pairs[j].used = False
         else:
             print("Indexes list out of range!")
 
@@ -225,13 +246,45 @@ class StagesManager(object):
         """ Returns a dictionary with all zeros and poles:
          { "Poles": {"1st order": [Poles], "2nd order": [Poles]}
            "Zeros": {"1st order": [Zeros], "2nd order": [Zeros]} } """
-        ret = {"Poles": {"1st order": [], "2nd order": []}, "Zeros": {"1st order": [], "2nd order": []}}
+        #ret = {"Poles": {"1st order": [], "2nd order": []}, "Zeros": {"1st order": [], "2nd order": []}}
+        ret = {"Poles": {}, "Zeros": {}}
+        first = False
+        sec = False
+        change = False
         for p in self.p_pairs:
-            key2 = "1st order" if p.q < 0 else "2nd order"
-            ret["Poles"][key2].append(p)
+            if p.q < 0:
+                key2 = "1st order"
+                if not first:
+                    change = True
+                    first = True
+            else:
+                key2 = "2nd order"
+                if not sec:
+                    change = True
+                    sec = True
+            if change:
+                ret["Poles"][key2] = [p]
+            else:
+                ret["Poles"][key2].append(p)
+            change = False
+        first = False
+        sec = False
         for z in self.z_pairs:
-            key2 = "1st order" if z.n == 1 else "2nd order"
-            ret["Zeros"][key2].append(z)
+            if z.n == 1:
+                key2 = "1st order"
+                if not first:
+                    change = True
+                    first = True
+            else:
+                key2 = "2nd order"
+                if not sec:
+                    change = True
+                    sec = True
+            if change:
+                ret["Zeros"][key2] = [z]
+            else:
+                ret["Zeros"][key2].append(z)
+            change = False
         return ret
 
     def get_stages_plot(self, indexes, type: ShowType):

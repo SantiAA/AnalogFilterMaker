@@ -6,7 +6,7 @@ class Zero:
 
     def get_msg(self):
         using = ""
-        if not self.used:
+        if self.used:
             using = " (used)"
         return "fo: " + str(abs(self.im)) + " - n: " + str(self.n) + using
 
