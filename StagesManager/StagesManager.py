@@ -301,3 +301,13 @@ class StagesManager(object):
         else:
             ret = "Vo_max must be greater than vi_min"
         return ok, ret
+
+    def get_save_info(self):
+        return {"Sos": self.sos, "Zeros": [self.z_pairs, self.unused_z], "Poles": [self.p_pairs, self.unused_p]}
+
+    def load_saved_info(self, info: dict):
+        self.sos = info["Sos"]
+        self.z_pairs = info["Zeros"][0]
+        self.unused_z = info["Zeros"][1]
+        self.p_pairs = info["Poles"][0]
+        self.unused_p = info["Poles"][1]
