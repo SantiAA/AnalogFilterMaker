@@ -199,9 +199,9 @@ class StagesManager(object):
             for i in indexes:
                 s = self.sos[i]
                 self.sos.remove(s)
-                for p in self.p_pairs:
-                    if p == s.p:
-                        p.used = False
+                for j in range(len(self.p_pairs)):
+                    if self.p_pairs[j] == s.p:
+                        self.p_pairs[j].used = False
         else:
             print("Indexes list out of range!")
 
