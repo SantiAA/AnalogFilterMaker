@@ -63,7 +63,7 @@ class FirstStage(QMainWindow):
         self.radioButtonsLayout.addWidget(self.group_box)
         self.templates = []
         self.update_filter_type()
-        self.show()
+        self.showMaximized()
 
     def next_stage(self):
 

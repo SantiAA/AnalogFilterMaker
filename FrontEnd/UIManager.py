@@ -35,6 +35,7 @@ class UIManager:
         """
         self.active_window = UIMainWindow(self)
         self.active_window.show()
+        self.active_window.showMaximized()
 
     def next_window(self):
         """
@@ -48,6 +49,7 @@ class UIManager:
             self.active_window = self.list_of_windows[self.window_iterator]
             self.active_window.start()
 
+
     def previous_window(self):
         """
         Closes the current active window and shows the previous one from the window sequence.
@@ -57,6 +59,7 @@ class UIManager:
             self.window_iterator -= 1
             self.active_window = self.list_of_windows[self.window_iterator]
             self.active_window.start()
+
             if self.configuration_dicts[self.window_iterator] is not None:
                 self.active_window.load_current_state(self.configuration_dicts[self.window_iterator])
 

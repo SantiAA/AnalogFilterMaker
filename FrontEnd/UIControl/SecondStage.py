@@ -53,7 +53,7 @@ class SecondStage(QMainWindow):
         self.param_group_box.setLayout(self.param_vbox)
         self.__redefine_const_params_()
         self.selected_amount_changed()
-        self.show()
+        self.showMaximized()
 
 
     def get_current_state_config(self):
