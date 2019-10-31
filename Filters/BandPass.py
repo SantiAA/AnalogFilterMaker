@@ -2,6 +2,7 @@
 
 # third-party modules
 from numpy import where
+from numpy import pi
 
 # AFM project modules
 from Filters.Filters import *
@@ -41,7 +42,7 @@ class BandPass(Filter):
                                         self.requirements[TemplateInfo.fp__.value]) / \
                                        (self.requirements[TemplateInfo.fa_.value] -
                                         self.requirements[TemplateInfo.fa__.value])  # K = Awa/ Awp
-                    self.normalized_freqs = [1, 1/self.selectivity]
+                    self.normalized_freqs = [1/(2*pi), 1/(2*pi*self.selectivity)]
                     return True, ret
                 else:
                     ret = "fa+ must me greater than fp+"

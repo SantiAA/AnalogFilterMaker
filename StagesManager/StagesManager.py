@@ -85,6 +85,7 @@ class StagesManager(object):
                         self.sos.append({"Poles": self.p_pairs[i], "Zeros": None, "Gain": 1})
                 # ver que hacer con los polos y ceros de primer orden aaaaaaaaa
         else:
+            pass
             # TIENE QUE SER UNA LISTA DE STAGES self.sos = [{"Poles": p, "Zeros": None, "Gain": 1} for p in self.p_pairs]
         """" The order of the stages depends on the input signal """
         self.sos.sort(key=lambda x:x.p.q, reverse=True) # ordena por Q decreciente
@@ -99,10 +100,12 @@ class StagesManager(object):
     def add_stage(self, p_str: str, z_str: str) -> (bool,str):
         """ Devuelve True es valida la etapa solicitada, False si no """
         if True:
-            z = find(z_str)
-            p = find(p_str)
-            self.sos.append(Stage(z, p))
+            #z = find(z_str)
+            #p = find(p_str)
+            #self.sos.append(Stage(z, p))
+            pass
         else:
+            pass
         # self.sos[i]["Poles"] = p
         # self.sos[i]["Zeros"] = z
 

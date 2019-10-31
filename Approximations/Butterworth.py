@@ -54,7 +54,7 @@ class Butterworth(Approximation):
             w, h = signal.freqs_zpk(z_norm, p_norm, k_norm)
             h = 20*np.log10(abs(h))
             i = [abs(j + self.information[TemplateInfo.Aa.value]) for j in h]
-            fa = w[i.index(min(i))]/(2*np.pi)
+            fa = w[i.index(min(i))]
             denorm_cte = (fa*(1-self.denorm/100)+self.denorm/(self.selectivity*100))/fa
             _z = z_norm*denorm_cte
             _p = p_norm*denorm_cte
