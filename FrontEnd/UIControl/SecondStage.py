@@ -201,6 +201,8 @@ class SecondStage(QMainWindow):
         self.stages_ui_layout.delete_all_stages()
         self.__reload_stages__()
         self.__redraw__()
+        self.__plot_p_z_graph__(self.stages_manager.get_z_p_plot())
+        self.poles_and_zeros_dict = self.stages_manager.get_z_p_dict()
         self.__fill_poles_and_zeros_combos__()
 
 
@@ -217,6 +219,9 @@ class SecondStage(QMainWindow):
             self.stages_ui_layout.delete_all_stages()
             self.__reload_stages__()
             self.__redraw__()
+            self.__plot_p_z_graph__(self.stages_manager.get_z_p_plot())
+            self.poles_and_zeros_dict = self.stages_manager.get_z_p_dict()
+            self.__fill_poles_and_zeros_combos__()
         else:
             self.__show_error__("Illegal pole or zero selection")
 
