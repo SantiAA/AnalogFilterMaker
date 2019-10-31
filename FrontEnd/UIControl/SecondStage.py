@@ -132,7 +132,7 @@ class SecondStage(QMainWindow):
         self.z_p_diagram.canvas.axes.set_xlabel(graphs[1][0])
         self.z_p_diagram.canvas.axes.xaxis.label.set_color('blue')
         self.z_p_diagram.canvas.axes.set_ylabel(graphs[1][1])
-        #self.z_p_diagram.canvas.axes.ticklabel_format(useOffset=False)
+        self.z_p_diagram.canvas.axes.ticklabel_format(useOffset=False)
         #self.z_p_diagram.canvas.axes.axis('scaled')
         self.z_p_diagram.canvas.axes.yaxis.label.set_color('blue')
         #self.__fix_axes_titles_position__(self.z_p_diagram, graphs[1][0], graphs[1][1])
@@ -170,7 +170,7 @@ class SecondStage(QMainWindow):
                                                           (graph_data.x_values[i], graph_data.y_values[i]))
 
 
-        #self.z_p_diagram.figure.tight_layout()
+        self.z_p_diagram.figure.tight_layout()
 
 
 
@@ -228,8 +228,6 @@ class SecondStage(QMainWindow):
         self.combo1.clear()
         self.combo2.clear()
         self.combo2.addItem("")
-        self.combo2.model().item(0).setEnabled(False)
-        self.illegal_zeros_titles.append("")
         keys = list(self.poles_and_zeros_dict.keys())
         self.title_combo_1.setText(keys[0])
         self.title_combo_2.setText(keys[1])
@@ -340,8 +338,9 @@ class SecondStage(QMainWindow):
                         self.graph_widget.canvas.axes.annotate(n_array_text[i],
                                                                (graph_data.x_values[i], graph_data.y_values[i]))
         self.graph_widget.canvas.axes.legend(loc='best')
-        self.graph_widget.canvas.draw()
         self.graph_widget.figure.tight_layout()
+        self.graph_widget.canvas.draw()
+
 
 
 
