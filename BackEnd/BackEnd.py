@@ -25,11 +25,12 @@ from Filters.Filters import GraphTypes
 
 
 class BackEnd:
-    def __init__(self):
+    def __init__(self, save_info=None):
         self.lp = LowPass
         self.all_filters = [LowPass(), HighPass(), BandPass(), BandReject(), GroupDelay()]
         self.all_approximations = [Bessel(), Butterworth(), ChevyI(), ChebyII(), Cauer(), Gauss(), Legendre(), Transitional()]
-        self.dynamic_filters = []
+        if not save_info:
+            self.dynamic_filters = []
         self.fil_dict = {}
         self.filters_specs = {}
         for fil in self.all_filters:
@@ -44,6 +45,7 @@ class BackEnd:
                 useful_dict[request] = [fil.get_limit(request), fil.get_default(request)]
             self.filters_specs[fil.get_type()] = useful_dict
     """ Returns """
+
 
     def get_util(self):
         return self.filters_specs, self.fil_dict
@@ -66,7 +68,7 @@ class BackEnd:
         return my_filter.get_templates()
 
     def get_graphics(self, filtro, aproximacion):
-        my_filter = self._parse_filter(filtro)
+        my_filter = self._parse_filter(filtro, id)
         approx_dict = {}
         for key, value in aproximacion[1].items():
             if value[1] is not None:
@@ -78,17 +80,11 @@ class BackEnd:
         self.dynamic_filters.append(my_filter)
         return my_filter.get_all_graphs()
 
-    def get_filter(self, filtro, aproximacion):
-        my_filter = self._parse_filter(filtro)
-        approx_dict = {}
-        for key, value in aproximacion[1].items():
-            if value[1] is not None:
-                approx_dict[key] = value[1]
-        for each in self.all_approximations:
-            if each.name is aproximacion[0]:
-                each.load_information(my_filter)
-                each.calculate(my_filter, approx_dict)
-        return my_filter
+    def get_filter(self, id: int):
+        return self.dynamic_filters[id]
+
+    def del_filter(self, id: int):
+        self.dynamic_filters.pop(id)
 
     def _parse_filter(self, front_end_filter) -> Filter:
         """ Busco el tipo de filtro que esta seleccionado """
@@ -104,3 +100,9 @@ class BackEnd:
             specs[aspect] = front_end_filter[1][aspect][1]
         filters.load_requirements(specs)
         return filters
+
+    def get_save_info(self):
+        return {"Dynamic filters": self.dynamic_filters}
+
+    def load_save_info(self, save_info):
+        self.__init__(self, save_info)
