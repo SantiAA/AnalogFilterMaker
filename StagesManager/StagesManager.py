@@ -289,7 +289,7 @@ class StagesManager(object):
         return ret
 
     def get_stages_plot(self, indexes, type: ShowType):
-        plot_list = [[], []]
+        plot_list = [[], ["", ""]]
         if len(self.sos):
             if type is ShowType.Accumulative.value:
                 z = []
