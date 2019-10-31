@@ -92,15 +92,17 @@ class DefaultStageUI(QWidget):
         self.set_label_text()
         self.name = self.label.text()
 
-        self.label.setStyleSheet("font-size: 14px; color:rgb(255, 255, 255);")
+        #self.label.setStyleSheet("font-size: 14px; color:rgb(255, 255, 255);")
         self.label.setAlignment(Qt.AlignCenter)
-        self.label.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Preferred)
+        self.label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         self.label.setMargin(0)
         self.label.setContentsMargins(0,0,0,0)
+        self.label.setStyleSheet("font-size: 14px; color: rgb(149, 205, 212);")
         vbox.addWidget(self.label)
 
 
         self.mathLabel = MathTextLabel(self.stage.get_tf_tex(), self)
+
         vbox.addWidget(self.mathLabel, alignment=Qt.AlignHCenter)
         '''
         self.graphWidget = StagesGraph()
@@ -110,8 +112,8 @@ class DefaultStageUI(QWidget):
         vbox.addWidget(self.graphWidget)
         '''
         self.radioButton = RightRadioButton(left_click_callback, changed_selected_amount)
-
-        self.radioButton.setSizePolicy(QSizePolicy.Maximum, QSizePolicy.Maximum)
+        #self.radioButton.setAlignment(Qt.AlignCenter)
+        self.radioButton.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         vbox.addWidget(self.radioButton)
 
     def __update_size__(self):
@@ -130,6 +132,9 @@ class DefaultStageUI(QWidget):
 
     def set_checked(self, checked):
         self.radioButton.setChecked(checked)
+
+
+
 
 
 class RightRadioButton (QRadioButton):

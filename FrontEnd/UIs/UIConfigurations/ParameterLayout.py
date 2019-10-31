@@ -36,19 +36,18 @@ class ApproximationParameterLayout(QWidget):
         self.label = QLabel(self.name)
         self.label.setAlignment(Qt.AlignCenter)
         self.label.setStyleSheet("font-size: 14px; color:rgb(255, 255, 255);")
-        self.label.setAlignment(Qt.AlignCenter)
         self.check_box = QCheckBox()
         self.check_box.setStyleSheet("font-size: 12px; color:rgb(255, 255, 255);")
         self.check_box.setText("Fixed")
-
+        self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         self.check_box.toggled.connect(self.check_box_toggled)
         self.rows = [InternalApproximationLayoutRow(self.label, self.check_box), self.widget]
         if not toggleable:
             self.check_box.hide()
-        self.layout.addStretch()
+        #self.layout.addStretch()
         for row in self.rows:
             self.layout.addWidget(row)
-        self.layout.addStretch()
+        #self.layout.addStretch()
         self.setLayout(self.layout)
         if toggleable:
             self.rows[1].hide()
@@ -87,11 +86,11 @@ class InternalApproximationLayoutRow(QWidget):
         self.widget1 = widget1
         self.widget2 = widget2
         self.layout = QHBoxLayout()
-
+        self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         self.layout.addWidget(widget1)
-        self.layout.addStretch(1)
+        #self.layout.addStretch(1)
         self.layout.addWidget(widget2)
-        self.layout.addStretch(1)
+        #self.layout.addStretch(1)
         self.setLayout(self.layout)
 
 
@@ -106,7 +105,7 @@ class DefaultNumberEdit(QDoubleSpinBox):
         self.setMinimum(min)
         self.setValue(default_value)
         self.setDecimals(decimals)
-        self.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Fixed)
+        self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         self.setStyleSheet("font-size: 14px; color:rgb(255, 255, 255);")
 
     def get_value(self):

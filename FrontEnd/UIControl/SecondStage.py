@@ -28,7 +28,7 @@ class SecondStage(QMainWindow):
         self.__define_showing_group__()
         self.graph_widget = self.graphWidget
         self.stages_ui_layout = StagesUILayout(self.selected_amount_changed)
-        self.stagesLayout.addWidget(self.stages_ui_layout)
+        self.stagesLayout.setWidget(self.stages_ui_layout)
         self.create_button.clicked.connect(self.create_clicked)
         self.deleteButton.clicked.connect(self.delete_stages)
         self.autostage.clicked.connect(self.auto_stage)
@@ -130,11 +130,11 @@ class SecondStage(QMainWindow):
 
     def __plot_p_z_graph__(self, graphs):
         self.z_p_diagram.canvas.axes.set_xlabel(graphs[1][0])
-        self.z_p_diagram.canvas.axes.xaxis.label.set_color('white')
+        self.z_p_diagram.canvas.axes.xaxis.label.set_color('blue')
         self.z_p_diagram.canvas.axes.set_ylabel(graphs[1][1])
-        self.z_p_diagram.canvas.axes.ticklabel_format(useOffset=False)
+        #self.z_p_diagram.canvas.axes.ticklabel_format(useOffset=False)
         #self.z_p_diagram.canvas.axes.axis('scaled')
-        self.z_p_diagram.canvas.axes.yaxis.label.set_color('white')
+        self.z_p_diagram.canvas.axes.yaxis.label.set_color('blue')
         #self.__fix_axes_titles_position__(self.z_p_diagram, graphs[1][0], graphs[1][1])
         for graph_data in graphs[0]:
             if graph_data.log:
@@ -145,11 +145,19 @@ class SecondStage(QMainWindow):
                 if n > 1:
                     string_gen += str(n)
                 n_array_text.append(string_gen)
-            """
+
+            '''
             r = 1.5 * np.amax(np.concatenate((graph_data.x_values, graph_data.y_values, [1])))
             self.z_p_diagram.canvas.axes.axis('scaled')
             self.z_p_diagram.canvas.axes.axis([-r, r, -r, r])
-            """
+            self.z_p_diagram.canvas.axes.spines['left'].set_position('zero')
+            self.z_p_diagram.canvas.axes.spines['right'].set_color('none')
+            self.z_p_diagram.canvas.axes.spines['bottom'].set_position('zero')
+            self.z_p_diagram.canvas.axes.spines['top'].set_color('none')
+            #self.z_p_diagram.canvas.axes.xaxis.set_ticks_position('bottom')
+            #self.z_p_diagram.canvas.axes.yaxis.set_ticks_position('left')
+            '''
+
             if not graph_data.x_marks:
                 self.z_p_diagram.canvas.axes.scatter(graph_data.x_values, graph_data.y_values)
                 for i in range(0, len(n_array_text)):
@@ -162,7 +170,7 @@ class SecondStage(QMainWindow):
                                                           (graph_data.x_values[i], graph_data.y_values[i]))
 
 
-        self.z_p_diagram.figure.tight_layout()
+        #self.z_p_diagram.figure.tight_layout()
 
 
 

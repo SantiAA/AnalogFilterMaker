@@ -15,7 +15,7 @@ class StagesManagerTesting(object):
         a = 0
 
     def get_stages(self):
-        return [StageTesting(1,2,5), StageTesting(4,4,8), StageTesting(3,2,1)]
+        return [StageTesting(1,2,5), StageTesting(4,4,8), StageTesting(3,2,1), StageTesting(4,4,8), StageTesting(3,2,1)]
 
     def add_stage(self, p_str: str, z_str: str) -> (bool, str):
         a = 0

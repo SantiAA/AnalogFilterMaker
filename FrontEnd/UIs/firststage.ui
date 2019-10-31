@@ -40,7 +40,7 @@
    </property>
    <layout class="QGridLayout" name="gridLayout">
     <item row="0" column="0">
-     <layout class="QHBoxLayout" name="horizontalLayout" stretch="20,3,77">
+     <layout class="QHBoxLayout" name="horizontalLayout" stretch="15,3,82">
       <property name="sizeConstraint">
        <enum>QLayout::SetMaximumSize</enum>
       </property>
@@ -536,7 +536,7 @@ color:rgb(255, 255, 255);
          </spacer>
         </item>
         <item>
-         <layout class="QHBoxLayout" name="approxParams" stretch="20,3,56,3,13,3">
+         <layout class="QHBoxLayout" name="approxParams" stretch="15,3,67,2,10,3">
           <item>
            <layout class="QVBoxLayout" name="verticalLayout_2">
             <item>
@@ -635,7 +635,7 @@ border: 0px solid blue;
           <item>
            <widget class="QPushButton" name="addApproxButton">
             <property name="sizePolicy">
-             <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>

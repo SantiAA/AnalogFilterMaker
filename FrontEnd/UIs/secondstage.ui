@@ -445,6 +445,9 @@ color:rgb(255, 255, 255);</string>
       </item>
       <item>
        <layout class="QVBoxLayout" name="rightLayout" stretch="0,55,4,1,35,4">
+        <property name="sizeConstraint">
+         <enum>QLayout::SetDefaultConstraint</enum>
+        </property>
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout_12" stretch="20,5,5,5,10,5,5,5,10,10,5,10,5,0">
           <item>
@@ -705,7 +708,28 @@ border: 0px solid blue;</string>
          </spacer>
         </item>
         <item>
-         <layout class="QHBoxLayout" name="stagesLayout"/>
+         <layout class="QHBoxLayout" name="stagesLayoutaa">
+          <property name="sizeConstraint">
+           <enum>QLayout::SetDefaultConstraint</enum>
+          </property>
+          <item>
+           <widget class="QScrollArea" name="stagesLayout">
+            <property name="widgetResizable">
+             <bool>true</bool>
+            </property>
+            <widget class="QWidget" name="scrollAreaWidgetContents">
+             <property name="geometry">
+              <rect>
+               <x>0</x>
+               <y>0</y>
+               <width>703</width>
+               <height>245</height>
+              </rect>
+             </property>
+            </widget>
+           </widget>
+          </item>
+         </layout>
         </item>
         <item>
          <layout class="QVBoxLayout" name="verticalLayout_6" stretch="0">
