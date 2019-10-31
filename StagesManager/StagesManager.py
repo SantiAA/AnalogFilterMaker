@@ -126,7 +126,7 @@ class StagesManager(object):
 
     def get_stages(self):
         """" Returns Stages list """
-        return self.sos
+        return self.sos, self.selected
 
     def add_stage(self, p_str: str, z_str: str) -> (bool,str):
         """ Devuelve True es valida la etapa solicitada, False si no """
@@ -382,6 +382,3 @@ class StagesManager(object):
 
     def set_selected(self, indexes: list):
         self.selected = indexes
-
-    def get_selected(self):
-        return self.selected
