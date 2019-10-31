@@ -135,14 +135,14 @@ class SecondStage(QMainWindow):
         self.__plot_p_z_graph__(z_p_plot)
 
     def __plot_p_z_graph__(self, graphs):
-        self.z_p_diagram.canvas.axes.set_xlabel(graphs[1][0])
-        self.z_p_diagram.canvas.axes.xaxis.label.set_color('green')
-        self.z_p_diagram.canvas.axes.set_ylabel(graphs[1][1])
+        #self.z_p_diagram.canvas.axes.set_xlabel(graphs[1][0])
+        self.z_p_diagram.canvas.axes.xaxis.label.set_color('black')
+        #self.z_p_diagram.canvas.axes.set_ylabel(graphs[1][1])
         self.z_p_diagram.canvas.axes.ticklabel_format(useOffset=False)
 
         self.z_p_diagram.canvas.axes.grid(True, which="both")
-        self.z_p_diagram.canvas.axes.yaxis.label.set_color('green')
-        #self.__fix_axes_titles_position__(self.z_p_diagram, graphs[1][0], graphs[1][1])
+        self.z_p_diagram.canvas.axes.yaxis.label.set_color('black')
+        self.__fix_axes_titles_position__(self.z_p_diagram, graphs[1][0], graphs[1][1])
         for graph_data in graphs[0]:
             if graph_data.log:
                 self.z_p_diagram.canvas.axes.set_xscale('log')
@@ -189,15 +189,15 @@ class SecondStage(QMainWindow):
 
     def __fix_x_title_position__(self, widget, label):
         ticklabelpad = mpl.rcParams['xtick.major.pad']
-        widget.canvas.axes.annotate(label, xy=(1, 0), xytext=(-15, -ticklabelpad),
-                                    ha='left', va='top',
-                                    xycoords='axes fraction', color="w", textcoords='offset points')
+        widget.canvas.axes.annotate(label, xy=(1, 0), xytext=(-ticklabelpad*5, 0),
+                                    ha='right', va='top',
+                                    xycoords='axes fraction', rotation=0, color="w",size=10, textcoords='offset points')
 
     def __fix_y_title_position__(self, widget, label):
         ticklabelpad = mpl.rcParams['ytick.major.pad']
-        widget.canvas.axes.annotate(label, xy=(0, 1), xytext=(15, -ticklabelpad + 5),
-                                    ha='left', va='bottom',
-                                    xycoords='axes fraction', color="w", textcoords='offset points', rotation=0)
+        widget.canvas.axes.annotate(label, xy=(0, 1), xytext=(-ticklabelpad*5, -ticklabelpad*30),
+                                    ha='left', va='bottom',size=10,
+                                    xycoords='axes fraction', color="w", rotation=90, textcoords='offset points')
 
     def delete_stages(self):
         if self.stages_ui_layout.get_number_of_checked() > 0:

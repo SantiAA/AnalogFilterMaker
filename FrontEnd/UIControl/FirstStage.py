@@ -470,9 +470,7 @@ class FirstStage(QMainWindow):
             a = 0
 
     def __plot_graph__(self, graph, legend_string):
-        self.graph_widget.canvas.axes.set_xlabel(graph[1][0])
 
-        self.graph_widget.canvas.axes.set_ylabel(graph[1][1])
         #self.graph_widget.canvas.axes.ticklabel_format(useOffset=False)
 
         #self.__fix_axes_titles_position__(self.graph_widget, graph[1][0], graph[1][1])
@@ -483,6 +481,9 @@ class FirstStage(QMainWindow):
             if graph_data.extra_information != "":
                 complete_legend += "-" + graph_data.extra_information
             if not graph_data.scattered:
+                self.graph_widget.canvas.axes.set_xlabel(graph[1][0])
+
+                self.graph_widget.canvas.axes.set_ylabel(graph[1][1])
                 self.graph_widget.canvas.axes.axis('auto')
                 self.graph_widget.canvas.axes.yaxis.label.set_color('white')
                 self.graph_widget.canvas.axes.xaxis.label.set_color('white')
@@ -496,16 +497,16 @@ class FirstStage(QMainWindow):
             else:
 
                 r = 1.5 * np.amax(np.concatenate((graph_data.x_values, graph_data.y_values, [1])))
-                self.graph_widget.canvas.axes.yaxis.label.set_color('green')
-                self.graph_widget.canvas.axes.xaxis.label.set_color('green')
-
+                self.graph_widget.canvas.axes.yaxis.label.set_color('black')
+                self.graph_widget.canvas.axes.xaxis.label.set_color('black')
+                self.__fix_axes_titles_position__(self.graph_widget, graph[1][0], graph[1][1])
                 self.graph_widget.canvas.axes.axis('scaled')
                 self.graph_widget.canvas.axes.axis([-1.5*r, r / 5, -r, r])
                 self.graph_widget.canvas.axes.spines['left'].set_position('zero')
                 self.graph_widget.canvas.axes.spines['right'].set_color('none')
                 self.graph_widget.canvas.axes.spines['bottom'].set_position('zero')
                 self.graph_widget.canvas.axes.spines['top'].set_color('none')
-                self.graph_widget.canvas.axes.tick_params(direction='out', length=1, width=1, labelsize=8, colors='g')
+                self.graph_widget.canvas.axes.tick_params(direction='out', length=1, width=1, labelsize=8, colors='k')
                 # self.z_p_diagram.canvas.axes.xaxis.set_ticks_position('bottom')
                 # self.z_p_diagram.canvas.axes.yaxis.set_ticks_position('left')
                 n_array_text = []
@@ -535,12 +536,13 @@ class FirstStage(QMainWindow):
 
     def __fix_x_title_position__(self, widget, label):
         ticklabelpad = mpl.rcParams['xtick.major.pad']
-        widget.canvas.axes.annotate(label, xy=(1, 0), xytext=(-15, -ticklabelpad),
-                                    ha='left', va='top',
-                                    xycoords='axes fraction', color="w", textcoords='offset points')
+        widget.canvas.axes.annotate(label, xy=(1, 0), xytext=(-ticklabelpad * 5, 0),
+                                    ha='right', va='top',
+                                    xycoords='axes fraction', rotation=0, color="w", size=10,
+                                    textcoords='offset points')
 
     def __fix_y_title_position__(self, widget, label):
         ticklabelpad = mpl.rcParams['ytick.major.pad']
-        widget.canvas.axes.annotate(label, xy=(0, 1), xytext=(15, -ticklabelpad + 5),
-                                    ha='left', va='bottom',
-                                    xycoords='axes fraction', color="w",textcoords='offset points', rotation=0)
+        widget.canvas.axes.annotate(label, xy=(0, 1), xytext=(-ticklabelpad * 5, -ticklabelpad * 30),
+                                    ha='left', va='bottom', size=10,
+                                    xycoords='axes fraction', color="w", rotation=90, textcoords='offset points')
