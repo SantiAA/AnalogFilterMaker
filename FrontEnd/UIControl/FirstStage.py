@@ -4,7 +4,7 @@ import matplotlib as mpl
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import *
 from PyQt5.uic import loadUi
-
+import numpy as np
 from FrontEnd.UIControl.FinalGraph import FinalGraph
 from FrontEnd.UIs.FilterConfigurations.Config import Config
 from FrontEnd.UIs.FilterConfigurations.Template import Template
@@ -30,6 +30,7 @@ class FirstStage(QMainWindow):
         """
         QMainWindow.__init__(self)
         loadUi('FrontEnd/UIs/firststage.ui', self)
+
         self.setWindowTitle("Filter Design Tool")
         self.graph_widget = self.graphWidget
         self.comboFilter.clear()
@@ -470,10 +471,10 @@ class FirstStage(QMainWindow):
 
     def __plot_graph__(self, graph, legend_string):
         self.graph_widget.canvas.axes.set_xlabel(graph[1][0])
-        self.graph_widget.canvas.axes.xaxis.label.set_color('white')
+
         self.graph_widget.canvas.axes.set_ylabel(graph[1][1])
         #self.graph_widget.canvas.axes.ticklabel_format(useOffset=False)
-        self.graph_widget.canvas.axes.yaxis.label.set_color('white')
+
         #self.__fix_axes_titles_position__(self.graph_widget, graph[1][0], graph[1][1])
         for graph_data in graph[0]:
             if graph_data.log:
@@ -482,6 +483,10 @@ class FirstStage(QMainWindow):
             if graph_data.extra_information != "":
                 complete_legend += "-" + graph_data.extra_information
             if not graph_data.scattered:
+                self.graph_widget.canvas.axes.axis('auto')
+                self.graph_widget.canvas.axes.yaxis.label.set_color('white')
+                self.graph_widget.canvas.axes.xaxis.label.set_color('white')
+                self.graph_widget.canvas.axes.tick_params(direction='out', length=1, width=1, labelsize=8, colors='w')
                 if not graph_data.x_marks:
                     self.graph_widget.canvas.axes.plot(graph_data.x_values, graph_data.y_values, label=complete_legend)
                 else:
@@ -489,6 +494,20 @@ class FirstStage(QMainWindow):
                                                        label=complete_legend)
 
             else:
+
+                r = 1.5 * np.amax(np.concatenate((graph_data.x_values, graph_data.y_values, [1])))
+                self.graph_widget.canvas.axes.yaxis.label.set_color('green')
+                self.graph_widget.canvas.axes.xaxis.label.set_color('green')
+
+                self.graph_widget.canvas.axes.axis('scaled')
+                self.graph_widget.canvas.axes.axis([-1.5*r, r / 5, -r, r])
+                self.graph_widget.canvas.axes.spines['left'].set_position('zero')
+                self.graph_widget.canvas.axes.spines['right'].set_color('none')
+                self.graph_widget.canvas.axes.spines['bottom'].set_position('zero')
+                self.graph_widget.canvas.axes.spines['top'].set_color('none')
+                self.graph_widget.canvas.axes.tick_params(direction='out', length=1, width=1, labelsize=8, colors='g')
+                # self.z_p_diagram.canvas.axes.xaxis.set_ticks_position('bottom')
+                # self.z_p_diagram.canvas.axes.yaxis.set_ticks_position('left')
                 n_array_text = []
                 for n in graph_data.n_array:
                     string_gen = ""

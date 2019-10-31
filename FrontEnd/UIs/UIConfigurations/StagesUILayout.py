@@ -141,7 +141,7 @@ class RightRadioButton (QRadioButton):
     def __init__(self, left_click, changed_selected_amount_callback):
         QRadioButton.__init__(self)
         self.left_click = left_click
-        self.setChecked(True)
+        self.setChecked(False)
         self.changed_selected_amount_callback = changed_selected_amount_callback
 
     def mousePressEvent(self, QMouseEvent):
