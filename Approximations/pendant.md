@@ -1,11 +1,11 @@
 # Pendiente aproximaciones
 
 ### Debug
-  - [ ] Bessel
-  - [ ] Butter
-  - [ ] Cheby I
+  - [X] Bessel
+  - [X] Butter
+  - [X] Cheby I
   - [ ] Cheby II
-  - [ ] Gauss
-  - [ ] Legendre
-  - [ ] Transicionales
+  - [X] Gauss
+  - [X] Legendre
+  - [X] Transicionales
   

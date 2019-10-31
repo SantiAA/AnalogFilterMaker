@@ -5,7 +5,7 @@ Approximation base class
 # third-party modules
 from scipy import signal, prod, asarray, amin
 import json
-
+from matplotlib import pyplot as plt
 from numpy import unwrap
 from numpy import diff
 from numpy import log
@@ -13,6 +13,7 @@ from numpy import divide
 from numpy import where
 from numpy import pi
 from numpy import amax
+from numpy import angle
 
 # AFM project modules
 from scipy.special import factorial
@@ -46,7 +47,7 @@ class Gauss(Approximation):
         super().calculate(filter_in_use, kwargs)
         """ Using the precalculated plots I get the order """
         if self.fixed_n > 0:
-            n = self.fixed_n if not self.fixed_n%2 else self.fixed_n - 1
+            n = self.fixed_n
         else:
             n = self._ord()
         while True:
@@ -72,10 +73,14 @@ class Gauss(Approximation):
         data = json.load(plots_file)
         n = 0
         for n_i in data:
-            ind = where(asarray(data[n_i]["w"]) >= 1)[0][0]
-            tol = 1 - data[n_i]["Group delay"][ind]
-            # wt = data[n_i]["w"][where(data[n_i]["Group Delay"] <= self.information[TemplateInfo.tol])[0]]
-            if tol <= self.information[TemplateInfo.tol.value]:
+            wo = 2*pi*self.information[TemplateInfo.ft.value]*self.information[TemplateInfo.gd.value]*1e-6
+            #ind = where(asarray(data[n_i]["w"]) >= wo)[0][0]
+            #tol = 1 - data[n_i]["Group delay"][ind]
+            index = where(asarray(data[n_i]["Group delay"]) <= (1 - self.information[TemplateInfo.tol.value] / 100))
+
+            wt = data[n_i]["w"][index]
+            #if tol <= self.information[TemplateInfo.tol.value]/100:
+            if wt <= wo:
                 n = int(n_i)
                 break
         return n
@@ -84,18 +89,29 @@ class Gauss(Approximation):
         """ Returns zeros, poles and gain of Gauss normalized approximation """
         transfer_function = self._get_tf(n)
         trans_zpk = transfer_function.to_zpk()
+        z, p, k = trans_zpk.zeros, trans_zpk.poles, trans_zpk.gain
+        w, h = signal.freqs_zpk(z, p, k)
+        norm_gd = -diff(unwrap(angle(h))) / diff(w)
+        trans_zpk.poles = trans_zpk.poles * norm_gd[0]
+        trans_zpk.gain = prod(abs(trans_zpk.poles))
         return trans_zpk.zeros, trans_zpk.poles, trans_zpk.gain
 
     def _gauss_des(self, z_n, p_n):
         """ Returns zeros, poles and gain of Gauss denormalized approximation """
+
         p = p_n/(self.information[TemplateInfo.gd.value]*1e-6)     # user's group delay in us
         k = prod(abs(p))
+        w, h = signal.freqs_zpk([], p, k)
+        norm_gd = -diff(unwrap(angle(h))) / diff(w)
+        f_n = w / (2 * pi)
+        plt.semilogx(f_n[:-1], norm_gd)
+        plt.show()
         return z_n, p, k
 
     def _pre_calc(self, n_max: int):
         data = {}
         outfile = open("Approximations/PreCalc/gauss.json", "w+")
-        for i in range(2, n_max + 1, 2):
+        for i in range(1, n_max + 1):
             transfer_function = self._get_tf(i)
             w, mag, phase = transfer_function.bode(n=3000)
             gd = -diff(unwrap(phase)) / diff(w)
@@ -124,9 +140,9 @@ class Gauss(Approximation):
         """
         num = [1.]
         den = []
-        for k in range(n+1, 1, -1):
+        for k in range(n, 0, -1):
             # den.append((-1)**k*gamma**k/factorial(k))
-            den.append(1 / factorial(k))    # normalizamos con gamma=1
+            den.append((-1)**k / factorial(k))    # normalizamos con gamma=1
             den.append(0)
         den.append(1.)
         transfer_function = signal.TransferFunction(num, den)   # tengo la transferencia al cuadrado
