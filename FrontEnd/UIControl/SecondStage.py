@@ -117,17 +117,18 @@ class SecondStage(QMainWindow):
         self.__redefine_const_params_()
 
     def right_shift(self):
-        if self.stages_manager.shift_stages(self.stages_ui_layout.get_selected_ids_array(), False):
-            self.stages_ui_layout.delete_all_stages()
-            self.__reload_stages__()
-            self.__redraw__()
+        if self.stages_ui_layout.get_number_of_checked() > 0:
+            if self.stages_manager.shift_stages(self.stages_ui_layout.get_selected_ids_array(), False):
+                self.stages_ui_layout.delete_all_stages()
+                self.__reload_stages__()
+                self.__redraw__()
 
     def left_shift(self):
-
-        if self.stages_manager.shift_stages(self.stages_ui_layout.get_selected_ids_array(), True):
-            self.stages_ui_layout.delete_all_stages()
-            self.__reload_stages__()
-            self.__redraw__()
+        if self.stages_ui_layout.get_number_of_checked() > 0:
+            if self.stages_manager.shift_stages(self.stages_ui_layout.get_selected_ids_array(), True):
+                self.stages_ui_layout.delete_all_stages()
+                self.__reload_stages__()
+                self.__redraw__()
 
     def __plot_poles_and_zeros__(self):
         z_p_plot = self.stages_manager.get_z_p_plot()
@@ -138,7 +139,7 @@ class SecondStage(QMainWindow):
         self.z_p_diagram.canvas.axes.xaxis.label.set_color('green')
         self.z_p_diagram.canvas.axes.set_ylabel(graphs[1][1])
         self.z_p_diagram.canvas.axes.ticklabel_format(useOffset=False)
-        #self.z_p_diagram.canvas.axes.axis('scaled')
+
         self.z_p_diagram.canvas.axes.grid(True, which="both")
         self.z_p_diagram.canvas.axes.yaxis.label.set_color('green')
         #self.__fix_axes_titles_position__(self.z_p_diagram, graphs[1][0], graphs[1][1])
@@ -154,8 +155,8 @@ class SecondStage(QMainWindow):
 
 
             r = 1.5 * np.amax(np.concatenate((graph_data.x_values, graph_data.y_values, [1])))
-            #self.z_p_diagram.canvas.axes.axis('scaled')
-            self.z_p_diagram.canvas.axes.axis([-2*r, r/10000, -r, r])
+            self.z_p_diagram.canvas.axes.axis('scaled')
+            self.z_p_diagram.canvas.axes.axis([-1.5*r, r / 5, -r, r])
             self.z_p_diagram.canvas.axes.spines['left'].set_position('zero')
             self.z_p_diagram.canvas.axes.spines['right'].set_color('none')
             self.z_p_diagram.canvas.axes.spines['bottom'].set_position('zero')
@@ -199,13 +200,14 @@ class SecondStage(QMainWindow):
                                     xycoords='axes fraction', color="w", textcoords='offset points', rotation=0)
 
     def delete_stages(self):
-        self.stages_manager.delete_stages(self.stages_ui_layout.get_selected_ids_array())
-        self.stages_ui_layout.delete_all_stages()
-        self.__reload_stages__()
-        self.__redraw__()
-        self.__plot_p_z_graph__(self.stages_manager.get_z_p_plot())
-        self.poles_and_zeros_dict = self.stages_manager.get_z_p_dict()
-        self.__fill_poles_and_zeros_combos__()
+        if self.stages_ui_layout.get_number_of_checked() > 0:
+            self.stages_manager.delete_stages(self.stages_ui_layout.get_selected_ids_array())
+            self.stages_ui_layout.delete_all_stages()
+            self.__reload_stages__()
+            self.__redraw__()
+            self.__plot_p_z_graph__(self.stages_manager.get_z_p_plot())
+            self.poles_and_zeros_dict = self.stages_manager.get_z_p_dict()
+            self.__fill_poles_and_zeros_combos__()
 
 
 

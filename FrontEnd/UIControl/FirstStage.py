@@ -483,6 +483,7 @@ class FirstStage(QMainWindow):
             if graph_data.extra_information != "":
                 complete_legend += "-" + graph_data.extra_information
             if not graph_data.scattered:
+                self.graph_widget.canvas.axes.axis('auto')
                 self.graph_widget.canvas.axes.yaxis.label.set_color('white')
                 self.graph_widget.canvas.axes.xaxis.label.set_color('white')
                 self.graph_widget.canvas.axes.tick_params(direction='out', length=1, width=1, labelsize=8, colors='w')
@@ -493,11 +494,13 @@ class FirstStage(QMainWindow):
                                                        label=complete_legend)
 
             else:
+
                 r = 1.5 * np.amax(np.concatenate((graph_data.x_values, graph_data.y_values, [1])))
                 self.graph_widget.canvas.axes.yaxis.label.set_color('green')
                 self.graph_widget.canvas.axes.xaxis.label.set_color('green')
-                # self.z_p_diagram.canvas.axes.axis('scaled')
-                self.graph_widget.canvas.axes.axis([-2 * r, r / 10000, -r, r])
+
+                self.graph_widget.canvas.axes.axis('scaled')
+                self.graph_widget.canvas.axes.axis([-1.5*r, r / 5, -r, r])
                 self.graph_widget.canvas.axes.spines['left'].set_position('zero')
                 self.graph_widget.canvas.axes.spines['right'].set_color('none')
                 self.graph_widget.canvas.axes.spines['bottom'].set_position('zero')
