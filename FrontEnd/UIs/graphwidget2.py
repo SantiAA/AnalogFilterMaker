@@ -31,4 +31,4 @@ class GraphWidget2(QWidget):
 
         self.setLayout(vertical_layout)
         self.figure.tight_layout()
-        self.canvas.axes.tick_params(direction='out', length=.2, width=.2, labelsize=5, colors='b')
+        self.canvas.axes.tick_params(direction='inout', length=.2, width=.2, labelsize=5, colors='g')

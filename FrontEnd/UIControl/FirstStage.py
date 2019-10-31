@@ -77,6 +77,7 @@ class FirstStage(QMainWindow):
                                                               approximation.make_approx_dict(),
                                                               approximation.extra_combos])
                     self.stages_manager.load_filter(backend_filter)
+                    self.ui_manager.next_window()
         else:
             msg = QMessageBox()
             msg.setIcon(QMessageBox.Critical)
@@ -85,26 +86,48 @@ class FirstStage(QMainWindow):
             msg.setWindowTitle("Error")
             msg.exec_()
 
-        self.ui_manager.next_window()
+
 
     def load_project_clicked(self):
         self.ui_manager.load_current_state()
 
     def load_current_state(self, configuration_dict):
+        self.filter_ret = configuration_dict["filter"]
+
+        self.graphPic.setPixmap(QPixmap(self.filter_ret.template_image))  # filter template image
+
         self.showingGraphs = []
         self.showingGraphs = configuration_dict["showing_graphs"]
-        self.fill_combo_graph()
         self.__update_active_approx_combo__()
+
+        self.fill_combo_graph()
+
+        if len(self.showingGraphs) == 0:
+            self.toggleApprox.hide()
+
+        self.__update_templates__()
+        self._template_ploting_w_graphs_()
         self.redraw()
+
+        self.comboFilter.currentIndexChanged.disconnect()
+        index = self.comboFilter.findText(self.filter_ret.name)
+        self.comboFilter.setCurrentIndex(index)
+        self.comboFilter.currentIndexChanged.connect(self.update_filter_type)
 
     def get_current_state_config(self):
         self.window_configuration = {}
         self.window_configuration["active_filter"] = self.comboFilter.currentText()
+        self.filter = self.filters[self.comboFilter.currentText()]
+        dict = self.filter.make_feature_dictionary()
+        list = self.filter.get_parameter_list_w_current_values()
         requirements = []
         for requirement in self.filters[self.comboFilter.currentText()].parameter_list:
             requirements.append(requirement.get_value())
         self.window_configuration["requirement_values"] = requirements
         self.window_configuration["showing_graphs"] = self.showingGraphs
+        self.window_configuration["filter"] = self.filter
+        self.window_configuration["filter_dict"] = dict
+        self.window_configuration["filter_params_list"] = list
         return self.window_configuration
 
     def combo_graph_changed(self):
@@ -191,31 +214,7 @@ class FirstStage(QMainWindow):
 
         else:
             self._template_ploting_w_graphs_()
-        """
-        if len(self.current_template.squares) == 0:
-            self.templateCheckBox.show()
-        self.filter = self.filters[self.comboFilter.currentText()]
-        dict = self.filter.make_feature_dictionary()
-        validated, error_string = self.backend.validate_filter([self.filter.name, dict])
-        if validated:
-            squares = self.backend.get_template([self.filter.name, dict])
-            self.current_template.squares = squares
-            if self.templateCheckBox.isChecked():
-                self.current_template.enabled = True
-            else:
-                self.current_template.enabled = False
-            self.redraw_template()
 
-
-        else:
-            msg = QMessageBox()
-            msg.setIcon(QMessageBox.Critical)
-            msg.setText("Error")
-            msg.setInformativeText(error_string)
-            msg.setWindowTitle("Error")
-            msg.exec_()
-
-        """
 
     def _template_ploting_w_graphs_(self):
 
@@ -265,11 +264,6 @@ class FirstStage(QMainWindow):
         self.templateCheckBox.hide()
 
     def __ask_for_templates__(self, param_list, approximation=None):
-        """
-        if len(self.current_template.squares) == 0:
-            self.templateCheckBox.show()
-            """
-
         validated, error_string = self.backend.validate_filter(param_list)
         if validated:
             templates = self.backend.get_template(param_list, approximation)
@@ -309,12 +303,17 @@ class FirstStage(QMainWindow):
         self.templateCheckBox.hide()
         self.redraw_graphs()
         # update plot
-        for filters in self.filters.values():  # Clearing requirement widgets
-            for parameters in filters.parameter_list:
-                parameters.setParent(None)
-            for approx in filters.approximation_list:
-                for parameter in approx.parameter_list:
-                    parameter.setParent(None)
+
+        try:
+            for filters in self.filters.values():  # Clearing requirement widgets
+                for parameters in filters.parameter_list:
+                    parameters.setParent(None)
+                for approx in filters.approximation_list:
+                    for parameter in approx.parameter_list:
+                        parameter.setParent(None)
+        except:
+            a = 0
+
 
         self.filter = self.filters[self.comboFilter.currentText()]
         self.approxCombo.clear()

@@ -21,3 +21,12 @@ class Config:
         for parameter in self.parameter_list:
             dict[parameter.name] = [[parameter.widget.min, parameter.widget.max], parameter.widget.value()]
         return dict
+
+    def get_parameter_list_w_current_values(self):
+        dict = self.make_feature_dictionary()
+        params_list = []
+        for feature in dict:
+            params_list.append(FilterParameterLayout(feature, DefaultNumberEdit(dict[feature][0][0],
+                                                                                        dict[feature][0][1], 2,
+                                                                                        dict[feature][1])))
+        return params_list

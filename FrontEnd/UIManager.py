@@ -43,7 +43,7 @@ class UIManager:
         if len(self.list_of_windows) > self.window_iterator + 1:
             if self.window_iterator > -1:
                 self.configuration_dicts[self.window_iterator] = self.active_window.get_current_state_config()
-            self.active_window.close()
+            self.active_window.hide()
             self.window_iterator += 1
             self.active_window = self.list_of_windows[self.window_iterator]
             self.active_window.start()
@@ -53,7 +53,7 @@ class UIManager:
         Closes the current active window and shows the previous one from the window sequence.
         """
         if self.window_iterator > 0:
-            self.active_window.close()
+            self.active_window.hide()
             self.window_iterator -= 1
             self.active_window = self.list_of_windows[self.window_iterator]
             self.active_window.start()

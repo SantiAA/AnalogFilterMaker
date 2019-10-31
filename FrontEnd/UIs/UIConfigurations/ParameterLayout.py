@@ -21,8 +21,8 @@ class FilterParameterLayout(QWidget):
     def get_value(self):
         return self.widget.get_value()
 
-    def set_value(self):
-        return self.widget.set_value()
+    def set_value(self, value):
+        return self.widget.set_value(value)
 
 
 class ApproximationParameterLayout(QWidget):
