@@ -34,8 +34,8 @@ class StagesManagerTesting(object):
 
     def get_z_p_plot(self):
         return [
-            [GraphValues([50, 500, 5000, 50000], [10, 100, 1000, 10000], True, False,False, "Zeros",[2,2,1,1]),  # GRAF CEROS
-             GraphValues([550000, 555, 10, 550000], [150545, 222222, 888877, 100500], True, True,False, "Poles",[2,3,1,2])],  # GRAF POLOS
+            [GraphValues([50, 500, 5000, 50000], [10, 100, 1000, 100], True, False,False, "Zeros",[2,2,1,1]),  # GRAF CEROS
+             GraphValues([550000, 555, 10, 55], [155, 222, 887, 100], True, True,False, "Poles",[2,3,1,2])],  # GRAF POLOS
             ["Re", "Im"]]
 
     def get_z_p_dict(self):

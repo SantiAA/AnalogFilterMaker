@@ -21,9 +21,122 @@
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout" stretch="30,70">
       <item>
-       <layout class="QVBoxLayout" name="verticalLayout_2" stretch="40,10,50">
+       <layout class="QVBoxLayout" name="verticalLayout_2" stretch="0,40,10,50">
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_11" stretch="20,20,20,20,20">
+          <item>
+           <widget class="QPushButton" name="prev_window">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>60</width>
+              <height>60</height>
+             </size>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">font: 63 8pt &quot;Open Sans Semibold&quot;;
+color:rgb(255, 255, 255);
+padding: 8px;
+bottom-margin:3px;
+</string>
+            </property>
+            <property name="text">
+             <string>PREV</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="saveButton">
+            <property name="maximumSize">
+             <size>
+              <width>60</width>
+              <height>60</height>
+             </size>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">font: 63 8pt &quot;Open Sans Semibold&quot;;
+color:rgb(255, 255, 255);
+padding: 8px;
+bottom-margin:3px;
+</string>
+            </property>
+            <property name="text">
+             <string>SAVE</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="saveAsButton">
+            <property name="maximumSize">
+             <size>
+              <width>70</width>
+              <height>60</height>
+             </size>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">font: 63 8pt &quot;Open Sans Semibold&quot;;
+color:rgb(255, 255, 255);
+padding: 8px;
+bottom-margin:3px;
+</string>
+            </property>
+            <property name="text">
+             <string>SAVE AS</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="loadButton">
+            <property name="maximumSize">
+             <size>
+              <width>60</width>
+              <height>60</height>
+             </size>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">font: 63 8pt &quot;Open Sans Semibold&quot;;
+color:rgb(255, 255, 255);
+padding: 8px;
+bottom-margin:3px;
+</string>
+            </property>
+            <property name="text">
+             <string>LOAD</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="next_window">
+            <property name="maximumSize">
+             <size>
+              <width>60</width>
+              <height>60</height>
+             </size>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">font: 63 8pt &quot;Open Sans Semibold&quot;;
+color:rgb(255, 255, 255);
+padding: 8px;
+bottom-margin:3px;
+</string>
+            </property>
+            <property name="text">
+             <string>NEXT</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout_9" stretch="5,90,5">
+          <property name="spacing">
+           <number>0</number>
+          </property>
           <item>
            <spacer name="horizontalSpacer_15">
             <property name="orientation">
@@ -305,7 +418,7 @@ border: 0px solid blue;</string>
 color:rgb(255, 255, 255);</string>
                 </property>
                 <property name="text">
-                 <string>GO</string>
+                 <string>Set Gain</string>
                 </property>
                </widget>
               </item>
@@ -333,7 +446,7 @@ color:rgb(255, 255, 255);</string>
       <item>
        <layout class="QVBoxLayout" name="rightLayout" stretch="0,55,4,1,35,4">
         <item>
-         <layout class="QHBoxLayout" name="horizontalLayout_12">
+         <layout class="QHBoxLayout" name="horizontalLayout_12" stretch="20,5,5,5,10,5,5,5,10,10,5,10,5,0">
           <item>
            <spacer name="horizontalSpacer_17">
             <property name="orientation">
@@ -446,7 +559,7 @@ border: 0px solid blue;</string>
 color:rgb(255, 255, 255);</string>
             </property>
             <property name="text">
-             <string>Reload</string>
+             <string>Calculate DR</string>
             </property>
            </widget>
           </item>
@@ -463,7 +576,7 @@ color:rgb(255, 255, 255);</string>
             </property>
            </spacer>
           </item>
-          <item>
+          <item alignment="Qt::AlignHCenter">
            <widget class="QLabel" name="label_10">
             <property name="styleSheet">
              <string notr="true">font: 63 11pt &quot;Open Sans Semibold&quot;;

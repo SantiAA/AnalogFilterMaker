@@ -44,9 +44,10 @@ def gauss_approximation_zpk(n: int):
     """
     num = [1.]
     den = []
+    gamma = 0.995
     for k in range(n+1, 1, -1):
-        # den.append((-1)**k*gamma**k/factorial(k))
-        den.append(1 / factorial(k))    # normalizamos con gamma=1
+        den.append((-1)**k*gamma**k/factorial(k))
+        # den.append(1 / factorial(k))    # normalizamos con gamma=1
         den.append(0)
     den.append(1.)
     transfer_function = signal.TransferFunction(num, den)   # tengo la transferencia al cuadrado

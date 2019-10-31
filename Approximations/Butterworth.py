@@ -17,7 +17,7 @@ class Butterworth(Approximation):
     def __init__(self):
         Approximation.__init__(self, "Butterworth")
         self.application = [FilterTypes.HighPass.value, FilterTypes.LowPass.value, FilterTypes.BandPass.value, FilterTypes.BandReject.value]
-        self.dict["Denorm."] = [(0, 100, False, int()), 0]
+        self.dict["Denorm."] = [(0, 100, True, int()), 0]
 
     def load_information(self, filter_in_use: Filter):
         self.information.clear()
@@ -85,7 +85,7 @@ class Butterworth(Approximation):
             else:
                 print("Butterworth.py: Invalid filter type passed to Butterworth aproximation")
                 return
-            if self.q_max >= filter_in_use.get_max_q() or normalized_n == self.n_max or self.fixed_n > 0:
+            if self.q_max < 0 or self.q_max >= filter_in_use.get_max_q() or normalized_n == self.n_max or self.fixed_n > 0:
                 break
 
             normalized_n = normalized_n + 1  # If I don't get the requested Q, increase the order, unless n_max reached

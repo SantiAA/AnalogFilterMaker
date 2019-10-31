@@ -3,7 +3,7 @@ Approximation base class
 """
 
 # third-party modules
-from scipy import signal, prod
+from scipy import signal, prod, asarray, amin
 import json
 
 from numpy import unwrap
@@ -29,7 +29,7 @@ class Gauss(Approximation):
         Approximation.__init__(self, "Gauss")
         self.application = [FilterTypes.GroupDelay.value]
         self.information = {}
-        self._pre_calc(self.n_max)
+        self._pre_calc(20)
 
     def load_information(self, filter_in_use: Filter):
 
@@ -46,14 +46,14 @@ class Gauss(Approximation):
         super().calculate(filter_in_use, kwargs)
         """ Using the precalculated plots I get the order """
         if self.fixed_n > 0:
-            n = self.fixed_n
+            n = self.fixed_n if not self.fixed_n%2 else self.fixed_n - 1
         else:
             n = self._ord()
         while True:
             """ If the approximation supports the filter I continue """
-            if filter_in_use.get_type() is FilterTypes.GruopDelay.value:
+            if filter_in_use.get_type() is FilterTypes.GroupDelay.value:
                 """ Now we limit the order of the filter """
-                n = amax([n, self.n_max])
+                n = amin([n, self.n_max])
                 """ After getting the order I get the zeros, poles and gain of the filter """
                 z_n, p_n, k_n = self._gauss_norm(n)
                 filter_in_use.load_normalized_z_p_k(z_n, p_n, k_n)
@@ -62,17 +62,18 @@ class Gauss(Approximation):
             else:
                 print("Gauss.py: Invalid filter type passed to Gauss aproximation")
                 return
-            if self.q_max >= filter_in_use.get_max_q() or n == self.n_max or self.fixed_n > 0:
+            if self.q_max < 0 or self.q_max >= filter_in_use.get_max_q() or n == self.n_max or self.fixed_n > 0:
                 break
             n = n + 1
 
     " ONCE I HAVE THE SPECS I CALL THIS METHOD "
     def _ord(self):
-        plots_file = open("PreCalc/gauss.json")
+        plots_file = open("Approximations/PreCalc/gauss.json")
         data = json.load(plots_file)
         n = 0
         for n_i in data:
-            tol = 1 - data[n_i]["Group delay"][where(data[n_i]["w"] >= 1)[0]]
+            ind = where(asarray(data[n_i]["w"]) >= 1)[0][0]
+            tol = 1 - data[n_i]["Group delay"][ind]
             # wt = data[n_i]["w"][where(data[n_i]["Group Delay"] <= self.information[TemplateInfo.tol])[0]]
             if tol <= self.information[TemplateInfo.tol.value]:
                 n = int(n_i)
@@ -93,8 +94,8 @@ class Gauss(Approximation):
 
     def _pre_calc(self, n_max: int):
         data = {}
-        outfile = open("gauss.json", "w")
-        for i in range(2, n_max + 1):
+        outfile = open("Approximations/PreCalc/gauss.json", "w+")
+        for i in range(2, n_max + 1, 2):
             transfer_function = self._get_tf(i)
             w, mag, phase = transfer_function.bode(n=1500)
             gd = -diff(unwrap(phase)) / diff(w)

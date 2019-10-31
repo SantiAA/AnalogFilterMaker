@@ -55,6 +55,14 @@ class BackEndTesting:
                 "Poles and Zeros": [rect1, rect3]}
         return dict
 
+
+    def get_save_info(self):
+        return {"hola": [4,5,5]}
+
+    def load_save_info(self, dict):
+        a=0
+
+
     def get_graphics(self, filter,
                    approximation):  ##IMPORTANTE. SI ES UN TRANSICIONAL. LOS DATOS DE QUE APROXIMACIONES SE USAN SE DEVUELVEN COMO CUALQUIER OTRA COSA. MIN Y MAX SON NONE.
         # EJEMPLO:

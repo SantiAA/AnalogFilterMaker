@@ -2,7 +2,7 @@ from PyQt5.QtGui import QIcon, QPixmap
 from PyQt5.QtWidgets import QMainWindow, QHBoxLayout, QRadioButton, QWidget, QVBoxLayout, QMessageBox
 from PyQt5.uic import loadUi
 from sympy.physics.quantum.tests.test_circuitplot import mpl
-
+import numpy as np
 from BackEnd.BackEnd import BackEnd
 from FrontEnd.UIs.Testing.BackEndTesting import BackEndTesting
 from FrontEnd.UIs.UIConfigurations.StagesUILayout import StagesUILayout, HorizontalParameter
@@ -35,7 +35,12 @@ class SecondStage(QMainWindow):
         self.reloadv.clicked.connect(self.update_rd)
         self.nextButton.clicked.connect(self.right_shift)
         self.backButton.clicked.connect(self.left_shift)
+        self.prev_window.clicked.connect(self.prev_window_clicked)
+        self.next_window.clicked.connect(self.next_window_clicked)
         self.goGain.clicked.connect(self.set_gain)
+        self.saveButton.clicked.connect(self.ui_manager.save_current_state)
+        self.saveAsButton.clicked.connect(self.ui_manager.save_as_current_state)
+        self.loadButton.clicked.connect(self.ui_manager.load_current_state)
         self.__plot_p_z_graph__(self.stages_manager.get_z_p_plot())
         self.poles_and_zeros_dict = self.stages_manager.get_z_p_dict()
         self.__fill_poles_and_zeros_combos__()
@@ -47,6 +52,24 @@ class SecondStage(QMainWindow):
 
 
         self.show()
+
+
+    def get_current_state_config(self):
+        self.window_configuration = self.backend.get_save_info()
+        return self.window_configuration
+
+    def load_current_state(self, configuration_dict):
+        self.backend.load_save_info(configuration_dict)
+        self.stages_ui_layout.delete_all_stages()
+        self.__reload_stages__()
+        self.__redraw__()
+
+    def next_window_clicked(self):
+        self.ui_manager.next_window()
+
+    def prev_window_clicked(self):
+        self.ui_manager.previous_window()
+
 
     def update_rd(self):
         validated, value = self.stages_manager.get_dr(self.vminSpin.value(), self.vmaxSpin.value())
@@ -69,7 +92,7 @@ class SecondStage(QMainWindow):
         self.__redraw__()
         if self.stages_ui_layout.get_number_of_checked() == 1:
             self.gainSpin.show()
-            self.goGain.setText("GO")
+            self.goGain.setText("Set Gain")
             self.goGain.setStyleSheet("font: 63 9pt; color:rgb(255, 255, 255);")
         else:
             self.gainSpin.hide()
@@ -106,7 +129,18 @@ class SecondStage(QMainWindow):
         self.__plot_p_z_graph__(z_p_plot)
 
     def __plot_p_z_graph__(self, graphs):
-        self.__fix_axes_titles_position__(self.z_p_diagram, graphs[1][0], graphs[1][1])
+        self.z_p_diagram.canvas.axes.set_xlabel(graphs[1][0])
+        self.z_p_diagram.canvas.axes.xaxis.label.set_color('black')
+        self.z_p_diagram.canvas.axes.set_ylabel(graphs[1][1])
+        self.z_p_diagram.canvas.axes.ticklabel_format(useOffset=False)
+        #self.z_p_diagram.canvas.axes.axis('scaled')
+        self.z_p_diagram.canvas.axes.yaxis.label.set_color('black')
+        self.z_p_diagram.canvas.axes.spines['left'].set_position('zero')
+        self.z_p_diagram.canvas.axes.spines['right'].set_color('none')
+        self.z_p_diagram.canvas.axes.spines['bottom'].set_position('zero')
+        self.z_p_diagram.canvas.axes.spines['top'].set_color('none')
+        self.z_p_diagram.canvas.axes.axis("equal")
+        #self.__fix_axes_titles_position__(self.z_p_diagram, graphs[1][0], graphs[1][1])
         for graph_data in graphs[0]:
             if graph_data.log:
                 self.z_p_diagram.canvas.axes.set_xscale('log')
@@ -116,6 +150,11 @@ class SecondStage(QMainWindow):
                 if n > 1:
                     string_gen += str(n)
                 n_array_text.append(string_gen)
+            """
+            r = 1.5 * np.amax(np.concatenate((graph_data.x_values, graph_data.y_values, [1])))
+            self.z_p_diagram.canvas.axes.axis('scaled')
+            self.z_p_diagram.canvas.axes.axis([-r, r, -r, r])
+            """
             if not graph_data.x_marks:
                 self.z_p_diagram.canvas.axes.scatter(graph_data.x_values, graph_data.y_values)
                 for i in range(0, len(n_array_text)):
@@ -126,6 +165,11 @@ class SecondStage(QMainWindow):
                 for i in range(0, len(n_array_text)):
                     self.z_p_diagram.canvas.axes.annotate(n_array_text[i],
                                                           (graph_data.x_values[i], graph_data.y_values[i]))
+
+
+        self.z_p_diagram.figure.tight_layout()
+
+
 
     # Funciones que configuran y muestran los titulos de los ejes.
     def __fix_axes_titles_position__(self, widget, label_x, label_y):
@@ -150,6 +194,7 @@ class SecondStage(QMainWindow):
         self.stages_ui_layout.delete_all_stages()
         self.__reload_stages__()
         self.__redraw__()
+        self.__fill_poles_and_zeros_combos__()
 
 
 
@@ -165,7 +210,7 @@ class SecondStage(QMainWindow):
         self.__reload_stages__()
         self.__redraw__()
 
-    def __reload_stages__(self):
+    def __reload_stages__(self, ):
         current_stages = self.stages_manager.get_stages()
         i = 0
         for stage in current_stages:
@@ -189,11 +234,15 @@ class SecondStage(QMainWindow):
                     self.combo1.model().item(self.combo1.findText(key)).setEnabled(False)
                     for sing in self.poles_and_zeros_dict[keys[i]][key]:
                         self.combo1.addItem(sing.get_msg())
+                        if sing.used:
+                            self.combo1.model().item(self.combo1.findText(sing.get_msg())).setEnabled(False)
                 if i == 1:
                     self.combo2.addItem(key)
                     self.combo2.model().item(self.combo2.findText(key)).setEnabled(False)
                     for sing in self.poles_and_zeros_dict[keys[i]][key]:
                         self.combo2.addItem(sing.get_msg())
+                        if sing.used:
+                            self.combo2.model().item(self.combo1.findText(sing.get_msg())).setEnabled(False)
 
     def __place_button_images__(self):
         pixmap = QPixmap("FrontEnd/UIs/figs/button_figs/next.png")
@@ -242,7 +291,12 @@ class SecondStage(QMainWindow):
             self.__plot_graph__(graphs)
 
     def __plot_graph__(self, graph):
-        self.__fix_axes_titles_position__(self.graph_widget, graph[1][0], graph[1][1])
+        self.graph_widget.canvas.axes.set_xlabel(graph[1][0])
+        self.graph_widget.canvas.axes.xaxis.label.set_color('white')
+        self.graph_widget.canvas.axes.set_ylabel(graph[1][1])
+        #self.graph_widget.canvas.axes.ticklabel_format(useOffset=False)
+        self.graph_widget.canvas.axes.yaxis.label.set_color('white')
+        # self.__fix_axes_titles_position__(self.graph_widget, graph[1][0], graph[1][1])
         self.graph_widget.canvas.axes.grid(True, which="both")
         for graph_data in graph[0]:
             if graph_data.log:
@@ -275,6 +329,10 @@ class SecondStage(QMainWindow):
                         self.graph_widget.canvas.axes.annotate(n_array_text[i],
                                                                (graph_data.x_values[i], graph_data.y_values[i]))
         self.graph_widget.canvas.axes.legend(loc='best')
+        self.graph_widget.canvas.draw()
+        self.graph_widget.figure.tight_layout()
+
+
 
 
 
