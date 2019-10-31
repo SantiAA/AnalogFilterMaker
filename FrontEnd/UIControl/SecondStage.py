@@ -311,9 +311,11 @@ class SecondStage(QMainWindow):
             if radio_but.isChecked():
                 show_type = radio_but.text()
 
-        if len(self.stages_ui_layout.get_selected_ids_array() )> 0:
-            graphs = self.stages_manager.get_stages_plot(self.stages_ui_layout.get_selected_ids_array(), show_type)
-            self.__plot_graph__(graphs)
+        #if len(self.stages_ui_layout.get_selected_ids_array() )> 0:
+        graphs = self.stages_manager.get_stages_plot(self.stages_ui_layout.get_selected_ids_array(), show_type)
+        self.__plot_graph__(graphs)
+
+
 
     def __plot_graph__(self, graph):
         self.graph_widget.canvas.axes.clear()
