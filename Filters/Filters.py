@@ -74,7 +74,7 @@ class Filter(object):
             TemplateInfo.Aa.value: (0, 10e9), TemplateInfo.Ap.value: (0, 10e9), TemplateInfo.fa.value: (0, 10e9),
             TemplateInfo.fp.value: (0, 10e9), TemplateInfo.fp_.value: (0, 10e9), TemplateInfo.fp__.value: (0, 10e9),
             TemplateInfo.fa_.value: (0, 10e9), TemplateInfo.fa__.value: (0, 10e9), TemplateInfo.ft.value: (0, 10e9),
-            TemplateInfo.gd.value: (0, 10e9), TemplateInfo.tol.value: (0, 1), TemplateInfo.k.value: (0, 10e9)}
+            TemplateInfo.gd.value: (0, 10e9), TemplateInfo.tol.value: (0, 100), TemplateInfo.k.value: (-10e9, 10e9)}
         self.selectivity = 0
         self.normalized_freqs = []
         self.defaults = []
@@ -160,7 +160,7 @@ class Filter(object):
         w, h = trans_func.freqresp(n=3000)
         f = w / (2 * pi)
         mag = 20 * log10(abs(h))
-        phase = angle(h)
+        phase = angle(h, deg=True)
         graphs[GraphTypes.Module.value] = [[GraphValues(f, mag, False, False, True, extra_info)],
                                            ["Frequency [Hz]", "Amplitude [dB]"]]
         graphs[GraphTypes.Phase.value] = [[GraphValues(f, phase, False, False, True, extra_info)], ["Frequency[Hz]", "Phase[deg]"]]
@@ -177,11 +177,14 @@ class Filter(object):
         phase_n = angle(h_n)
         graphs[GraphTypes.Attenuation.value] = [[GraphValues(f, -mag, False, False, True, extra_info)], ["Frequency [Hz]", "Attenuation[dB]"]]   # se pasa una lista de graphvalues
         if self.filter is FilterTypes.GroupDelay.value:
-            graphs[GraphTypes.NormalizedGd.value] = [[GraphValues(f, -2 * pi * diff(unwrap(phase_n)) / diff(w_n), False, False, True, extra_info)],
-                                             ["Frequency[Hz]", "Group delay [us]"]]  # -d(Phase)/df = -dP/dw * dw/df = -dP/dw * 2pi
+            # norm_gd = -2 * pi * diff(unwrap(phase_n)) / diff(w_n)
+            norm_gd = -diff(unwrap(phase)) / diff(w)
+            f_n = f*norm_gd[0]
+            graphs[GraphTypes.NormalizedGd.value] = [[GraphValues(f_n[:-1], norm_gd/norm_gd[0], False, False, True, extra_info)],
+                                             ["Frequency[Hz]", "Group delay [s]"]]  # -d(Phase)/df = -dP/dw * dw/df = -dP/dw * 2pi
         else:
             graphs[GraphTypes.NormalizedAt.value] = [[GraphValues(f_n, -mag_n, False, False, True, extra_info)], ["Frequency[Hz]", "Attenuation[dB]"]]
-        graphs[GraphTypes.GroupDelay.value] = [[GraphValues(f[:-1], -2*pi*diff(unwrap(phase))/diff(w), False, False, True, extra_info)], ["Frequency[Hz]", "Group delay[us]"]]  # -d(Phase)/df = -dP/dw * dw/df = -dP/dw * 2pi
+        graphs[GraphTypes.GroupDelay.value] = [[GraphValues(f[:-1], -diff(unwrap(phase))/diff(w)*1e6, False, False, True, extra_info)], ["Frequency[Hz]", "Group delay[us]"]]  # -d(Phase)/df = -dP/dw * dw/df = -dP/dw * 2pi
         t, imp = signal.impulse(trans_func)
         graphs[GraphTypes.Impulse.value] = [[GraphValues(t, imp, False, False, False, extra_info)], ["t[s]", "V[V]"]]
         t, step = signal.step(trans_func)
@@ -219,6 +222,8 @@ class Filter(object):
 
     @staticmethod
     def _agrup_roots(p):
+        if len(p) is 0:
+            return p
         new_p = []
         p = sorted(p, key=lambda x: x.real)  # ordeno por parte real creciente
         while len(p):

@@ -35,7 +35,7 @@ class LowPass(Filter):
         if self.requirements[TemplateInfo.Aa.value] > self.requirements[TemplateInfo.Ap.value]:
             if self.requirements[TemplateInfo.fa.value] > self.requirements[TemplateInfo.fp.value]:
                 self.selectivity = self.requirements[TemplateInfo.fp.value] / self.requirements[TemplateInfo.fa.value]  # K = wp/wa
-                self.normalized_freqs = [1, 1 / self.selectivity]
+                self.normalized_freqs = [1/(2*pi), 1 / (2*pi*self.selectivity)]
                 return True, ret
             else:
                 ret = "fa must be greater than fp"

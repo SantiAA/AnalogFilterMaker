@@ -50,7 +50,7 @@ class StagesManager(object):
         while len(z):  # guardo en self.z_pairs los pares de ceros complejos conjugados como [wo,n]
             if len(z) > 1:
                 if z[0] == conjugate(z[1]):
-                    self.z_pairs.append(Zero(abs(z[0].im), 2))
+                    self.z_pairs.append(Zero(abs(z[0]), 2))
                     z.remove(z[1])
                     saved = True
             if not saved:
@@ -214,7 +214,6 @@ class StagesManager(object):
             i += count
         return [[GraphValues(real(z), imag(z), True, False, False, "Zeros", repeated_z), GraphValues(real(p),
                         imag(p), True, True, False, "Poles", repeated_p)], ["Re(s)[rad/sec]", "Im(s)[rad/sec]"]]
-
 
     def get_z_p_dict(self):
         """ Returns a dictionary with all zeros and poles:

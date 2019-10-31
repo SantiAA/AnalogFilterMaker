@@ -63,7 +63,7 @@ class ChebyII(Approximation):
             w, h = signal.freqs_zpk(z_norm, p_norm, k_norm)
             h = 20 * np.log10(abs(h))
             i = [abs(j + self.information[TemplateInfo.Ap.value]) for j in h]
-            fp = w[i.index(min(i))]/(2*np.pi)
+            fp = w[i.index(min(i))]
             denorm_cte = (fp * (1 - self.denorm / 100) + self.denorm * self.selectivity / 100)/fp
             _z = z_norm * denorm_cte
             _p = p_norm * denorm_cte
