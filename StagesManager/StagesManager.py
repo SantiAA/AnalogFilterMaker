@@ -117,7 +117,7 @@ class StagesManager(object):
         else:
             for i in range(len(self.p_pairs)):
                 self.p_pairs[i].used = True
-                self.sos[i] = Stage(None, self.p_pairs[i], 1)
+                self.sos.append(Stage(None, self.p_pairs[i], 1))
         self.sos.sort(key=lambda x: x.p.q)  # ordena por Q decreciente
         self.sos[-1].set_gain(self.k_tot)   # le pongo toda la ganancia a la ultima etapa
         return self.sos
@@ -197,10 +197,9 @@ class StagesManager(object):
         """" Deletes stages indicated by indexes list """
         if amax(indexes) < len(self.sos):
             for i in indexes:
-                s = self.sos[i]
-                self.sos.remove(s)
+                s = self.sos.pop(i)
                 for j in range(len(self.p_pairs)):
-                    if self.p_pairs[j] == s.p:
+                    if self.p_pairs[j] == s.pole:
                         self.p_pairs[j].used = False
         else:
             print("Indexes list out of range!")
@@ -291,21 +290,22 @@ class StagesManager(object):
 
     def get_stages_plot(self, indexes, type: ShowType):
         plot_list = [[], []]
-        if type is ShowType.Accumulative.value:
-            z = []
-            p = []
-            for s in self.sos:
-                z += s.z
-                p += s.p
-            transf = signal.ZerosPolesGain(z, p, self.k_tot)
-            w, mag = transf.freqresp(n=3000)
-            f = w/(2*pi)
-            plot_list = [[GraphValues(f, mag, False, False, True)], ["Frequency [Hz]", "Amplitude [dB]"]]
-        else:
-            if type is ShowType.Superposed:
-                indexes = list(range(len(self.sos)))
-            plot_list[0] = [self.sos[i].get_tf_plot() for i in indexes]
-            plot_list[1] = ["Frequency [Hz]", "Amplitude [dB]"]
+        if len(self.sos):
+            if type is ShowType.Accumulative.value:
+                z = []
+                p = []
+                for s in self.sos:
+                    z += s.z
+                    p += s.p
+                transf = signal.ZerosPolesGain(z, p, self.k_tot)
+                w, mag = transf.freqresp(n=3000)
+                f = w/(2*pi)
+                plot_list = [[GraphValues(f, mag, False, False, True)], ["Frequency [Hz]", "Amplitude [dB]"]]
+            else:
+                if type is ShowType.Superposed:
+                    indexes = list(range(len(self.sos)))
+                plot_list[0] = [self.sos[i].get_tf_plot() for i in indexes]
+                plot_list[1] = ["Frequency [Hz]", "Amplitude [dB]"]
         return plot_list
 
     def get_dr(self, vi_min, vo_max):
