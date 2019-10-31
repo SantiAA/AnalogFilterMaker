@@ -107,7 +107,7 @@ bottom-margin:3px;
               </property>
              </widget>
             </item>
-            <item>
+            <item alignment="Qt::AlignHCenter">
              <widget class="QPushButton" name="nextButton">
               <property name="styleSheet">
                <string notr="true">font: 63 8pt &quot;Open Sans Semibold&quot;;
@@ -117,7 +117,7 @@ bottom-margin:3px;
 </string>
               </property>
               <property name="text">
-               <string>NEXT</string>
+               <string>DESIGN STAGES</string>
               </property>
              </widget>
             </item>

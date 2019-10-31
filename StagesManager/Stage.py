@@ -16,13 +16,13 @@ class Stage:
             z = [complex(0, self.z.im), complex(0, -self.z.im)] if self.z.n == 2 else [complex(0, 0)]
         else:
             z = []
-        k_correct = abs(self.pole.p)**2*self.k
+        k_correct = abs(self.pole.p)**2*self.k if self.pole.q > 0 else abs(self.pole.p)*self.k
         p = [self.pole.p, conjugate(self.pole.p)] if self.pole.q > 0 else [self.pole.p]
         transfer_function = ZerosPolesGain(z, p, k_correct)
         w, h = transfer_function.freqresp(n=3000)
         f = w/(2*pi)
         mag = 20*log10(h)
-        return GraphValues(f, mag, False, False, True)
+        return GraphValues(f, mag, False, False, True, f'Test')
 
     def get_tf_tex(self):
         z = complex(0, self.z.im) if self.z is not None else []

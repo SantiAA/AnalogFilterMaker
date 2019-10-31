@@ -291,7 +291,7 @@ class StagesManager(object):
     def get_stages_plot(self, indexes, type: ShowType):
         plot_list = [[], ["", ""]]
         if len(self.sos):
-            if type == ShowType.Accumulative.value[0]:
+            if type == ShowType.Total.value:
                 zeros = []
                 poles = []
                 for z in self.z_pairs:
@@ -305,7 +305,7 @@ class StagesManager(object):
                 transf = signal.ZerosPolesGain(zeros, poles, self.k_tot)
                 w, mag = transf.freqresp(n=3000)
                 f = w/(2*pi)
-                plot_list = [[GraphValues(f, mag, False, False, True)], ["Frequency [Hz]", "Amplitude [dB]"]]
+                plot_list = [[GraphValues(f, 20*log10(mag), False, False, True)], ["Frequency [Hz]", "Amplitude [dB]"]]
             else:
                 if type is ShowType.Superposed:
                     indexes = list(range(len(self.sos)))
@@ -344,10 +344,10 @@ class StagesManager(object):
         if len(indexes) == 1:
             i = indexes[0]
             if i < len(self.sos):
-                q = self.sos[i].p.q
+                q = self.sos[i].pole.q
                 if q > 0:
                     ret["Q"][0] = str(q)
-                ret["fo"][0] = str(self.sos[i].p.fo)
+                ret["fo"][0] = str(self.sos[i].pole.fo)
                 if self._validate_vi(vi_min, vo_max)[0]:
                     ret["DR"][0] = str(self._get_stg_dr(i, vi_min, vo_max))
         return ret
