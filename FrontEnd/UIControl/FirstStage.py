@@ -341,7 +341,7 @@ class FirstStage(QMainWindow):
             for approx in self.showingGraphs:
                 if approx.get_total_string() == self.activeApproxsCombo.currentText():
                     id = self.activeApproxsCombo.findText(self.activeApproxsCombo.currentText())
-                    self.del_filter(id)
+                    self.backend.del_filter(id)
                     self.showingGraphs.remove(approx)
             self.fill_combo_graph()
             self.__update_active_approx_combo__()
@@ -372,11 +372,11 @@ class FirstStage(QMainWindow):
                                 properties.append([prop.name, str(prop.get_value())])
                             else:
                                 properties.append([prop.name, "Auto"])
-                        id, self.graphics_returned = self.backend.get_graphics([self.filter.name, dict], [approximation.name,
+                        self.graphics_returned = self.backend.get_graphics([self.filter.name, dict], [approximation.name,
                                                                                               approximation.make_approx_dict(),
                                                                                               approximation.extra_combos])
                         approx = approximation
-                        #self.existing = True
+
                         new_graph = FinalGraph(self.graphics_returned, properties, True, id)
 
                         self.showingGraphs.append(new_graph)
