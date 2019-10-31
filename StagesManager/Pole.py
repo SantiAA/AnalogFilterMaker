@@ -4,7 +4,7 @@ class Pole:
         self.used = False
         self.fo = abs(self.p)
         if abs(p.imag) > 1e-9:
-            self.q = self.fo / (2 * self.p.real)
+            self.q = self.fo / (2 * -self.p.real)
         else:
             self.q = -1
 

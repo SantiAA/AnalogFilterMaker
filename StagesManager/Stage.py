@@ -1,6 +1,6 @@
 from scipy.signal import ZerosPolesGain, TransferFunction
 
-from numpy import pi, log10
+from numpy import pi, log10, conjugate
 from BackEnd.Output.plots import GraphValues
 from StagesManager import Zero, Pole
 
@@ -12,25 +12,42 @@ class Stage:
         self.pole = p
 
     def get_tf_plot(self):
-        transfer_function = ZerosPolesGain(complex(0, self.z.im), self.pole.p, self.k)
+        z = complex(0, self.z.im) if self.z is not None else []
+        transfer_function = ZerosPolesGain(z, self.pole.p, self.k)
         w, h = transfer_function.freqresp(n=3000)
         f = w/(2*pi)
         mag = 20*log10(h)
         return GraphValues(f, mag, False, False, True)
 
     def get_tf_tex(self):
-        zpk = ZerosPolesGain(complex(0, self.z.im), self.pole.p, self.k)
+        z = complex(0, self.z.im) if self.z is not None else []
+        p = [self.pole.p, conjugate(self.pole.p)] if self.pole.q > 0 else self.pole.p
+        zpk = ZerosPolesGain(z, p, self.k)
         transfer_function = zpk.to_tf()
         num = transfer_function.num
         den = transfer_function.den
-        ret = "H(s)=\\frac{"
+        ret = "$H(s)=\\frac{"
         i=0
-        for i in range(len(num), 0):
-            ret += "{0.2f}".format(num[i]) + "s^" + str(i)
+        for i in range(len(num)-1, 0-1, -1):
+            if abs(num[i]) > 0:
+                if i < len(num) - 1:
+                    ret += '+'
+                ret += f'{num[i]:.2}'
+                if i > 0:
+                    ret += f's'
+                if i > 1:
+                    ret += f'^{i}'
         ret += "}{"
-        for i in range(len(den), 0):
-            ret += "{0.2f}".format(den[i]) + "s^" + str(i)
-        ret += "}"
+        for i in range(len(den)-1, 0-1, -1):
+            if abs(den[i]) > 0:
+                if i < len(den) - 1:
+                    ret += '+'
+                ret += f'{den[i]:.2}'
+                if i > 0:
+                    ret += f's'
+                if i > 1:
+                    ret += f'^{i}'
+        ret += "}$"
         return ret
 
     def set_gain(self, k):

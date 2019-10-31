@@ -240,8 +240,8 @@ def gauss_approximation_zpk(n: int):
     """
     num = [1.]
     den = []
-    # gamma = log(2)
-    gamma = 1
+    gamma = log(2)
+    #gamma = 1
     for k in range(n+1, 1, -1):
         den.append(gamma**k/factorial(k))
         # den.append(1 / factorial(k))
