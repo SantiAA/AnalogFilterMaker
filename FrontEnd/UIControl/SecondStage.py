@@ -26,7 +26,9 @@ class SecondStage(QMainWindow):
 
     def start(self):
         QMainWindow.__init__(self)
+
         loadUi('FrontEnd/UIs/secondstage.ui', self)
+
         self.setWindowTitle("Filter Design Tool")
         self.__place_button_images__()
         self.__define_showing_group__()
@@ -135,6 +137,7 @@ class SecondStage(QMainWindow):
         self.z_p_diagram.canvas.axes.set_ylabel(graphs[1][1])
         self.z_p_diagram.canvas.axes.ticklabel_format(useOffset=False)
         #self.z_p_diagram.canvas.axes.axis('scaled')
+        self.z_p_diagram.canvas.axes.grid(True, which="both")
         self.z_p_diagram.canvas.axes.yaxis.label.set_color('green')
         #self.__fix_axes_titles_position__(self.z_p_diagram, graphs[1][0], graphs[1][1])
         for graph_data in graphs[0]:
