@@ -20,6 +20,8 @@ class Bessel(Approximation):
 
     def load_information(self, filter_in_use: Filter):
 
+        self.information.clear()
+
         if filter_in_use.get_type() not in self.application:
             print("Something done wrong, Bessel is not valid for ", filter_in_use.get_type())
             return False

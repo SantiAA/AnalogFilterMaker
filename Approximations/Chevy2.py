@@ -14,7 +14,7 @@ from Filters.Filters import Filter
 class ChebyII(Approximation):
 
     def __init__(self):
-        Approximation.__init__(self, "Cheby II")
+        Approximation.__init__(self, "Chebyshev II")
         self.application = [FilterTypes.HighPass.value, FilterTypes.LowPass.value, FilterTypes.BandPass.value, FilterTypes.BandReject.value]
         self.information = {}
         self.dict["Denorm."] = [(0, 100, True, int()), 0]
@@ -39,7 +39,7 @@ class ChebyII(Approximation):
         self.selectivity = 1/filter_in_use.get_selectivity()  # Chevy 2 es un ansistema y va al reves pq normaliza en la
                                                               # banda de paso
         filter_in_use.selectivity = self.selectivity
-        filter_in_use.normalized_freqs = [1/self.selectivity, 1]
+        filter_in_use.normalized_freqs = [1/(2*np.pi*self.selectivity), 1/(2*np.pi)]
         return True
 
     def calculate(self, filter_in_use: Filter, kwargs):
@@ -48,7 +48,7 @@ class ChebyII(Approximation):
         p = []
         k = 0
         """ First I calculate the Normalized LowPass, to get the useful w """
-        normalized_n, useful_w = signal.cheb2ord(self.selectivity, 1, self.information[TemplateInfo.Ap.value],
+        normalized_n, useful_w = signal.cheb2ord(1/self.selectivity, 1, self.information[TemplateInfo.Ap.value],
                                                  self.information[TemplateInfo.Aa.value], analog=True)
         if self.fixed_n > 0:
             normalized_n = self.fixed_n
@@ -57,14 +57,14 @@ class ChebyII(Approximation):
 
         while True:
             z_norm, p_norm, k_norm = signal.cheby2(normalized_n, self.information[TemplateInfo.Aa.value],
-                                                   2*np.pi*useful_w, analog=True, output='zpk')
+                                                   1, analog=True, output='zpk')
 
             """ Now check the desnomalization cte """
             w, h = signal.freqs_zpk(z_norm, p_norm, k_norm)
             h = 20 * np.log10(abs(h))
             i = [abs(j + self.information[TemplateInfo.Ap.value]) for j in h]
             fp = w[i.index(min(i))]
-            denorm_cte = (fp * (1 - self.denorm / 100) + self.denorm * self.selectivity / 100)/fp
+            denorm_cte = (fp * (1 - self.denorm / 100) + self.denorm / (100 * self.selectivity))/fp
             _z = z_norm * denorm_cte
             _p = p_norm * denorm_cte
             _k = k_norm * (denorm_cte ** (len(p_norm) - len(z_norm)))
@@ -72,25 +72,25 @@ class ChebyII(Approximation):
 
             if filter_in_use.get_type() is FilterTypes.LowPass.value:
                 """ And transform the normalized low pass to the desire one """
-                z, p, k = signal.lp2lp_zpk(_z, _p, _k, self.information[TemplateInfo.fa.value])
+                z, p, k = signal.lp2lp_zpk(_z, _p, _k, 2*np.pi*self.information[TemplateInfo.fa.value])
                 filter_in_use.load_z_p_k(z, p, k)
 
             elif filter_in_use.get_type() is FilterTypes.HighPass.value:
-                z, p, k = signal.lp2hp_zpk(_z, _p, _k, (2*np.pi)**2*self.information[TemplateInfo.fa.value])
+                z, p, k = signal.lp2hp_zpk(_z, _p, _k, 2*np.pi**self.information[TemplateInfo.fa.value])
                 filter_in_use.load_z_p_k(z, p, k)
 
             elif filter_in_use.get_type() is FilterTypes.BandPass.value:
                 Awa = self.information[TemplateInfo.fa_.value] - self.information[TemplateInfo.fa__.value]
                 w0 = np.sqrt(self.information[TemplateInfo.fa_.value] * self.information[TemplateInfo.fa__.value])
 
-                z, p, k = signal.lp2bp_zpk(_z, _p, _k, 2*np.pi*w0, Awa)  # Desnormalizado
+                z, p, k = signal.lp2bp_zpk(_z, _p, _k, 2*np.pi*w0, 2*np.pi*Awa)  # Desnormalizado
                 filter_in_use.load_z_p_k(z, p, k)
 
             elif filter_in_use.get_type() is FilterTypes.BandReject.value:
                 Awa = self.information[TemplateInfo.fa_.value] - self.information[TemplateInfo.fa__.value]
                 w0 = np.sqrt(self.information[TemplateInfo.fa_.value] * self.information[TemplateInfo.fa__.value])
 
-                z, p, k = signal.lp2bs_zpk(_z, _p, _k, 2*np.pi*w0, (2*np.pi)**2*Awa)  # Desnormalizado
+                z, p, k = signal.lp2bs_zpk(_z, _p, _k, 2*np.pi*w0, 2*np.pi**Awa)  # Desnormalizado
                 filter_in_use.load_z_p_k(z, p, k)
 
             else:

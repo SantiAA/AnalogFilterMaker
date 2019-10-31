@@ -52,8 +52,17 @@ class BackEnd:
         my_filter = self._parse_filter(filter)
         return my_filter.validate_requirements()
 
-    def get_template(self, filtro):
+    def get_template(self, filtro, approximation=None):
         my_filter = self._parse_filter(filtro)
+        if approximation is not None:
+            if approximation[0] == "Chebyshev II":
+                approx_dict = {}
+                for key, value in approximation[1].items():
+                    if value[1] is not None:
+                        approx_dict[key] = value[1]
+                for each in self.all_approximations:
+                    if each.name is approximation[0]:
+                        each.load_information(my_filter)  # Hago que chevy 2 cambie la plantilla normalizada
         return my_filter.get_templates()
 
     def get_graphics(self, filtro, aproximacion):

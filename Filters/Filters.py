@@ -38,7 +38,7 @@ class TemplateInfo(Enum):
     fp__ = "fp- [Hz]"
     gd = "Group delay [us]"
     ft = "ft [Hz]"
-    tol = "Tolerance (0-1]"
+    tol = "Tolerance [%]"
     k = "Gain [dB]"
 
 

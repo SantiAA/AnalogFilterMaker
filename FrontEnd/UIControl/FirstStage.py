@@ -242,10 +242,10 @@ class FirstStage(QMainWindow):
             self.plotTemplateButton.setStyleSheet("font: 63 10pt; color:rgb(255, 255, 255); padding: 8px; bottom-margin:3px;")
         self.redraw()
 
-    def __update_templates__(self):
+    def __update_templates__(self, appoximation=None):
         self.filter = self.filters[self.comboFilter.currentText()]
         dict = self.filter.make_feature_dictionary()
-        self.templates_dict = self.__ask_for_templates__([self.filter.name, dict])
+        self.templates_dict = self.__ask_for_templates__([self.filter.name, dict], appoximation)
         self.templates = []
         for key in self.templates_dict.keys():
             self.templates.append(Template(key, self.templates_dict[key], False))
@@ -264,7 +264,7 @@ class FirstStage(QMainWindow):
         self.redraw()
         self.templateCheckBox.hide()
 
-    def __ask_for_templates__(self, param_list):
+    def __ask_for_templates__(self, param_list, approximation=None):
         """
         if len(self.current_template.squares) == 0:
             self.templateCheckBox.show()
@@ -272,7 +272,7 @@ class FirstStage(QMainWindow):
 
         validated, error_string = self.backend.validate_filter(param_list)
         if validated:
-            templates = self.backend.get_template(param_list)
+            templates = self.backend.get_template(param_list, approximation)
             return templates
         else:
             msg = QMessageBox()
@@ -376,6 +376,7 @@ class FirstStage(QMainWindow):
             self.filter = self.filters[self.comboFilter.currentText()]
             dict = self.filter.make_feature_dictionary()
             validated, error_string = self.backend.validate_filter([self.filter.name, dict])
+            approx = None
             if validated:
                 for approximation in self.filter.approximation_list:
                     if approximation.name == self.approxCombo.currentText():
@@ -389,6 +390,7 @@ class FirstStage(QMainWindow):
                         self.graphics_returned = self.backend.get_graphics([self.filter.name, dict], [approximation.name,
                                                                                               approximation.make_approx_dict(),
                                                                                               approximation.extra_combos])
+                        approx = approximation
                         #self.existing = True
                         new_graph = FinalGraph(self.graphics_returned, properties, True)
                         """
@@ -401,10 +403,10 @@ class FirstStage(QMainWindow):
                         self.showingGraphs.append(new_graph)
                 self.fill_combo_graph()
                 self.__update_active_approx_combo__()
-                self.__update_templates__()
+                self.__update_templates__([approx.name, approx.make_approx_dict(),
+                                           approx.extra_combos])
                 self.redraw_graphs()
                 self._template_ploting_w_graphs_()
-
 
             else:
                 msg = QMessageBox()
