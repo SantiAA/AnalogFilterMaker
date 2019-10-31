@@ -177,11 +177,12 @@ class Filter(object):
         phase_n = angle(h_n)
         graphs[GraphTypes.Attenuation.value] = [[GraphValues(f, -mag, False, False, True, extra_info)], ["Frequency [Hz]", "Attenuation[dB]"]]   # se pasa una lista de graphvalues
         if self.filter is FilterTypes.GroupDelay.value:
-            graphs[GraphTypes.NormalizedGd.value] = [[GraphValues(f[:-1], -2 * pi * diff(unwrap(phase_n)) / diff(w_n), False, False, True, extra_info)],
-                                             ["Frequency[Hz]", "Group delay [us]"]]  # -d(Phase)/df = -dP/dw * dw/df = -dP/dw * 2pi
+            norm_gd = -2 * pi * diff(unwrap(phase_n)) / diff(w_n)
+            graphs[GraphTypes.NormalizedGd.value] = [[GraphValues(f_n[:-1], norm_gd/norm_gd[0], False, False, True, extra_info)],
+                                             ["Frequency[Hz]", "Group delay [s]"]]  # -d(Phase)/df = -dP/dw * dw/df = -dP/dw * 2pi
         else:
             graphs[GraphTypes.NormalizedAt.value] = [[GraphValues(f_n, -mag_n, False, False, True, extra_info)], ["Frequency[Hz]", "Attenuation[dB]"]]
-        graphs[GraphTypes.GroupDelay.value] = [[GraphValues(f[:-1], -2*pi*diff(unwrap(phase))/diff(w), False, False, True, extra_info)], ["Frequency[Hz]", "Group delay[us]"]]  # -d(Phase)/df = -dP/dw * dw/df = -dP/dw * 2pi
+        graphs[GraphTypes.GroupDelay.value] = [[GraphValues(f[:-1], -2*pi*diff(unwrap(phase))/diff(w)*1e6, False, False, True, extra_info)], ["Frequency[Hz]", "Group delay[us]"]]  # -d(Phase)/df = -dP/dw * dw/df = -dP/dw * 2pi
         t, imp = signal.impulse(trans_func)
         graphs[GraphTypes.Impulse.value] = [[GraphValues(t, imp, False, False, False, extra_info)], ["t[s]", "V[V]"]]
         t, step = signal.step(trans_func)

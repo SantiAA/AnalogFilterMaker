@@ -88,7 +88,7 @@ class Gauss(Approximation):
 
     def _gauss_des(self, z_n, p_n):
         """ Returns zeros, poles and gain of Gauss denormalized approximation """
-        p = p_n/(self.information[TemplateInfo.gd.value]*10e-6)     # user's group delay in us
+        p = p_n/(self.information[TemplateInfo.gd.value]*1e-6)     # user's group delay in us
         k = prod(abs(p))
         return z_n, p, k
 
@@ -97,7 +97,7 @@ class Gauss(Approximation):
         outfile = open("Approximations/PreCalc/gauss.json", "w+")
         for i in range(2, n_max + 1, 2):
             transfer_function = self._get_tf(i)
-            w, mag, phase = transfer_function.bode(n=1500)
+            w, mag, phase = transfer_function.bode(n=3000)
             gd = -diff(unwrap(phase)) / diff(w)
             gd = divide(gd, gd[0])
             data[str(i)] = {}
