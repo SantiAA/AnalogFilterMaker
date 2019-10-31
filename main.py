@@ -6,10 +6,12 @@ from FrontEnd.UIManager import UIManager
 from enum import Enum
 from random import random
 
-class hola(Enum):
-    A = "A"
-    B = "B"
+A = B = 1
+print(A, " ", B)
+B = 2
+print(A, " ", B)
 
+exit()
 class my(object):
     def __init__(self):
         self.lista = []
