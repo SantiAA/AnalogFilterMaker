@@ -137,9 +137,9 @@ class SecondStage(QMainWindow):
         self.__plot_p_z_graph__(z_p_plot)
 
     def __plot_p_z_graph__(self, graphs):
-        #self.z_p_diagram.canvas.axes.set_xlabel(graphs[1][0])
+
         self.z_p_diagram.canvas.axes.xaxis.label.set_color('black')
-        #self.z_p_diagram.canvas.axes.set_ylabel(graphs[1][1])
+
         self.z_p_diagram.canvas.axes.ticklabel_format(useOffset=False)
 
         self.z_p_diagram.canvas.axes.grid(True, which="both")
@@ -163,8 +163,6 @@ class SecondStage(QMainWindow):
             self.z_p_diagram.canvas.axes.spines['right'].set_color('none')
             self.z_p_diagram.canvas.axes.spines['bottom'].set_position('zero')
             self.z_p_diagram.canvas.axes.spines['top'].set_color('none')
-            #self.z_p_diagram.canvas.axes.xaxis.set_ticks_position('bottom')
-            #self.z_p_diagram.canvas.axes.yaxis.set_ticks_position('left')
 
 
             if not graph_data.x_marks:
