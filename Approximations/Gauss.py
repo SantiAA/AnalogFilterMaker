@@ -76,7 +76,7 @@ class Gauss(Approximation):
             wo = 2*pi*self.information[TemplateInfo.ft.value]*self.information[TemplateInfo.gd.value]*1e-6
             #ind = where(asarray(data[n_i]["w"]) >= wo)[0][0]
             #tol = 1 - data[n_i]["Group delay"][ind]
-            index = where(asarray(data[n_i]["Group delay"]) <= (1 - self.information[TemplateInfo.tol.value] / 100))
+            index = where(asarray(data[n_i]["Group delay"]) <= (1 - self.information[TemplateInfo.tol.value] / 100))[0][0]
 
             wt = data[n_i]["w"][index]
             #if tol <= self.information[TemplateInfo.tol.value]/100:
@@ -111,7 +111,7 @@ class Gauss(Approximation):
     def _pre_calc(self, n_max: int):
         data = {}
         outfile = open("Approximations/PreCalc/gauss.json", "w+")
-        for i in range(1, n_max + 1):
+        for i in range(2, n_max + 1):
             transfer_function = self._get_tf(i)
             w, mag, phase = transfer_function.bode(n=3000)
             gd = -diff(unwrap(phase)) / diff(w)
