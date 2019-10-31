@@ -104,5 +104,5 @@ class BackEnd:
         return {"Dynamic filters": self.dynamic_filters}
 
     def load_save_info(self, save_info):
-        self.__init__(self)
+        self.__init__()
         self.dynamic_filters = save_info
