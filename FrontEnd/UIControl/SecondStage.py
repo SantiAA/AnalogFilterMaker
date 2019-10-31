@@ -96,6 +96,8 @@ class SecondStage(QMainWindow):
             self.gainSpin.show()
             self.goGain.setText("Set Gain")
             self.goGain.setStyleSheet("font: 63 9pt; color:rgb(255, 255, 255);")
+            self.__redefine_const_params_()
+            
         else:
             self.gainSpin.hide()
             self.goGain.setText("N/A")
