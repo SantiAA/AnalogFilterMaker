@@ -60,19 +60,17 @@ class StagesManager(object):
                     z.remove(z[1])
                     saved = True
             if not saved:
-                self.z_pairs.append(Zero(abs(z[0].im), 1))  # si no tiene conjugado es de primer orden en el origen
+                self.z_pairs.append(Zero(abs(z[0]), 1))  # si no tiene conjugado es de primer orden en el origen
             z.remove(z[0])
             saved = False
         self.p_pairs.sort(key=lambda x: x.q, reverse=True)  # ordeno polos por Q creciente
         self.z_pairs.sort(key=lambda x: x.n, reverse=True)  # ordeno ceros por orden creciente
-        self.unused_p = self.p_pairs
-        self.unused_z = self.z_pairs
 
     def auto_max_rd(self, vi_min, vi_max):
         # agrupo todas
         self.sos = []
-        z_1 = None  # habra como mucho un cero de primer orden
-        p_1 = None  # habra como mucho un polo de primer orden
+        z_i = None  # habra como mucho un cero de primer orden
+        p_i = None  # habra como mucho un polo de primer orden
         """ To agrupate nearest poles and zeros """
         if len(self.z_pairs):   # si tiene ceros
                 adj_matrix = [] # aqui se guardaran todas las distancias entre frecuencias de corte de polos y ceros
@@ -83,44 +81,45 @@ class StagesManager(object):
                                 dist = abs(self.z_pairs[i].imag - self.p_pairs[j].fo)
                                 adj_matrix[i][j] = dist         # guardo la distancia entre cada polo y cero de orden 2
                             else:
-                                if p_1 is None:
-                                    p_1 = self.p_pairs[j]
+                                if p_i is None:
+                                    p_i = j
                     else:
-                        if z_1 is None:
-                            z_1 = self.z_pairs[i].n
+                        if z_i is None:
+                            z_i = i
                 used_p = full(adj_matrix.shape(1), False)
                 i, j = (0, 0)
                 while adj_matrix[i][j] < 1e9:
                     i, j = argmin(adj_matrix)
+                    self.z_pairs[i].used = True
+                    self.p_pairs[j] = True
                     self.sos.append(Stage(self.z_pairs[i], self.p_pairs[j], 1)) # ganancia 1 por defecto
-                    self.unused_z.remove(self.z_pairs[i])
-                    self.unused_p.remove(self.p_pairs[j])
                     adj_matrix[i] = full(adj_matrix.shape(0),1e9)  # ya no me interesa esta distancia, la hago grande para que no salga elegida
-                    adj_matrix[ : ,j] = full(adj_matrix.shape(1), 1e9)
+                    adj_matrix[:, j] = full(adj_matrix.shape(1), 1e9)
                     used_p[j] = True    # marca que este polo ya se utilizo
                 for i in range(adj_matrix.shape(1)):
                     if not used_p[i]:
-                        if z_1 is None:
+                        self.p_pairs[i].used = True
+                        if z_i is None:
                             self.sos.append(Stage(None, self.p_pairs[i], 1))
                         else:   # si hay algun cero de primer oden, se lo agrego a la primera etapa sin ceros que aparezca
-                            self.sos.append(Stage(z_1, self.p_pairs[i], 1))
-                            self.unused_z.remove(self.z_pairs[i])
-                            z_1 = None
-                        self.unused_p.remove(self.p_pairs[i])
-                if p_1 is not None:
+                            self.z_pairs[z_i].used = True
+                            self.sos.append(Stage(self.z_pairs[z_i], self.p_pairs[i], 1))
+                            z_i = None
+                if p_i is not None:
                     zero = complex(0)
-                    if z_1 is not None:
-                        zero = z_1
-                        z_1 = None
-                        self.unused_z.remove(z_1)
-                    self.sos.append(Stage(zero, p_1, 1))
-                    self.unused_p.remove(p_1)
-                    p_1 = None
+                    self.p_pairs[p_i].used = True
+                    if z_i is not None:
+                        self.z_pairs[z_i].used = True
+                        zero = self.z_pairs[z_i]
+                        z_i = None
+                    self.sos.append(Stage(zero, self.p_pairs[p_i], 1))
+                    p_i = None
         else:
-            self.sos = [Stage(None, p, 1) for p in self.p_pairs]
-            self.unused_p.clear()
-        self.sos.sort(key=lambda x:x.p.q) # ordena por Q decreciente
-        self.sos[-1].set_gain(self.k_tot) # le pongo toda la ganancia a la ultima etapa
+            for i in range(len(self.p_pairs)):
+                self.p_pairs[i].used = True
+                self.sos[i] = Stage(None, self.p_pairs[i], 1)
+        self.sos.sort(key=lambda x: x.p.q)  # ordena por Q decreciente
+        self.sos[-1].set_gain(self.k_tot)   # le pongo toda la ganancia a la ultima etapa
         return self.sos
 
     def get_stages(self):
@@ -133,39 +132,37 @@ class StagesManager(object):
         ok = False
         z_ind = None
         p_ind = None
-        for i_z in range(len(self.z_pairs)):
+        for i_z in range(len(self.z_pairs)):    # busco el indice del cero seleccionado
             if z_str == self.z_pairs[i_z].get_msg():
                 z_ind = i_z
                 break
-        for i_p in range(len(self.p_pairs)):
+        for i_p in range(len(self.p_pairs)):    # busco el indice del polo seleccionado
             if p_str == self.p_pairs[i_p].get_msg():
                 p_ind = i_p
                 break
             # self.sos.append(Stage(zero, pole, 1))
         n_z = 0
         n_p = 1
-        if z_ind is not None:
+        if z_ind:
             n_p = 1 if self.p_pairs[p_ind].q < 0 else 2
             n_z = self.z_pairs[z_ind].n
         if n_p >= n_z:
             pole_n_left = 0
             z_n_left = 0
-            for p in self.unused_p:
-                pole_n_left += 2 if p.q > 0 else 1
-            for z in self.unused_z:
-                z_n_left += z.n
+            for p in self.p_pairs:
+                if not p.used:
+                    pole_n_left += 2 if p.q > 0 else 1
+            for z in self.z_pairs:
+                if not z.used:
+                    z_n_left += z.n
             if pole_n_left >= z_n_left:
                 ok = True
-                pole = self.p_pairs[p_ind]
-                pole.used = True
-                self.unused_p.remove(pole)
+                self.p_pairs[p_ind].used = True
                 if z_ind:
-                    zero = self.z_pairs[z_ind]
-                    zero.used = True
-                    self.unused_z.remove(zero)
-                    self.sos.append(Stage(zero, pole, 1))
+                    self.z_pairs[z_ind].used = True
+                    self.sos.append(Stage(self.z_pairs[z_ind], self.p_pairs[p_ind], 1))
                 else:
-                    self.sos.append(Stage(None, pole, 1))
+                    self.sos.append(Stage(None, self.p_pairs[p_ind], 1))
             else:
                 ret = "There must be greater o equal amount of poles than zeros remaing after selection"
         else:
@@ -174,7 +171,9 @@ class StagesManager(object):
 
     def shift_stages(self, indexes: list, left):
         """ Shifts the stages indicated at the indexes list. Shifts left if left == True,shifts rigth otherwise"""
+        ret = False
         if len(self.sos) > 1:
+            ret = True
             if left:
                 step = -1
                 i_lim = 0
@@ -192,6 +191,7 @@ class StagesManager(object):
                     self.sos[i], self.sos[i+rep] = (self.sos[i+rep], self.sos[i])
                 i += step
                 rep = step
+        return ret
 
     def delete_stages(self, indexes: list):
         """" Deletes stages indicated by indexes list """
@@ -214,9 +214,9 @@ class StagesManager(object):
                 self.sos[i].k = 10**(k/20)
                 return True, ""
             else:
-                return False, "Total gain can't exceed" + str(self.k_tot) + "dB"
+                return False, f"Total gain can't exceed {self.k_tot:.2f} dB"
         else:
-            return False, "Stage" + str(i + 1) + "doesn't exist."
+            return False, f"Stage {i + 1} doesn't exist."
 
     def get_z_p_plot(self):
         """" Returns poles and zeros diagram with number of repeticiones of each pole and zero """
@@ -231,13 +231,15 @@ class StagesManager(object):
             for j in range(count):
                 add += self.z_pairs[i + j].n
             repeated_z.append(add)
-            z.append(complex(0,self.z_pairs[i].im))
+            add_z = complex(0, self.z_pairs[i].im)
+            z += [add_z, conjugate(add_z)] if self.z_pairs[i].n == 2 else [add_z]
             i += count
         i = 0
         while i < len(self.p_pairs):
             count = self.p_pairs.count(self.p_pairs[i])
             repeated_p.append(count)
-            p.append(self.p_pairs[i].p)
+            add_p = self.p_pairs[i].p
+            p += [add_p, conjugate(add_p)] if self.p_pairs[i].q > 0 else [add_p]
             i += count
         return [[GraphValues(real(z), imag(z), True, False, False, "Zeros", repeated_z), GraphValues(real(p),
                         imag(p), True, True, False, "Poles", repeated_p)], ["Re(s)[rad/sec]", "Im(s)[rad/sec]"]]
@@ -361,11 +363,9 @@ class StagesManager(object):
         return ok, ret
 
     def get_save_info(self):
-        return {"Sos": self.sos, "Zeros": [self.z_pairs, self.unused_z], "Poles": [self.p_pairs, self.unused_p]}
+        return {"Sos": self.sos, "Zeros": self.z_pairs, "Poles": self.p_pairs}
 
     def load_saved_info(self, info: dict):
         self.sos = info["Sos"]
-        self.z_pairs = info["Zeros"][0]
-        self.unused_z = info["Zeros"][1]
-        self.p_pairs = info["Poles"][0]
-        self.unused_p = info["Poles"][1]
+        self.z_pairs = info["Zeros"]
+        self.p_pairs = info["Poles"]

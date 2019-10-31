@@ -14,9 +14,9 @@ class Pole:
     def get_msg(self):
         aux = ""
         if self.q > 0:
-            aux += " - Q: " + str(self.q)
+            aux += f" - Q: {self.q:.2f}"
         if self.used:
             aux += " (used)"
-        return "fo: " + str(self.fo) + aux
+        return f"fo:{self.fo:.1f}" + aux
 
 

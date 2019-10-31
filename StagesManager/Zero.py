@@ -8,7 +8,7 @@ class Zero:
         using = ""
         if self.used:
             using = " (used)"
-        return "fo: " + str(abs(self.im)) + " - n: " + str(self.n) + using
+        return f"fo: {abs(self.im):.1f}, n: {self.n}" + using
 
     def __eq__(self, other):
         return self.im == other.im
