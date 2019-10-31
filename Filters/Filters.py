@@ -177,7 +177,9 @@ class Filter(object):
         phase_n = angle(h_n)
         graphs[GraphTypes.Attenuation.value] = [[GraphValues(f, -mag, False, False, True, extra_info)], ["Frequency [Hz]", "Attenuation[dB]"]]   # se pasa una lista de graphvalues
         if self.filter is FilterTypes.GroupDelay.value:
-            norm_gd = -2 * pi * diff(unwrap(phase_n)) / diff(w_n)
+            # norm_gd = -2 * pi * diff(unwrap(phase_n)) / diff(w_n)
+            norm_gd = -2 * pi * diff(unwrap(phase)) / diff(w)
+            f_n = f*norm_gd[0]
             graphs[GraphTypes.NormalizedGd.value] = [[GraphValues(f_n[:-1], norm_gd/norm_gd[0], False, False, True, extra_info)],
                                              ["Frequency[Hz]", "Group delay [s]"]]  # -d(Phase)/df = -dP/dw * dw/df = -dP/dw * 2pi
         else:
