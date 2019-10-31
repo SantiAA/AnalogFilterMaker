@@ -35,7 +35,12 @@ class SecondStage(QMainWindow):
         self.reloadv.clicked.connect(self.update_rd)
         self.nextButton.clicked.connect(self.right_shift)
         self.backButton.clicked.connect(self.left_shift)
+        self.prev_window.clicked.connect(self.prev_window_clicked)
+        self.next_window.clicked.connect(self.next_window_clicked)
         self.goGain.clicked.connect(self.set_gain)
+        self.saveButton.clicked.connect(self.ui_manager.save_current_state)
+        self.saveAsButton.clicked.connect(self.ui_manager.save_as_current_state)
+        self.loadButton.clicked.connect(self.ui_manager.load_current_state)
         self.__plot_p_z_graph__(self.stages_manager.get_z_p_plot())
         self.poles_and_zeros_dict = self.stages_manager.get_z_p_dict()
         self.__fill_poles_and_zeros_combos__()
@@ -47,6 +52,24 @@ class SecondStage(QMainWindow):
 
 
         self.show()
+
+
+    def get_current_state_config(self):
+        self.window_configuration = self.backend.get_save_info()
+        return self.window_configuration
+
+    def load_current_state(self, configuration_dict):
+        self.backend.load_save_info(configuration_dict)
+        self.stages_ui_layout.delete_all_stages()
+        self.__reload_stages__()
+        self.__redraw__()
+
+    def next_window_clicked(self):
+        self.ui_manager.next_window()
+
+    def prev_window_clicked(self):
+        self.ui_manager.previous_window()
+
 
     def update_rd(self):
         validated, value = self.stages_manager.get_dr(self.vminSpin.value(), self.vmaxSpin.value())
@@ -69,7 +92,7 @@ class SecondStage(QMainWindow):
         self.__redraw__()
         if self.stages_ui_layout.get_number_of_checked() == 1:
             self.gainSpin.show()
-            self.goGain.setText("GO")
+            self.goGain.setText("Set Gain")
             self.goGain.setStyleSheet("font: 63 9pt; color:rgb(255, 255, 255);")
         else:
             self.gainSpin.hide()
@@ -127,6 +150,11 @@ class SecondStage(QMainWindow):
                     self.z_p_diagram.canvas.axes.annotate(n_array_text[i],
                                                           (graph_data.x_values[i], graph_data.y_values[i]))
 
+
+        self.z_p_diagram.figure.tight_layout()
+
+
+
     # Funciones que configuran y muestran los titulos de los ejes.
     def __fix_axes_titles_position__(self, widget, label_x, label_y):
         #widget.canvas.axes.legend.remove()
@@ -165,7 +193,7 @@ class SecondStage(QMainWindow):
         self.__reload_stages__()
         self.__redraw__()
 
-    def __reload_stages__(self):
+    def __reload_stages__(self, ):
         current_stages = self.stages_manager.get_stages()
         i = 0
         for stage in current_stages:
@@ -189,11 +217,15 @@ class SecondStage(QMainWindow):
                     self.combo1.model().item(self.combo1.findText(key)).setEnabled(False)
                     for sing in self.poles_and_zeros_dict[keys[i]][key]:
                         self.combo1.addItem(sing.get_msg())
+                        if sing.used:
+                            self.combo1.model().item(self.combo1.findText(sing.get_msg())).setEnabled(False)
                 if i == 1:
                     self.combo2.addItem(key)
                     self.combo2.model().item(self.combo2.findText(key)).setEnabled(False)
                     for sing in self.poles_and_zeros_dict[keys[i]][key]:
                         self.combo2.addItem(sing.get_msg())
+                        if sing.used:
+                            self.combo2.model().item(self.combo1.findText(sing.get_msg())).setEnabled(False)
 
     def __place_button_images__(self):
         pixmap = QPixmap("FrontEnd/UIs/figs/button_figs/next.png")
@@ -275,6 +307,10 @@ class SecondStage(QMainWindow):
                         self.graph_widget.canvas.axes.annotate(n_array_text[i],
                                                                (graph_data.x_values[i], graph_data.y_values[i]))
         self.graph_widget.canvas.axes.legend(loc='best')
+        self.graph_widget.canvas.draw()
+        self.graph_widget.figure.tight_layout()
+
+
 
 
 
