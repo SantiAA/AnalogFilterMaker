@@ -6,6 +6,7 @@ from numpy import argmin
 from numpy import full
 from numpy import log10
 from enum  import Enum
+from numpy import sum
 
 # AFM project modules
 from scipy import signal
@@ -43,7 +44,8 @@ class StagesManager(object):
         self.sos = []
         self.k_tot = 0
         """ Guarda todos los polos y ceros agrupados en etapas de 1/2do orden """
-        z, p, self.k_tot, q = fil.get_z_p_k_q()
+        z, p, gain, q = fil.get_z_p_k_q()
+
         saved = False
         while len(p):  # guardo en self.p_pairs los pares de polos complejos conjugados como [wo,Q]
             if len(p) > 1:
@@ -75,7 +77,7 @@ class StagesManager(object):
         p_i = None  # habra como mucho un polo de primer orden
         """ To agrupate nearest poles and zeros """
         if len(self.z_pairs):   # si tiene ceros
-                adj_matrix = [] # aqui se guardaran todas las distancias entre frecuencias de corte de polos y ceros
+                adj_matrix = [[]] # aqui se guardaran todas las distancias entre frecuencias de corte de polos y ceros
                 for i in range(len(self.z_pairs)):      # para cada cero
                     if self.z_pairs[i].n == 2:  # si el cero es de segundo orden
                         for j in range(len(self.p_pairs)):
@@ -88,15 +90,15 @@ class StagesManager(object):
                     else:
                         if z_i is None:
                             z_i = i
-                used_p = full(adj_matrix.shape(1), False)
+                used_p = full(len(adj_matrix), False)
                 i, j = (0, 0)
                 while adj_matrix[i][j] < 1e9:
                     i, j = argmin(adj_matrix)
                     self.z_pairs[i].used = True
                     self.p_pairs[j] = True
                     self.sos.append(Stage(self.z_pairs[i], self.p_pairs[j], 1)) # ganancia 1 por defecto
-                    adj_matrix[i] = full(adj_matrix.shape(0),1e9)  # ya no me interesa esta distancia, la hago grande para que no salga elegida
-                    adj_matrix[:, j] = full(adj_matrix.shape(1), 1e9)
+                    adj_matrix[i] = full(len(adj_matrix), 1e9)  # ya no me interesa esta distancia, la hago grande para que no salga elegida
+                    adj_matrix[:, j] = full(len(adj_matrix), 1e9)
                     used_p[j] = True    # marca que este polo ya se utilizo
                 for i in range(adj_matrix.shape(1)):
                     if not used_p[i]:
@@ -120,8 +122,26 @@ class StagesManager(object):
             for i in range(len(self.p_pairs)):
                 self.p_pairs[i].used = True
                 self.sos.append(Stage(None, self.p_pairs[i], 1))
-        self.sos.sort(key=lambda x: x.p.q)  # ordena por Q decreciente
-        self.sos[-1].set_gain(self.k_tot)   # le pongo toda la ganancia a la ultima etapa
+        self.sos.sort(key=lambda x: x.pole.q)  # ordena por Q decreciente
+        ganancias = []
+        # for i in range(len(self.sos)):
+        #     self.sos[i].k = 1  # Le pongo a todas ganancias 1
+        #     polos = 0
+        #     if self.sos[i].pole.q > 0:  # Polo de segundo orden
+        #         polos *= abs(self.sos[i].pole.p)**2
+        #     else:
+        #         polos *= abs(self.sos[i].pole.p)
+        #     zero = 0
+        #     if self.sos[i].z is not None:
+        #         zero = abs(self.sos[i].z.im)**self.sos[i].z
+        #     else:
+        #         zero = 1
+        #     self.k_tot /= polos/zero
+        #
+        # print(self.k_tot)
+        #
+        # self.sos[:-1].k += self.k_tot
+
         return self.sos
 
     def get_stages(self):
@@ -336,7 +356,7 @@ class StagesManager(object):
     def _get_stg_dr(self, i, vi_min, vo_max):
         """ Returns stage i dynamic range """
         partial_gain = 0
-        for j in range(i): # recorro todas las etapas hasta la que quiero calcular el rango dinamico
+        for j in range(i+1): # recorro todas las etapas hasta la que quiero calcular el rango dinamico
             partial_gain += self.sos[j].k
         vi_max = amin(vo_max, vo_max/partial_gain)
         vi_min = amax(vi_min, vi_min/partial_gain) # vi_min: minimo valor a la entrada tal que la salida no este en el piso de ruido y la entrada no este en el piso de ruido
