@@ -379,7 +379,7 @@ class StagesManager(object):
                 ret["fo"][0] = f"{self.sos[i].pole.fo:.1f}"
                 if self._validate_vi(vi_min, vo_max)[0]:
                     pass
-                    # ret["DR"][0] = str(self._get_stg_dr(i, vi_min, vo_max))
+                    ret["DR"][0] = str(self._get_stg_dr(i, vi_min, vo_max))
         return ret
 
     @staticmethod

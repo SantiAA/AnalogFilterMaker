@@ -106,3 +106,6 @@ class BackEnd:
     def load_save_info(self, save_info):
         self.dynamic_filters = save_info["Dynamic filters"]
         #self.__init__(save_info["Dynamic filters"])
+
+    def reset(self):
+        self.__init__()
