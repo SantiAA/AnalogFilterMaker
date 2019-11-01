@@ -291,6 +291,7 @@ class FirstStage(QMainWindow):
         self.templateCheckBox.hide()
         self.redraw_graphs()
         # update plot
+        self.backend.reset()
 
         try:
             for filters in self.filters.values():  # Clearing requirement widgets

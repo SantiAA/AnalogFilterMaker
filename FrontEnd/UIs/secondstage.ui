@@ -579,7 +579,7 @@ color:rgb(255, 255, 255);
 border: 0px solid blue;</string>
             </property>
             <property name="text">
-             <string>RD</string>
+             <string>RD:</string>
             </property>
            </widget>
           </item>
@@ -591,7 +591,7 @@ color:rgb(255, 255, 255);
 border: 0px solid blue;</string>
             </property>
             <property name="text">
-             <string>50</string>
+             <string/>
             </property>
            </widget>
           </item>
