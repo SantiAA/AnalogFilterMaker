@@ -2,7 +2,7 @@
 from enum import Enum
 
 # third-party modules
-from numpy import poly
+from numpy import poly, conjugate
 from numpy import sqrt
 from numpy import conj
 from numpy import angle
@@ -114,7 +114,7 @@ class Filter(object):
         return self.denormalized["MaxQ"]
 
     def load_z_p_k(self, z, p, k):
-        self.denormalized["Zeros"] = self._agrup_roots(z) + [1]
+        self.denormalized["Zeros"] = self._agrup_roots(z)
         self.denormalized["Gain"] = k
         self.denormalized["Order"] = len(p)
         self.denormalized["StagesQ"] = []
@@ -207,15 +207,23 @@ class Filter(object):
         i=0
         while i < len(self.denormalized["Zeros"]):
             count = self.denormalized["Zeros"].count(self.denormalized["Zeros"][i])
-            repeated_z.append(count)
+            count_conj = self.denormalized["Zeros"].count(conjugate(self.denormalized["Zeros"][i]))
             z.append(self.denormalized["Zeros"][i])
-            i += count
+            z.append(conjugate(self.denormalized["Zeros"][i]))
+            repeated_z.append(count)
+            repeated_z.append(count_conj)
+            i += count + count_conj
         i = 0
         while i < len(self.denormalized["Poles"]):
-            count = self.denormalized["Poles"].count(self.denormalized["Poles"][i])
+            count = self.denormalized["Poles"].count(conjugate(self.denormalized["Poles"][i]))
+            count_conj = self.denormalized["Poles"].count(conjugate(self.denormalized["Poles"][i]))
+            for j in range(count):
+                p.append(self.denormalized["Poles"][i])
+            for j in range(count_conj):
+                p.append(conjugate(self.denormalized["Poles"][i]))
             repeated_p.append(count)
-            p.append(self.denormalized["Poles"][i])
-            i += count
+            repeated_p.append(count_conj)
+            i += count + count_conj
         if len(self.denormalized["Zeros"]):
             graphs[GraphTypes.PolesZeros.value][0].append(GraphValues(real(z), imag(z), True, False, False, extra_info, repeated_z))
         graphs[GraphTypes.PolesZeros.value][0].append(GraphValues(real(p), imag(p), True, True, False, extra_info, repeated_p))

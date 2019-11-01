@@ -255,7 +255,11 @@ class StagesManager(object):
                 add += self.z_pairs[i + j].n
             repeated_z.append(add)
             add_z = complex(0, self.z_pairs[i].im)
-            z += [add_z, conjugate(add_z)] if self.z_pairs[i].n == 2 else [add_z]
+            if self.z_pairs[i].n == 2:
+                z += [add_z, conjugate(add_z)]
+                repeated_z.append(add)
+            else:
+                z += [add_z]
             i += count
         i = 0
         while i < len(self.p_pairs):
