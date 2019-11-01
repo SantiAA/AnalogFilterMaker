@@ -23,7 +23,7 @@
       <item>
        <layout class="QVBoxLayout" name="verticalLayout_2" stretch="0,40,10,50">
         <item>
-         <layout class="QHBoxLayout" name="horizontalLayout_11" stretch="20,20,20,20,20">
+         <layout class="QHBoxLayout" name="horizontalLayout_11" stretch="20,20,20,20">
           <item>
            <widget class="QPushButton" name="prev_window">
             <property name="sizePolicy">
@@ -107,26 +107,6 @@ bottom-margin:3px;
             </property>
             <property name="text">
              <string>LOAD</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="next_window">
-            <property name="maximumSize">
-             <size>
-              <width>60</width>
-              <height>60</height>
-             </size>
-            </property>
-            <property name="styleSheet">
-             <string notr="true">font: 63 8pt &quot;Open Sans Semibold&quot;;
-color:rgb(255, 255, 255);
-padding: 8px;
-bottom-margin:3px;
-</string>
-            </property>
-            <property name="text">
-             <string>NEXT</string>
             </property>
            </widget>
           </item>
