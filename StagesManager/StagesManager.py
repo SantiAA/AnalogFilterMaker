@@ -164,9 +164,8 @@ class StagesManager(object):
                 break
             # self.sos.append(Stage(zero, pole, 1))
         n_z = 0
-        n_p = 1
-        if z_ind:
-            n_p = 1 if self.p_pairs[p_ind].q < 0 else 2
+        n_p = 1 if self.p_pairs[p_ind].q < 0 else 2
+        if z_ind is not None:
             n_z = self.z_pairs[z_ind].n
         if n_p >= n_z:
             pole_n_left = 0
@@ -180,7 +179,7 @@ class StagesManager(object):
             if pole_n_left-n_p >= z_n_left-n_z:
                 ok = True
                 self.p_pairs[p_ind].used = True
-                if z_ind:
+                if z_ind is not None:
                     self.z_pairs[z_ind].used = True
                     self.sos.append(Stage(self.z_pairs[z_ind], self.p_pairs[p_ind], 1))
                 else:
@@ -338,7 +337,7 @@ class StagesManager(object):
             else:
                 if type is ShowType.Superposed:
                     indexes = list(range(len(self.sos)))
-                plot_list[0] = [self.sos[i].get_tf_plot() for i in indexes]
+                plot_list[0] = [self.sos[i].get_tf_plot(i) for i in indexes]
                 plot_list[1] = ["Frequency [Hz]", "Amplitude [dB]"]
         return plot_list
 
