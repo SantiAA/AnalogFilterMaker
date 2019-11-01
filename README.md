@@ -1,3 +1,3 @@
-#Analog Filter Maker:
+#Analog Filter Maker
 
 
