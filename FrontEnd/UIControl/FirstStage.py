@@ -71,6 +71,13 @@ class FirstStage(QMainWindow):
             backend_filter = self.backend.get_filter(id)
             self.stages_manager.load_filter(backend_filter)
             self.ui_manager.next_window()
+        else:
+            msg = QMessageBox()
+            msg.setIcon(QMessageBox.Critical)
+            msg.setText("Error")
+            msg.setInformativeText("No approximation detected.")
+            msg.setWindowTitle("Error")
+            msg.exec_()
 
     def load_project_clicked(self):
         self.ui_manager.load_current_state()
