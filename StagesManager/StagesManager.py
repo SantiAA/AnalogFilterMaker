@@ -77,10 +77,10 @@ class StagesManager(object):
         p_i = None  # habra como mucho un polo de primer orden
         """ To agrupate nearest poles and zeros """
         if len(self.z_pairs):   # si tiene ceros
-                adj_matrix = [[]] # aqui se guardaran todas las distancias entre frecuencias de corte de polos y ceros
+                adj_matrix = [] # aqui se guardaran todas las distancias entre frecuencias de corte de polos y ceros
                 for i in range(len(self.z_pairs)):      # para cada cero
                     if self.z_pairs[i].n == 2:  # si el cero es de segundo orden
-                        adj_matrix[i] = []
+                        adj_matrix.append([])
                         for j in range(len(self.p_pairs)):
                             if self.p_pairs[j].q > 0:  # si el polo es de segundo orden
                                 dist = abs(self.z_pairs[i].im - self.p_pairs[j].fo)
@@ -147,7 +147,13 @@ class StagesManager(object):
 
     def get_stages(self):
         """" Returns Stages list """
-        return self.sos, self.selected
+        ret = []
+        for i in self.sos:
+            if i in self.selected:
+                ret.append(True)
+            else:
+                ret.append(False)
+        return self.sos, ret
 
     def add_stage(self, p_str: str, z_str: str) -> (bool,str):
         """ Devuelve True es valida la etapa solicitada, False si no """
@@ -210,7 +216,8 @@ class StagesManager(object):
                 if i in indexes:
                     while i+rep in indexes:
                         rep += step
-                    self.sos[i], self.sos[i+rep] = (self.sos[i+rep], self.sos[i])
+                    if i+rep != i_lim:
+                        self.sos[i], self.sos[i+rep] = (self.sos[i+rep], self.sos[i])
                 i += step
                 rep = step
         return ret
@@ -218,13 +225,12 @@ class StagesManager(object):
     def delete_stages(self, indexes: list):
         """" Deletes stages indicated by indexes list """
         if amax(indexes) < len(self.sos):
-            for i in indexes:
-                if i in self.selected:
-                    self.selected.remove(i)
+            for i in reversed(indexes):
                 s = self.sos.pop(i)
                 for j in range(len(self.p_pairs)):
                     if self.p_pairs[j] == s.pole:
                         self.p_pairs[j].used = False
+            self.selected = [0]
         else:
             print("Indexes list out of range!")
 
@@ -336,7 +342,7 @@ class StagesManager(object):
                 f = w/(2*pi)
                 plot_list = [[GraphValues(f, 20*log10(mag), False, False, True)], ["Frequency [Hz]", "Amplitude [dB]"]]
             else:
-                if type is ShowType.Superposed:
+                if type == ShowType.Superposed.value[0]:
                     indexes = list(range(len(self.sos)))
                 plot_list[0] = [self.sos[i].get_tf_plot(i) for i in indexes]
                 plot_list[1] = ["Frequency [Hz]", "Amplitude [dB]"]
