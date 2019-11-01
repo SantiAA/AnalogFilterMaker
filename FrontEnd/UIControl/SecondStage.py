@@ -57,11 +57,19 @@ class SecondStage(QMainWindow):
 
 
     def get_current_state_config(self):
-        self.window_configuration = self.backend.get_save_info()
+        self.window_configuration = {}
+        self.window_configuration["back"] = self.backend
+        self.window_configuration["stages"] = self.stages_manager
+        #self.window_configuration = self.backend.get_save_info()
         return self.window_configuration
 
     def load_current_state(self, configuration_dict):
-        self.backend.load_save_info(configuration_dict)
+        self.backend = configuration_dict["back"]
+        self.stages_manager = configuration_dict["stages"]
+        #self.backend.load_save_info(configuration_dict)
+        self.__plot_p_z_graph__(self.stages_manager.get_z_p_plot())
+        self.poles_and_zeros_dict = self.stages_manager.get_z_p_dict()
+        self.__fill_poles_and_zeros_combos__()
         self.stages_ui_layout.delete_all_stages()
         self.__reload_stages__()
         self.__redraw__()
