@@ -224,13 +224,16 @@ class SecondStage(QMainWindow):
 
     def create_clicked(self):
         if (self.combo1.currentText() not in self.illegal_pole_titles) and (self.combo2.currentText() not in self.illegal_zeros_titles):
-            self.stages_manager.add_stage(self.combo1.currentText(), self.combo2.currentText())
-            self.stages_ui_layout.delete_all_stages()
-            self.__reload_stages__()
-            self.__redraw__()
-            self.__plot_p_z_graph__(self.stages_manager.get_z_p_plot())
-            self.poles_and_zeros_dict = self.stages_manager.get_z_p_dict()
-            self.__fill_poles_and_zeros_combos__()
+            validated, strerr = self.stages_manager.add_stage(self.combo1.currentText(), self.combo2.currentText())
+            if validated:
+                self.stages_ui_layout.delete_all_stages()
+                self.__reload_stages__()
+                self.__redraw__()
+                self.__plot_p_z_graph__(self.stages_manager.get_z_p_plot())
+                self.poles_and_zeros_dict = self.stages_manager.get_z_p_dict()
+                self.__fill_poles_and_zeros_combos__()
+            else:
+                self.__show_error__(strerr)
         else:
             self.__show_error__("Illegal pole or zero selection")
 
