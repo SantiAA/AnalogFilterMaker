@@ -93,12 +93,12 @@ class UIManager:
             pickle.dump(Save, open(path, "wb"))  # Creates the file and puts the data into the file
             self.project_path = path
         except:
-            msg = QMessageBox()
-            msg.setIcon(QMessageBox.Critical)
-            msg.setText("Error")
-            msg.setInformativeText("Couldn't save file")
-            msg.setWindowTitle("Error")
-            msg.exec_()
+             msg = QMessageBox()
+             msg.setIcon(QMessageBox.Critical)
+             msg.setText("Error")
+             msg.setInformativeText("Couldn't save file")
+             msg.setWindowTitle("Error")
+             msg.exec_()
 
     def save_current_state(self):
         self.program_state["window_iterator"] = self.window_iterator

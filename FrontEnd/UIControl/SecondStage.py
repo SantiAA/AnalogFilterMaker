@@ -42,7 +42,7 @@ class SecondStage(QMainWindow):
         self.nextButton.clicked.connect(self.right_shift)
         self.backButton.clicked.connect(self.left_shift)
         self.prev_window.clicked.connect(self.prev_window_clicked)
-        self.next_window.clicked.connect(self.next_window_clicked)
+
         self.goGain.clicked.connect(self.set_gain)
         self.saveButton.clicked.connect(self.ui_manager.save_current_state)
         self.saveAsButton.clicked.connect(self.ui_manager.save_as_current_state)
@@ -66,8 +66,6 @@ class SecondStage(QMainWindow):
         self.__reload_stages__()
         self.__redraw__()
 
-    def next_window_clicked(self):
-        self.ui_manager.next_window()
 
     def prev_window_clicked(self):
         self.ui_manager.previous_window()
