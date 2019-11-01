@@ -44,7 +44,7 @@ class StagesManager(object):
         self.sos = []
         self.k_tot = 0
         """ Guarda todos los polos y ceros agrupados en etapas de 1/2do orden """
-        z, p, gain, q = fil.get_z_p_k_q()
+        z, p, self.k_tot, q = fil.get_z_p_k_q()
 
         saved = False
         while len(p):  # guardo en self.p_pairs los pares de polos complejos conjugados como [wo,Q]
@@ -80,10 +80,11 @@ class StagesManager(object):
                 adj_matrix = [[]] # aqui se guardaran todas las distancias entre frecuencias de corte de polos y ceros
                 for i in range(len(self.z_pairs)):      # para cada cero
                     if self.z_pairs[i].n == 2:  # si el cero es de segundo orden
+                        adj_matrix[i] = []
                         for j in range(len(self.p_pairs)):
                             if self.p_pairs[j].q > 0:  # si el polo es de segundo orden
                                 dist = abs(self.z_pairs[i].im - self.p_pairs[j].fo)
-                                adj_matrix[i][j] = dist         # guardo la distancia entre cada polo y cero de orden 2
+                                adj_matrix[i].append(dist)          # guardo la distancia entre cada polo y cero de orden 2
                             else:
                                 if p_i is None:
                                     p_i = j
