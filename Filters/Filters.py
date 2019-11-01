@@ -154,7 +154,10 @@ class Filter(object):
 
     def get_all_graphs(self):
         graphs = {}
-        extra_info = f'n={self.denormalized["Order"]} Qmax={self.denormalized["MaxQ"]:.2}'
+        if self.denormalized["MaxQ"] is not None:
+            extra_info = f'n={self.denormalized["Order"]} Qmax={self.denormalized["MaxQ"]:.2}'
+        else:
+            extra_info = f'n={self.denormalized["Order"]} Qmax= - '
         k = self.denormalized["Gain"]*pow(10, self.requirements[TemplateInfo.k.value]/20)
         trans_func = signal.ZerosPolesGain(self.denormalized["Zeros"], self.denormalized["Poles"], k)
         w, h = trans_func.freqresp(n=3000)
