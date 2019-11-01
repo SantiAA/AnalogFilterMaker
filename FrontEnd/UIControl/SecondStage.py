@@ -92,6 +92,8 @@ class SecondStage(QMainWindow):
 
     def selected_amount_changed(self):
         self.__redraw__()
+        self.stages_manager.set_selected(self.stages_ui_layout.get_selected_ids_array())
+
         if self.stages_ui_layout.get_number_of_checked() == 1:
             self.gainSpin.show()
             self.goGain.setText("Set Gain")
@@ -135,9 +137,9 @@ class SecondStage(QMainWindow):
         self.__plot_p_z_graph__(z_p_plot)
 
     def __plot_p_z_graph__(self, graphs):
-        #self.z_p_diagram.canvas.axes.set_xlabel(graphs[1][0])
+
         self.z_p_diagram.canvas.axes.xaxis.label.set_color('black')
-        #self.z_p_diagram.canvas.axes.set_ylabel(graphs[1][1])
+
         self.z_p_diagram.canvas.axes.ticklabel_format(useOffset=False)
 
         self.z_p_diagram.canvas.axes.grid(True, which="both")
@@ -161,8 +163,6 @@ class SecondStage(QMainWindow):
             self.z_p_diagram.canvas.axes.spines['right'].set_color('none')
             self.z_p_diagram.canvas.axes.spines['bottom'].set_position('zero')
             self.z_p_diagram.canvas.axes.spines['top'].set_color('none')
-            #self.z_p_diagram.canvas.axes.xaxis.set_ticks_position('bottom')
-            #self.z_p_diagram.canvas.axes.yaxis.set_ticks_position('left')
 
 
             if not graph_data.x_marks:
@@ -229,10 +229,14 @@ class SecondStage(QMainWindow):
             self.__show_error__("Illegal pole or zero selection")
 
     def __reload_stages__(self, ):
-        current_stages = self.stages_manager.get_stages()
+        current_stages, selected = self.stages_manager.get_stages()
         i = 0
         for stage in current_stages:
-            self.stages_ui_layout.add_stage(stage,i )
+            if len(selected) > i:
+                sel = selected [i]
+            else:
+                sel = True
+            self.stages_ui_layout.add_stage(stage,i, sel )
             i+=1
 
     def __fill_poles_and_zeros_combos__(self):

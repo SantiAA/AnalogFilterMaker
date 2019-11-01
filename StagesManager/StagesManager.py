@@ -33,8 +33,10 @@ class StagesManager(object):
         self.unused_z = []
         self.sos = []
         self.k_tot = 0
+        self.selected = []
 
     def load_filter(self, fil: Filter):
+        self.selected = []
         self.p_pairs = []  # va a tener arreglo de Poles
         self.z_pairs = []  # va a tener arreglos de Zeros
         self.unused_p = []
@@ -144,7 +146,7 @@ class StagesManager(object):
 
     def get_stages(self):
         """" Returns Stages list """
-        return self.sos
+        return self.sos, self.selected
 
     def add_stage(self, p_str: str, z_str: str) -> (bool,str):
         """ Devuelve True es valida la etapa solicitada, False si no """
@@ -217,6 +219,8 @@ class StagesManager(object):
         """" Deletes stages indicated by indexes list """
         if amax(indexes) < len(self.sos):
             for i in indexes:
+                if i in self.selected:
+                    self.selected.remove(i)
                 s = self.sos.pop(i)
                 for j in range(len(self.p_pairs)):
                     if self.p_pairs[j] == s.pole:
@@ -366,10 +370,11 @@ class StagesManager(object):
             if i < len(self.sos):
                 q = self.sos[i].pole.q
                 if q > 0:
-                    ret["Q"][0] = str(q)
-                ret["fo"][0] = str(self.sos[i].pole.fo)
+                    ret["Q"][0] = f"{q:.4f}"
+                ret["fo"][0] = f"{self.sos[i].pole.fo:.1f}"
                 if self._validate_vi(vi_min, vo_max)[0]:
-                    ret["DR"][0] = str(self._get_stg_dr(i, vi_min, vo_max))
+                    pass
+                    # ret["DR"][0] = str(self._get_stg_dr(i, vi_min, vo_max))
         return ret
 
     @staticmethod
@@ -385,7 +390,7 @@ class StagesManager(object):
             else:
                 ret = "Vi min should be smaller than 2V (go to a less noisy place!)"
         else:
-            ret = "Vo_max must be greater than vi_min"
+            ret = "Vo max must be greater than vi min"
         return ok, ret
 
     def get_save_info(self):
@@ -395,3 +400,6 @@ class StagesManager(object):
         self.sos = info["Sos"]
         self.z_pairs = info["Zeros"]
         self.p_pairs = info["Poles"]
+
+    def set_selected(self, indexes: list):
+        self.selected = indexes

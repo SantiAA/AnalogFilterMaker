@@ -114,7 +114,7 @@ class Filter(object):
         return self.denormalized["MaxQ"]
 
     def load_z_p_k(self, z, p, k):
-        self.denormalized["Zeros"] = self._agrup_roots(z)
+        self.denormalized["Zeros"] = self._agrup_roots(z) + [1]
         self.denormalized["Gain"] = k
         self.denormalized["Order"] = len(p)
         self.denormalized["StagesQ"] = []
@@ -146,8 +146,7 @@ class Filter(object):
 
     def get_z_p_k_q(self):
         """ Returns poles ordered: conjugates are next to each other """
-        return self.denormalized["Zeros"], self.denormalized["Poles"], self.denormalized["Gain"], \
-               self.denormalized["StagesQ"]
+        return self.denormalized["Zeros"], self.denormalized["Poles"], self.denormalized["Gain"], self.denormalized["StagesQ"]
 
     def get_req_limit(self, key: TemplateInfo):
         return self.limits[key]

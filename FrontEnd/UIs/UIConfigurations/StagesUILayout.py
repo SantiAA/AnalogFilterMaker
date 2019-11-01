@@ -11,7 +11,7 @@ from FrontEnd.UIs.graphwidget import GraphWidget
 
 
 class StagesUILayout(QWidget):
-    def __init__(self,changed_selected_amount_callback):
+    def __init__(self, changed_selected_amount_callback):
         QWidget.__init__(self)
         hbox = QHBoxLayout()
         self.setLayout(hbox)
@@ -25,13 +25,13 @@ class StagesUILayout(QWidget):
         self.w_width = groupbox.frameGeometry().width()
         self.stages = []
 
-
     def left_click(self):
         for stage in self.stages:
             stage.set_checked(False)
 
-    def add_stage(self, stage, i):
-        new_stage = DefaultStageUI( self.w_width, self.left_click, stage, i, self.changed_selected_amount_callback)
+    def add_stage(self, stage, i, selected=True):
+        new_stage = DefaultStageUI(self.w_width, self.left_click, stage, i, self.changed_selected_amount_callback,
+                                   selected)
         self.stages.append(new_stage)
         self.group_box_layout.addWidget(new_stage)
 
@@ -45,12 +45,9 @@ class StagesUILayout(QWidget):
         checked = 0
         for stage in self.stages:
             if stage.is_checked():
-                checked +=1
+                checked += 1
 
         return checked
-
-
-
 
     def get_selected_ids_array(self):
         selected_ids_array = []
@@ -66,6 +63,7 @@ class StagesUILayout(QWidget):
                 checked_array.append(stage)
         return checked_array
 
+
 '''    def delete_selected_stages(self):
         for stage in self.get_checked_array():
             self.stages.remove(stage)
@@ -78,10 +76,8 @@ class StagesUILayout(QWidget):
             i+=1'''
 
 
-
-
 class DefaultStageUI(QWidget):
-    def __init__(self, width, left_click_callback, stage, i, changed_selected_amount):
+    def __init__(self, width, left_click_callback, stage, i, changed_selected_amount, selected=True):
         QWidget.__init__(self)
         vbox = QVBoxLayout()
         self.setLayout(vbox)
@@ -92,14 +88,13 @@ class DefaultStageUI(QWidget):
         self.set_label_text()
         self.name = self.label.text()
 
-        #self.label.setStyleSheet("font-size: 14px; color:rgb(255, 255, 255);")
+        # self.label.setStyleSheet("font-size: 14px; color:rgb(255, 255, 255);")
         self.label.setAlignment(Qt.AlignCenter)
         self.label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         self.label.setMargin(0)
-        self.label.setContentsMargins(0,0,0,0)
+        self.label.setContentsMargins(0, 0, 0, 0)
         self.label.setStyleSheet("font-size: 14px; color: rgb(149, 205, 212);")
         vbox.addWidget(self.label)
-
 
         self.mathLabel = MathTextLabel(self.stage.get_tf_tex(), self)
 
@@ -111,21 +106,21 @@ class DefaultStageUI(QWidget):
         self.__update_size__()
         vbox.addWidget(self.graphWidget)
         '''
-        self.radioButton = RightRadioButton(left_click_callback, changed_selected_amount)
-        #self.radioButton.setAlignment(Qt.AlignCenter)
+        self.radioButton = RightRadioButton(left_click_callback, changed_selected_amount, selected)
+        # self.radioButton.setAlignment(Qt.AlignCenter)
         self.radioButton.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         vbox.addWidget(self.radioButton)
 
     def __update_size__(self):
         self.graphWidget.setFixedWidth(int(self.width / 3.3))
         self.graphWidget.setFixedHeight(int(self.width / 3.3))
-        self.graphWidget.setContentsMargins(0,0,0,0)
+        self.graphWidget.setContentsMargins(0, 0, 0, 0)
 
     def get_id(self):
         return self.id
 
     def set_label_text(self):
-        self.label.setText("Stage "+ str(self.id + 1))
+        self.label.setText("Stage " + str(self.id + 1))
 
     def is_checked(self):
         return self.radioButton.isChecked()
@@ -134,14 +129,11 @@ class DefaultStageUI(QWidget):
         self.radioButton.setChecked(checked)
 
 
-
-
-
-class RightRadioButton (QRadioButton):
-    def __init__(self, left_click, changed_selected_amount_callback):
+class RightRadioButton(QRadioButton):
+    def __init__(self, left_click, changed_selected_amount_callback, selected=True):
         QRadioButton.__init__(self)
         self.left_click = left_click
-        self.setChecked(False)
+        self.setChecked(selected)
         self.changed_selected_amount_callback = changed_selected_amount_callback
 
     def mousePressEvent(self, QMouseEvent):
@@ -155,11 +147,11 @@ class RightRadioButton (QRadioButton):
             print("Right Button Clicked")
             self.changed_selected_amount_callback()
 
+
 class StagesGraph(QWidget):
 
     def __init__(self, parent=None):
         QWidget.__init__(self, parent)
-
 
         self.figure = Figure()
         self.canvas = FigureCanvas(self.figure)
@@ -168,7 +160,7 @@ class StagesGraph(QWidget):
 
         self.figure.tight_layout()
         self.canvas.axes = self.canvas.figure.add_subplot(111)
-        #self.canvas.axes.axis('off')
+        # self.canvas.axes.axis('off')
         self.setLayout(vertical_layout)
 
 
@@ -178,7 +170,6 @@ class UIStageData(QWidget):
         self.layout = QVBoxLayout()
         self.setLayout(self.layout)
         self.enabled_text = ""
-
 
 
 class HorizontalParameter(QWidget):
@@ -212,32 +203,28 @@ class MathTextLabel(QWidget):
     def __init__(self, mathText, parent=None, **kwargs):
         super(QWidget, self).__init__(parent, **kwargs)
 
-        l=QVBoxLayout(self)
-        l.setContentsMargins(0,0,0,0)
+        l = QVBoxLayout(self)
+        l.setContentsMargins(0, 0, 0, 0)
 
-        r,g,b,a=self.palette().base().color().getRgbF()
+        r, g, b, a = self.palette().base().color().getRgbF()
 
-        self._figure=Figure(edgecolor=(r,g,b), facecolor=(r,g,b))
-        self._canvas=FigureCanvas(self._figure)
+        self._figure = Figure(edgecolor=(r, g, b), facecolor=(r, g, b))
+        self._canvas = FigureCanvas(self._figure)
         l.addWidget(self._canvas)
         self._figure.clear()
-        text=self._figure.suptitle(
+        text = self._figure.suptitle(
             mathText,
             x=0.0,
             y=1.0,
             horizontalalignment='left',
             verticalalignment='top',
-            size=QtGui.QFont().pointSize()*2
+            size=QtGui.QFont().pointSize() * 2
         )
         self._canvas.draw()
 
-        (x0,y0),(x1,y1)=text.get_window_extent().get_points()
-        w=x1-x0; h=y1-y0
+        (x0, y0), (x1, y1) = text.get_window_extent().get_points()
+        w = x1 - x0;
+        h = y1 - y0
 
-        self._figure.set_size_inches(w/80, h/80)
-        self.setFixedSize(w,h)
-
-
-
-
-
+        self._figure.set_size_inches(w / 80, h / 80)
+        self.setFixedSize(w, h)
