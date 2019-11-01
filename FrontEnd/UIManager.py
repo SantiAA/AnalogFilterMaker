@@ -47,6 +47,17 @@ class UIManager:
             self.active_window.hide()
             self.window_iterator += 1
             self.active_window = self.list_of_windows[self.window_iterator]
+
+
+            '''
+            if self.window_iterator == 1 and self.active_window.i == 1:
+                if self.configuration_dicts[self.window_iterator] is not None:
+                    self.active_window.load_current_state(self.configuration_dicts[self.window_iterator])
+            else:
+            '''
+            self.active_window.ui_manager = self
+            self.active_window.backend = self.back_end
+            self.active_window.stages_manager = self.stages_manager
             self.active_window.start()
 
 
@@ -68,7 +79,7 @@ class UIManager:
             filename = QFileDialog.getOpenFileName(None, "Select Project File", os.getenv('HOME'), "Filter Design Tool Project File (*.fdtpf)")[0]
             configuration_dict = pickle.load(open(filename, "rb"))  # Loads the file
             self.project_path = filename
-            self.active_window.close()
+            self.active_window.hide()
             self.window_iterator  = configuration_dict["window_iterator"]
             self.configuration_dicts = configuration_dict["window_configurations"]
             self.active_window = self.list_of_windows[self.window_iterator]
