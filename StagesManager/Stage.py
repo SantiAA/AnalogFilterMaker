@@ -1,6 +1,6 @@
 from scipy.signal import ZerosPolesGain, TransferFunction
 
-from numpy import pi, log10, conjugate
+from numpy import pi, log10, conjugate, imag
 from BackEnd.Output.plots import GraphValues
 from StagesManager import Zero, Pole
 
@@ -11,7 +11,7 @@ class Stage:
         self.z = z
         self.pole = p
 
-    def get_tf_plot(self):
+    def get_tf_plot(self, i):
         if self.z is not None:
             z = [complex(0, self.z.im), complex(0, -self.z.im)] if self.z.n == 2 else [complex(0, 0)]
         else:
@@ -22,10 +22,13 @@ class Stage:
         w, h = transfer_function.freqresp(n=3000)
         f = w/(2*pi)
         mag = 20*log10(h)
-        return GraphValues(f, mag, False, False, True, f'Test')
+        return GraphValues(f, mag, False, False, True, f'Stage {i + 1}')
 
     def get_tf_tex(self):
-        z = complex(0, self.z.im) if self.z is not None else []
+        if self.z is not None:
+            z = [complex(0, self.z.im), complex(0, -self.z.im)] if self.z.n == 2 else [complex(0, 0)]
+        else:
+            z = []
         p = [self.pole.p, conjugate(self.pole.p)] if self.pole.q > 0 else self.pole.p
         zpk = ZerosPolesGain(z, p, self.k)
         transfer_function = zpk.to_tf()
