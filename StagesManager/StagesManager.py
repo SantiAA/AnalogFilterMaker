@@ -230,6 +230,9 @@ class StagesManager(object):
                 for j in range(len(self.p_pairs)):
                     if self.p_pairs[j] == s.pole:
                         self.p_pairs[j].used = False
+                for j in range(len(self.z_pairs)):
+                    if self.z_pairs[j] == s.z:
+                        self.z_pairs[j].used = False
             self.selected = [0]
         else:
             print("Indexes list out of range!")
