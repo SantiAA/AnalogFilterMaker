@@ -355,16 +355,16 @@ class StagesManager(object):
                 rd = self._get_stg_dr(i, vi_min, vo_max)
                 if rd > max_rd:
                     max_rd = rd
-                ret = str(max_rd)
+                ret = str(round(max_rd))
         return ok, ret
 
     def _get_stg_dr(self, i, vi_min, vo_max):
         """ Returns stage i dynamic range """
-        partial_gain = 0
+        partial_gain = 1
         for j in range(i+1): # recorro todas las etapas hasta la que quiero calcular el rango dinamico
-            partial_gain += self.sos[j].k
-        vi_max = amin(vo_max, vo_max/partial_gain)
-        vi_min = amax(vi_min, vi_min/partial_gain) # vi_min: minimo valor a la entrada tal que la salida no este en el piso de ruido y la entrada no este en el piso de ruido
+            partial_gain *= self.sos[j].k
+        vi_max = vo_max if partial_gain < 1 else vo_max/partial_gain
+        vi_min = vi_min if partial_gain > 1 else vi_min/partial_gain # vi_min: minimo valor a la entrada tal que la salida no este en el piso de ruido y la entrada no este en el piso de ruido
         return 20*log10(vi_max/vi_min)
 
     def get_const_data(self, indexes, vi_min, vo_max):
