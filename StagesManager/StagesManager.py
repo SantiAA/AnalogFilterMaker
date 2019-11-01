@@ -355,7 +355,7 @@ class StagesManager(object):
                 rd = self._get_stg_dr(i, vi_min, vo_max)
                 if rd > max_rd:
                     max_rd = rd
-                ret = str(round(max_rd))
+                ret = str(round(max_rd)) + " dB"
         return ok, ret
 
     def _get_stg_dr(self, i, vi_min, vo_max):
