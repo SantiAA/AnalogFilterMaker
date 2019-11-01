@@ -83,9 +83,10 @@ class FirstStage(QMainWindow):
         self.ui_manager.load_current_state()
 
     def load_current_state(self, configuration_dict):
-        self.filter_ret = configuration_dict["filter"]
+        self.filname = configuration_dict["name"]
+        self.imagetemp = configuration_dict["image"]
         self.backend.load_save_info(configuration_dict["backend"])
-        self.graphPic.setPixmap(QPixmap(self.filter_ret.template_image))  # filter template image
+        self.graphPic.setPixmap(QPixmap(self.imagetemp))  # filter template image
 
         self.showingGraphs = []
         self.showingGraphs = configuration_dict["showing_graphs"]
@@ -101,25 +102,20 @@ class FirstStage(QMainWindow):
         self.redraw()
 
         self.comboFilter.currentIndexChanged.disconnect()
-        index = self.comboFilter.findText(self.filter_ret.name)
+        index = self.comboFilter.findText(self.filname)
         self.comboFilter.setCurrentIndex(index)
         self.comboFilter.currentIndexChanged.connect(self.update_filter_type)
 
     def get_current_state_config(self):
         self.window_configuration = {}
-        self.window_configuration["active_filter"] = self.comboFilter.currentText()
         self.filter = self.filters[self.comboFilter.currentText()]
-        dict = self.filter.make_feature_dictionary()
-        list = self.filter.get_parameter_list_w_current_values()
         requirements = []
         for requirement in self.filters[self.comboFilter.currentText()].parameter_list:
             requirements.append(requirement.get_value())
-        self.window_configuration["requirement_values"] = requirements
         self.window_configuration["showing_graphs"] = self.showingGraphs
+        self.window_configuration["image"] = self.filter.template_image
+        self.window_configuration["name"] = self.filter.name
         self.window_configuration["backend"] = self.backend.get_save_info()
-        self.window_configuration["filter"] = self.filter
-        self.window_configuration["filter_dict"] = dict
-        self.window_configuration["filter_params_list"] = list
         return self.window_configuration
 
     def combo_graph_changed(self):
