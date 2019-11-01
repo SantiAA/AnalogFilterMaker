@@ -84,7 +84,7 @@ class SecondStage(QMainWindow):
         if validated == False:
             self.__show_error__(value)
         else:
-            self.rd.setText(str(round(value)))
+            self.rd.setText(value)
             self.__redefine_const_params_()
 
     def __show_error__(self, error):
