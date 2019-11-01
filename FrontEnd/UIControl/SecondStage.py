@@ -24,11 +24,10 @@ class SecondStage(QMainWindow):
         self.backend = backend
         self.stages_manager = stages_manager
 
+
     def start(self):
         QMainWindow.__init__(self)
-
         loadUi('FrontEnd/UIs/secondstage.ui', self)
-
         self.setWindowTitle("Filter Design Tool")
         self.__place_button_images__()
         self.__define_showing_group__()
@@ -60,13 +59,13 @@ class SecondStage(QMainWindow):
         self.window_configuration = {}
         self.window_configuration["back"] = self.backend
         self.window_configuration["stages"] = self.stages_manager
-        #self.window_configuration = self.backend.get_save_info()
+
         return self.window_configuration
 
     def load_current_state(self, configuration_dict):
         self.backend = configuration_dict["back"]
         self.stages_manager = configuration_dict["stages"]
-        #self.backend.load_save_info(configuration_dict)
+
         self.__plot_p_z_graph__(self.stages_manager.get_z_p_plot())
         self.poles_and_zeros_dict = self.stages_manager.get_z_p_dict()
         self.__fill_poles_and_zeros_combos__()
@@ -232,6 +231,7 @@ class SecondStage(QMainWindow):
                 self.__plot_p_z_graph__(self.stages_manager.get_z_p_plot())
                 self.poles_and_zeros_dict = self.stages_manager.get_z_p_dict()
                 self.__fill_poles_and_zeros_combos__()
+                self.__redefine_const_params_()
             else:
                 self.__show_error__(strerr)
         else:
