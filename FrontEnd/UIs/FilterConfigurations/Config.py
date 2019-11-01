@@ -6,7 +6,7 @@ class Config:
         self.name = name
         self.dict_of_features = dict_of_features
         self.template_image = "FrontEnd/UIs/figs/filter_templates/" + self.name.replace(" ", "").lower() + "template" \
-                                                                                                           ".png"
+                                                                                                           ".jpg"
         self.parameter_list = []
         for feature in dict_of_features:
             self.parameter_list.append(FilterParameterLayout(feature, DefaultNumberEdit(dict_of_features[feature][0][0],
