@@ -25,11 +25,11 @@ from Filters.Filters import GraphTypes
 
 
 class BackEnd:
-    def __init__(self):
+    def __init__(self, save_info=None):
         self.lp = LowPass
         self.all_filters = [LowPass(), HighPass(), BandPass(), BandReject(), GroupDelay()]
         self.all_approximations = [Bessel(), Butterworth(), ChevyI(), ChebyII(), Cauer(), Gauss(), Legendre(), Transitional()]
-        self.dynamic_filters = []
+        self.dynamic_filters = save_info if save_info else []
         self.fil_dict = {}
         self.filters_specs = {}
         for fil in self.all_filters:
@@ -104,5 +104,4 @@ class BackEnd:
         return {"Dynamic filters": self.dynamic_filters}
 
     def load_save_info(self, save_info):
-        self.__init__()
-        self.dynamic_filters = save_info["Dynamic filters"]
+        self.__init__(save_info["Dynamic filters"])

@@ -350,10 +350,11 @@ class StagesManager(object):
             if i < len(self.sos):
                 q = self.sos[i].pole.q
                 if q > 0:
-                    ret["Q"][0] = str(q)
-                ret["fo"][0] = str(self.sos[i].pole.fo)
+                    ret["Q"][0] = f"{q:.4f}"
+                ret["fo"][0] = f"{self.sos[i].pole.fo:.1f}"
                 if self._validate_vi(vi_min, vo_max)[0]:
-                    ret["DR"][0] = str(self._get_stg_dr(i, vi_min, vo_max))
+                    pass
+                    # ret["DR"][0] = str(self._get_stg_dr(i, vi_min, vo_max))
         return ret
 
     @staticmethod
@@ -369,7 +370,7 @@ class StagesManager(object):
             else:
                 ret = "Vi min should be smaller than 2V (go to a less noisy place!)"
         else:
-            ret = "Vo_max must be greater than vi_min"
+            ret = "Vo max must be greater than vi min"
         return ok, ret
 
     def get_save_info(self):
