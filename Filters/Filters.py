@@ -115,7 +115,7 @@ class Filter(object):
 
     def load_z_p_k(self, z, p, k):
         self.denormalized["Zeros"] = self._agrup_roots(z)
-        self.denormalized["Gain"] = k
+        self.denormalized["Gain"] = k*pow(10, self.requirements[TemplateInfo.k.value]/20)
         self.denormalized["Order"] = len(p)
         self.denormalized["StagesQ"] = []
         max_q = 0
@@ -157,7 +157,7 @@ class Filter(object):
             extra_info = f'n={self.denormalized["Order"]} Qmax={self.denormalized["MaxQ"]:.2}'
         else:
             extra_info = f'n={self.denormalized["Order"]} Qmax= - '
-        k = self.denormalized["Gain"]*pow(10, self.requirements[TemplateInfo.k.value]/20)
+        k = self.denormalized["Gain"]
         trans_func = signal.ZerosPolesGain(self.denormalized["Zeros"], self.denormalized["Poles"], k)
         w, h = trans_func.freqresp(n=3000)
         f = w / (2 * pi)
@@ -167,7 +167,8 @@ class Filter(object):
                                            ["Frequency [Hz]", "Amplitude [dB]"]]
         graphs[GraphTypes.Phase.value] = [[GraphValues(f, phase, False, False, True, extra_info)], ["Frequency[Hz]", "Phase[deg]"]]
 
-        trans_func = signal.ZerosPolesGain(self.denormalized["Zeros"], self.denormalized["Poles"], self.denormalized["Gain"])
+        trans_func = signal.ZerosPolesGain(self.denormalized["Zeros"], self.denormalized["Poles"],
+                                           self.denormalized["Gain"]/pow(10, self.requirements[TemplateInfo.k.value]/20))
         norm_trans_func = signal.ZerosPolesGain(self.normalized["Zeros"], self.normalized["Poles"], self.normalized["Gain"])
         w, h = trans_func.freqresp(n=3000)
         f = w/(2*pi)
