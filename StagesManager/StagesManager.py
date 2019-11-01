@@ -1,7 +1,7 @@
 # python native modules
 from enum import Enum
 
-from numpy import conjugate, amax, amin, pi, real, imag
+from numpy import conjugate, amax, amin, pi, real, imag, floor
 from numpy import argmin
 from numpy import full
 from numpy import log10
@@ -177,7 +177,7 @@ class StagesManager(object):
             for z in self.z_pairs:
                 if not z.used:
                     z_n_left += z.n
-            if pole_n_left >= z_n_left:
+            if pole_n_left-n_p >= z_n_left-n_z:
                 ok = True
                 self.p_pairs[p_ind].used = True
                 if z_ind:
@@ -253,9 +253,14 @@ class StagesManager(object):
             add = 0
             for j in range(count):
                 add += self.z_pairs[i + j].n
-            repeated_z.append(add)
             add_z = complex(0, self.z_pairs[i].im)
-            z += [add_z, conjugate(add_z)] if self.z_pairs[i].n == 2 else [add_z]
+            if self.z_pairs[i].n == 2:
+                z += [add_z, conjugate(add_z)]
+                repeated_z.append(int(floor(add/2)))
+                repeated_z.append(int(floor(add/2)))
+            else:
+                repeated_z.append(add)
+                z += [add_z]
             i += count
         i = 0
         while i < len(self.p_pairs):
