@@ -346,16 +346,24 @@ class StagesManager(object):
         """Returns a tuple:
             (True, dr) if everytihing ok, (False, err_str) if error
             Could fail because of: Invalid vi values, or not all stages loaded"""
-        valid = self._validate_vi(vi_min, vo_max)
-        ok = valid[0]
-        ret = valid[1]
-        if valid[0]:
-            max_rd = 0
-            for i in range(len(self.sos)):
-                rd = self._get_stg_dr(i, vi_min, vo_max)
-                if rd > max_rd:
-                    max_rd = rd
-                ret = str(round(max_rd)) + " dB"
+        ok = True
+        end = True
+        ret = ""
+        for p in self.p_pairs:
+            if not p.used:
+                end = False
+                ret = "N/A"
+        if end:
+            valid = self._validate_vi(vi_min, vo_max)
+            ok = valid[0]
+            ret = valid[1]
+            if valid[0]:
+                max_rd = 0
+                for i in range(len(self.sos)):
+                    rd = self._get_stg_dr(i, vi_min, vo_max)
+                    if rd > max_rd:
+                        max_rd = rd
+                    ret = str(round(max_rd)) + " dB"
         return ok, ret
 
     def _get_stg_dr(self, i, vi_min, vo_max):
