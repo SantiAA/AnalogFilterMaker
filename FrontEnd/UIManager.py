@@ -17,7 +17,7 @@ class UIManager:
         self.active_window = None
         self.back_end = BackEnd()
         self.stages_manager = StagesManager()
-        self.list_of_windows = [FirstStage(self, self.back_end, self.stages_manager), SecondStage(self, self.back_end, self.stages_manager)]  # Sequence of windows to show
+        self.list_of_windows = [FirstStage(self), SecondStage(self)]  # Sequence of windows to show
         self.window_iterator = -1
         self.project_path = None
         self.program_state = {
@@ -55,10 +55,10 @@ class UIManager:
                     self.active_window.load_current_state(self.configuration_dicts[self.window_iterator])
             else:
             '''
-            self.active_window.ui_manager = self
-            self.active_window.backend = self.back_end
-            self.active_window.stages_manager = self.stages_manager
-            self.active_window.start()
+            #self.active_window.ui_manager = self
+            #self.active_window.backend = self.back_end
+            #self.active_window.stages_manager = self.stages_manager
+            self.active_window.start(self.back_end, self.stages_manager)
 
 
     def previous_window(self):
@@ -69,10 +69,12 @@ class UIManager:
             self.active_window.hide()
             self.window_iterator -= 1
             self.active_window = self.list_of_windows[self.window_iterator]
-            self.active_window.start()
+            self.active_window.start(self.back_end, self.stages_manager)
 
             if self.configuration_dicts[self.window_iterator] is not None:
                 self.active_window.load_current_state(self.configuration_dicts[self.window_iterator])
+
+
 
     def load_current_state(self):
         try:
@@ -83,7 +85,7 @@ class UIManager:
             self.window_iterator  = configuration_dict["window_iterator"]
             self.configuration_dicts = configuration_dict["window_configurations"]
             self.active_window = self.list_of_windows[self.window_iterator]
-            self.active_window.start()
+            self.active_window.start(self.back_end, self.stages_manager)
             self.active_window.load_current_state(self.configuration_dicts[self.window_iterator])
         except:
             msg = QMessageBox()

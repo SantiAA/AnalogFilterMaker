@@ -13,24 +13,25 @@ from FrontEnd.UIs.UIConfigurations.ParameterLayout import DefaultRadioGroup
 
 class FirstStage(QMainWindow):
 
-    def __init__(self, ui_manager, backend, stages_manager):
+    def __init__(self, ui_manager):
         self.graph_widget = None
         self.ui_manager = ui_manager
         self.a = 0
         self.filters = {}
-        self.backend = backend
-        self.stages_manager = stages_manager
-        self.filters_received, self.approximations_received = self.backend.get_util()
+
+
 
         self.showingGraphs = []
 
-    def start(self):
+    def start(self, backend, stages_manager):
         """
         Actions to perform when the window is shown.
         """
         QMainWindow.__init__(self)
         loadUi('FrontEnd/UIs/firststage.ui', self)
-
+        self.backend = backend
+        self.stages_manager = stages_manager
+        self.filters_received, self.approximations_received = self.backend.get_util()
         self.setWindowTitle("Filter Design Tool")
         self.graph_widget = self.graphWidget
         self.comboFilter.clear()
@@ -85,11 +86,14 @@ class FirstStage(QMainWindow):
     def load_current_state(self, configuration_dict):
         self.filname = configuration_dict["name"]
         self.imagetemp = configuration_dict["image"]
-        self.backend.load_save_info(configuration_dict["backend"])
+
+        self.backend = configuration_dict["backend"]
+        self.stages_manager = configuration_dict["stages_manager"]
         self.graphPic.setPixmap(QPixmap(self.imagetemp))  # filter template image
 
         self.showingGraphs = []
         self.showingGraphs = configuration_dict["showing_graphs"]
+        self.backend.load_save_info(configuration_dict["backend_info"])
         self.__update_active_approx_combo__()
 
         self.fill_combo_graph()
@@ -115,7 +119,9 @@ class FirstStage(QMainWindow):
         self.window_configuration["showing_graphs"] = self.showingGraphs
         self.window_configuration["image"] = self.filter.template_image
         self.window_configuration["name"] = self.filter.name
-        self.window_configuration["backend"] = self.backend.get_save_info()
+        self.window_configuration["backend_info"] = self.backend.get_save_info()
+        self.window_configuration["backend"] = self.backend
+        self.window_configuration["stages_manager"] = self.stages_manager
         return self.window_configuration
 
     def combo_graph_changed(self):
@@ -291,7 +297,8 @@ class FirstStage(QMainWindow):
         self.templateCheckBox.hide()
         self.redraw_graphs()
         # update plot
-        self.backend.reset()
+        if self.sender() == self.comboFilter:
+            self.backend.reset()
 
         try:
             for filters in self.filters.values():  # Clearing requirement widgets

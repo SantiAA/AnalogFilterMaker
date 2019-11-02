@@ -11,7 +11,7 @@ from StagesManager.StagesManager import StagesManager, ShowType
 
 class SecondStage(QMainWindow):
 
-    def __init__(self, ui_manager, backend, stages_manager):
+    def __init__(self, ui_manager):
         self.showing_options = []
         self.all_loaded = False
         self.param_vbox = QVBoxLayout()
@@ -21,13 +21,14 @@ class SecondStage(QMainWindow):
         self.ui_manager = ui_manager
         self.a = 0
         self.filters = {}
-        self.backend = backend
-        self.stages_manager = stages_manager
 
 
-    def start(self):
+
+    def start(self, backend, stages_manager):
         QMainWindow.__init__(self)
         loadUi('FrontEnd/UIs/secondstage.ui', self)
+        self.backend = backend
+        self.stages_manager = stages_manager
         self.setWindowTitle("Filter Design Tool")
         self.__place_button_images__()
         self.__define_showing_group__()

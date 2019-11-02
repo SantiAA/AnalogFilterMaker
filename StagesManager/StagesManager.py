@@ -45,30 +45,32 @@ class StagesManager(object):
         self.k_tot = 0
         """ Guarda todos los polos y ceros agrupados en etapas de 1/2do orden """
         z, p, self.k_tot, q = fil.get_z_p_k_q()
-
+        z2 = z.copy()
+        p2 = p.copy()
         saved = False
-        while len(p):  # guardo en self.p_pairs los pares de polos complejos conjugados como [wo,Q]
-            if len(p) > 1:
-                if p[0] == conjugate(p[1]):
-                    self.p_pairs.append(Pole(p[0]))
-                    p.remove(p[1])
+        while len(p2):  # guardo en self.p_pairs los pares de polos complejos conjugados como [wo,Q]
+            if len(p2) > 1:
+                if p2[0] == conjugate(p2[1]):
+                    self.p_pairs.append(Pole(p2[0]))
+                    p2.remove(p2[1])
                     saved = True
             if not saved:
-                self.p_pairs.append(Pole(p[0]))  # si no tiene conjugado deberia ser real
-            p.remove(p[0])
+                self.p_pairs.append(Pole(p2[0]))  # si no tiene conjugado deberia ser real
+            p2.remove(p2[0])
             saved = False
-        while len(z):  # guardo en self.z_pairs los pares de ceros complejos conjugados como [wo,n]
-            if len(z) > 1:
-                if z[0] == conjugate(z[1]):
-                    self.z_pairs.append(Zero(abs(z[0]), 2))
-                    z.remove(z[1])
+        while len(z2):  # guardo en self.z_pairs los pares de ceros complejos conjugados como [wo,n]
+            if len(z2) > 1:
+                if z2[0] == conjugate(z2[1]):
+                    self.z_pairs.append(Zero(abs(z2[0]), 2))
+                    z2.remove(z2[1])
                     saved = True
             if not saved:
-                self.z_pairs.append(Zero(abs(z[0]), 1))  # si no tiene conjugado es de primer orden en el origen
-            z.remove(z[0])
+                self.z_pairs.append(Zero(abs(z2[0]), 1))  # si no tiene conjugado es de primer orden en el origen
+            z2.remove(z2[0])
             saved = False
         self.p_pairs.sort(key=lambda x: x.q, reverse=True)  # ordeno polos por Q creciente
         self.z_pairs.sort(key=lambda x: x.n, reverse=True)  # ordeno ceros por orden creciente
+
 
     def auto_max_rd(self, vi_min, vi_max):
         # agrupo todas
