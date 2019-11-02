@@ -87,8 +87,8 @@ class FirstStage(QMainWindow):
         self.filname = configuration_dict["name"]
         self.imagetemp = configuration_dict["image"]
 
-        self.backend = configuration_dict["backend"]
-        self.stages_manager = configuration_dict["stages_manager"]
+        #self.backend = configuration_dict["backend"]
+        #self.stages_manager = configuration_dict["stages_manager"]
         self.graphPic.setPixmap(QPixmap(self.imagetemp))  # filter template image
 
         self.showingGraphs = []
