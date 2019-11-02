@@ -93,7 +93,7 @@ class FirstStage(QMainWindow):
 
         self.showingGraphs = []
         self.showingGraphs = configuration_dict["showing_graphs"]
-        self.backend.load_save_info(configuration_dict["backend_info"])
+        #self.backend.load_save_info(configuration_dict["backend_info"])
         self.__update_active_approx_combo__()
 
         self.fill_combo_graph()
@@ -121,7 +121,7 @@ class FirstStage(QMainWindow):
         self.window_configuration["name"] = self.filter.name
         self.window_configuration["backend_info"] = self.backend.get_save_info()
         self.window_configuration["backend"] = self.backend
-        self.window_configuration["stages_manager"] = self.stages_manager
+        self.window_configuration["stages"] = self.stages_manager
         return self.window_configuration
 
     def combo_graph_changed(self):

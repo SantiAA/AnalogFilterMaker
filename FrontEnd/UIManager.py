@@ -84,6 +84,9 @@ class UIManager:
             self.active_window.hide()
             self.window_iterator  = configuration_dict["window_iterator"]
             self.configuration_dicts = configuration_dict["window_configurations"]
+            self.back_end = configuration_dict["backend"]
+            self.stages_manager = configuration_dict["stages"]
+
             self.active_window = self.list_of_windows[self.window_iterator]
             self.active_window.start(self.back_end, self.stages_manager)
             self.active_window.load_current_state(self.configuration_dicts[self.window_iterator])
@@ -98,6 +101,8 @@ class UIManager:
     def save_as_current_state(self):
         try:
             self.program_state["window_iterator"] = self.window_iterator
+            self.program_state["backend"] = self.back_end
+            self.program_state["stages"] = self.stages_manager
             self.configuration_dicts[self.window_iterator] = self.active_window.get_current_state_config()
             self.program_state["window_configurations"] = self.configuration_dicts
             # self.program_state["active_window_configuration"] = self.active_window.get_current_state_config()
@@ -115,6 +120,8 @@ class UIManager:
 
     def save_current_state(self):
         self.program_state["window_iterator"] = self.window_iterator
+        self.program_state["backend"] = self.back_end
+        self.program_state["stages"] = self.stages_manager
         self.configuration_dicts[self.window_iterator] = self.active_window.get_current_state_config()
         self.program_state["window_configurations"] = self.configuration_dicts
         #self.program_state["active_window_configuration"] = self.active_window.get_current_state_config()
