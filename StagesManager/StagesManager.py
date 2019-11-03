@@ -266,9 +266,13 @@ class StagesManager(object):
                 add += self.z_pairs[i + j].n
             add_z = complex(0, self.z_pairs[i].im)
             if self.z_pairs[i].n == 2:
-                z += [add_z, conjugate(add_z)]
-                repeated_z.append(int(floor(add/2)))
-                repeated_z.append(int(floor(add/2)))
+                if self.z_pairs[i].im != 0:
+                    z += [add_z, conjugate(add_z)]
+                    repeated_z.append(int(floor(add/2)))
+                    repeated_z.append(int(floor(add/2)))
+                else:
+                    z += [complex(0), complex(0)]
+                    repeated_z.append(int(floor(add)))
             else:
                 repeated_z.append(add)
                 z += [add_z]
