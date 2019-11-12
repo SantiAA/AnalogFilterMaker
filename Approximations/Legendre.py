@@ -106,7 +106,7 @@ class Legendre(Approximation):
             else:
                 print("Legendre.py: Invalid filter type passed to Legendre aproximation")
                 return
-            if self.q_max >= filter_in_use.get_max_q() or n == self.n_max or self.fixed_n > 0:
+            if self.q_max >= filter_in_use.get_max_q() or n == self.n_max or self.fixed_n > 0 or self.q_max < 0:
                 break
             n = n + 1
         # filter_in_use.load_normalized_z_p_k(z_norm, p_norm, k_norm)

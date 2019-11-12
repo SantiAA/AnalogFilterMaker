@@ -117,7 +117,7 @@ class Filter(object):
         self.denormalized["Zeros"] = self._agrup_roots(z)
         self.denormalized["Gain"] = k*pow(10, self.requirements[TemplateInfo.k.value]/20)
         self.denormalized["Order"] = len(p)
-        self.denormalized["StagesQ"] = []
+        self.denormalized["StagesQ"] = [0.5]  # Por si tengo de orden 1
         max_q = 0
         p = self._agrup_roots(p)     # ordena Re(p) creciente, se asegura que los comp conj tengan el mismo valor
         self.denormalized["Poles"] = p.copy()
