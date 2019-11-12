@@ -45,30 +45,32 @@ class StagesManager(object):
         self.k_tot = 0
         """ Guarda todos los polos y ceros agrupados en etapas de 1/2do orden """
         z, p, self.k_tot, q = fil.get_z_p_k_q()
-
+        z2 = z.copy()
+        p2 = p.copy()
         saved = False
-        while len(p):  # guardo en self.p_pairs los pares de polos complejos conjugados como [wo,Q]
-            if len(p) > 1:
-                if p[0] == conjugate(p[1]):
-                    self.p_pairs.append(Pole(p[0]))
-                    p.remove(p[1])
+        while len(p2):  # guardo en self.p_pairs los pares de polos complejos conjugados como [wo,Q]
+            if len(p2) > 1:
+                if p2[0] == conjugate(p2[1]):
+                    self.p_pairs.append(Pole(p2[0]))
+                    p2.remove(p2[1])
                     saved = True
             if not saved:
-                self.p_pairs.append(Pole(p[0]))  # si no tiene conjugado deberia ser real
-            p.remove(p[0])
+                self.p_pairs.append(Pole(p2[0]))  # si no tiene conjugado deberia ser real
+            p2.remove(p2[0])
             saved = False
-        while len(z):  # guardo en self.z_pairs los pares de ceros complejos conjugados como [wo,n]
-            if len(z) > 1:
-                if z[0] == conjugate(z[1]):
-                    self.z_pairs.append(Zero(abs(z[0]), 2))
-                    z.remove(z[1])
+        while len(z2):  # guardo en self.z_pairs los pares de ceros complejos conjugados como [wo,n]
+            if len(z2) > 1:
+                if z2[0] == conjugate(z2[1]):
+                    self.z_pairs.append(Zero(abs(z2[0]), 2))
+                    z2.remove(z2[1])
                     saved = True
             if not saved:
-                self.z_pairs.append(Zero(abs(z[0]), 1))  # si no tiene conjugado es de primer orden en el origen
-            z.remove(z[0])
+                self.z_pairs.append(Zero(abs(z2[0]), 1))  # si no tiene conjugado es de primer orden en el origen
+            z2.remove(z2[0])
             saved = False
         self.p_pairs.sort(key=lambda x: x.q, reverse=True)  # ordeno polos por Q creciente
         self.z_pairs.sort(key=lambda x: x.n, reverse=True)  # ordeno ceros por orden creciente
+
 
     def auto_max_rd(self, vi_min, vi_max):
         # agrupo todas
@@ -204,7 +206,7 @@ class StagesManager(object):
             ret = True
             if left:
                 step = -1
-                i_lim = 0
+                i_lim = -1
                 i = len(self.sos)
             else:
                 step = 1
@@ -264,9 +266,13 @@ class StagesManager(object):
                 add += self.z_pairs[i + j].n
             add_z = complex(0, self.z_pairs[i].im)
             if self.z_pairs[i].n == 2:
-                z += [add_z, conjugate(add_z)]
-                repeated_z.append(int(floor(add/2)))
-                repeated_z.append(int(floor(add/2)))
+                if self.z_pairs[i].im != 0:
+                    z += [add_z, conjugate(add_z)]
+                    repeated_z.append(int(floor(add/2)))
+                    repeated_z.append(int(floor(add/2)))
+                else:
+                    z += [complex(0), complex(0)]
+                    repeated_z.append(int(floor(add)))
             else:
                 repeated_z.append(add)
                 z += [add_z]
@@ -367,22 +373,27 @@ class StagesManager(object):
             ok = valid[0]
             ret = valid[1]
             if valid[0]:
-                max_rd = 0
+                min_vmax = 1e6
+                max_vmin = 0
                 for i in range(len(self.sos)):
-                    rd = self._get_stg_dr(i, vi_min, vo_max)
-                    if rd > max_rd:
-                        max_rd = rd
-                    ret = str(round(max_rd)) + " dB"
+                    vi_max, vi_min = self._get_stg_minmax(i, vi_min, vo_max)
+                    rd = 20*log10(vi_max/vi_min)
+                    if vi_max < min_vmax:
+                        min_vmax = vi_max
+                    if vi_min > max_vmin:
+                        max_vmin = vi_min
+                rd = 20*log10(min_vmax/max_vmin)
+                ret = f"{rd:.2f} dB"
         return ok, ret
 
-    def _get_stg_dr(self, i, vi_min, vo_max):
+    def _get_stg_minmax(self, i, vi_min, vo_max):
         """ Returns stage i dynamic range """
         partial_gain = 1
         for j in range(i+1): # recorro todas las etapas hasta la que quiero calcular el rango dinamico
-            partial_gain *= self.sos[j].k
+            partial_gain *= self.sos[j].max
         vi_max = vo_max if partial_gain < 1 else vo_max/partial_gain
         vi_min = vi_min if partial_gain > 1 else vi_min/partial_gain # vi_min: minimo valor a la entrada tal que la salida no este en el piso de ruido y la entrada no este en el piso de ruido
-        return 20*log10(vi_max/vi_min)
+        return vi_max, vi_min
 
     def get_const_data(self, indexes, vi_min, vo_max):
         """Returns a dictionary with string values of the stage i"""
@@ -391,12 +402,12 @@ class StagesManager(object):
             i = indexes[0]
             if i < len(self.sos):
                 q = self.sos[i].pole.q
-                if q > 0:
-                    ret["Q"][0] = f"{q:.4f}"
+                ret["Q"][0] = f"{q:.4f}" if q > 0 else "N/A"
                 ret["fo"][0] = f"{self.sos[i].pole.fo:.1f}"
                 if self._validate_vi(vi_min, vo_max)[0]:
-                    pass
-                    ret["DR"][0] = str(self._get_stg_dr(i, vi_min, vo_max))
+                    vmax, vmin = self._get_stg_minmax(i, vi_min, vo_max)
+                    dr = 20*log10(vmax/vmin)
+                    ret["DR"][0] = f"{dr:.3f}"
         return ret
 
     @staticmethod

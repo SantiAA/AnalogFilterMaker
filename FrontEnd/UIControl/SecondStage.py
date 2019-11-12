@@ -11,7 +11,7 @@ from StagesManager.StagesManager import StagesManager, ShowType
 
 class SecondStage(QMainWindow):
 
-    def __init__(self, ui_manager, backend, stages_manager):
+    def __init__(self, ui_manager):
         self.showing_options = []
         self.all_loaded = False
         self.param_vbox = QVBoxLayout()
@@ -21,13 +21,14 @@ class SecondStage(QMainWindow):
         self.ui_manager = ui_manager
         self.a = 0
         self.filters = {}
-        self.backend = backend
-        self.stages_manager = stages_manager
 
 
-    def start(self):
+
+    def start(self, backend, stages_manager):
         QMainWindow.__init__(self)
         loadUi('FrontEnd/UIs/secondstage.ui', self)
+        self.backend = backend
+        self.stages_manager = stages_manager
         self.setWindowTitle("Filter Design Tool")
         self.__place_button_images__()
         self.__define_showing_group__()
@@ -57,13 +58,13 @@ class SecondStage(QMainWindow):
 
     def get_current_state_config(self):
         self.window_configuration = {}
-        self.window_configuration["back"] = self.backend
+        self.window_configuration["backend"] = self.backend
         self.window_configuration["stages"] = self.stages_manager
 
         return self.window_configuration
 
     def load_current_state(self, configuration_dict):
-        self.backend = configuration_dict["back"]
+        self.backend = configuration_dict["backend"]
         self.stages_manager = configuration_dict["stages"]
 
         self.__plot_p_z_graph__(self.stages_manager.get_z_p_plot())
