@@ -87,10 +87,18 @@ class ChebyII(Approximation):
                 filter_in_use.load_z_p_k(z, p, k)
 
             elif filter_in_use.get_type() is FilterTypes.BandReject.value:
+                wp = [self.information[TemplateInfo.fp__.value], self.information[TemplateInfo.fp_.value]]
+                wa = [self.information[TemplateInfo.fa__.value], self.information[TemplateInfo.fa_.value]]
+                n, w = signal.cheb2ord(wp, wa, self.information[TemplateInfo.Ap.value], self.information[TemplateInfo.Aa.value],
+                                       analog=True)
+                z, p, k = signal.cheby2(n, self.information[TemplateInfo.Aa.value],  w, analog=True, output='zpk',
+                                        btype='stop')
+                """
                 Awp = self.information[TemplateInfo.fp_.value] - self.information[TemplateInfo.fp__.value]
                 w0 = np.sqrt(self.information[TemplateInfo.fa_.value] * self.information[TemplateInfo.fa__.value])
 
                 z, p, k = signal.lp2bs_zpk(_z, _p, _k, 2*np.pi*w0, 2*np.pi**Awp)  # Desnormalizado
+                """
                 filter_in_use.load_z_p_k(z, p, k)
 
             else:
